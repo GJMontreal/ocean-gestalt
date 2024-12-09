@@ -17,6 +17,7 @@ add_executable(opengl-cmake-skeleton
 
 set_property(TARGET opengl-cmake-skeleton PROPERTY CXX_STANDARD 11)
 target_compile_options(opengl-cmake-skeleton PRIVATE -Wall)
+add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
 
 add_definitions(-DGLEW_STATIC)
 add_subdirectory(lib/glfw EXCLUDE_FROM_ALL)

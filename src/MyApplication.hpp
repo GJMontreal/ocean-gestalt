@@ -20,12 +20,17 @@ class MyApplication : public Application {
   virtual void loop();
 
  private:
-  const int size = 100;
+  const int size = 1;
 
   // shader
   Shader vertexShader;
   Shader fragmentShader;
   ShaderProgram shaderProgram;
+
+  Shader wireframeVertexShader;
+  Shader wireframeFragmentShader;
+  Shader wireframeGeometryShader;
+  ShaderProgram wireframeShaderProgram;
 
   // shader matrix uniform
   glm::mat4 projection = glm::mat4(1.0);

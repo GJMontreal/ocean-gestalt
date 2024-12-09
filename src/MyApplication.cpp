@@ -13,7 +13,6 @@
 #include <glm/gtx/matrix_operation.hpp>
 #include <iostream>
 #include <vector>
-
 #include "asset.hpp"
 #include "glError.hpp"
 
@@ -36,7 +35,7 @@ VertexType getHeightMap(const glm::vec2 position) {
   float hx = 100.f * (heightMap(position + 0.01f * dx) - h);
   float hy = 100.f * (heightMap(position + 0.01f * dy) - h);
 
-  v.position = glm::vec3(position, h);
+  v.position = glm::vec3(position, 0);
   v.normal = glm::normalize(glm::vec3(-hx, -hy, 1.0));
 
   float c = sin(h * 5.f) * 0.5 + 0.5;
@@ -48,7 +47,11 @@ MyApplication::MyApplication()
     : Application(),
       vertexShader(SHADER_DIR "/shader.vert", GL_VERTEX_SHADER),
       fragmentShader(SHADER_DIR "/shader.frag", GL_FRAGMENT_SHADER),
-      shaderProgram({vertexShader, fragmentShader}) {
+      shaderProgram({vertexShader, fragmentShader}),
+      wireframeVertexShader(SHADER_DIR "/wireframe.vs", GL_VERTEX_SHADER),
+      wireframeFragmentShader(SHADER_DIR "/wireframe.fs", GL_FRAGMENT_SHADER),
+      wireframeGeometryShader(SHADER_DIR "/wireframe.gs", GL_GEOMETRY_SHADER),
+      wireframeShaderProgram({wireframeVertexShader,wireframeFragmentShader,wireframeGeometryShader}) {
   glCheckError(__FILE__, __LINE__);
 
   // creation of the mesh ------------------------------------------------------
@@ -119,23 +122,27 @@ void MyApplication::loop() {
   if (glfwWindowShouldClose(getWindow()))
     exit();
 
-  float t = getTime();
+  // float t = getTime();
   // set matrix : projection + view
-  projection = glm::perspective(float(2.0 * atan(getHeight() / 1920.f)),
+  projection = glm::perspective(glm::radians(getCamera()->Zoom),
                                 getWindowRatio(), 0.1f, 100.f);
-  view = glm::lookAt(glm::vec3(20.0 * sin(t), 20.0 * cos(t), 20.0),
-                     glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
-
+  // view = glm::lookAt(glm::vec3(20.0 * sin(t), 20.0 * cos(t), 20.0),
+                    //  glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
+  Camera *camera = getCamera();
+  view = camera->GetViewMatrix();
   // clear
   glClear(GL_COLOR_BUFFER_BIT);
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   shaderProgram.use();
+  glm::mat4 model = glm::mat4(1.0f);
+  model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
   // send uniforms
   shaderProgram.setUniform("projection", projection);
   shaderProgram.setUniform("view", view);
+  shaderProgram.setUniform("model", model);
 
   glCheckError(__FILE__, __LINE__);
 
@@ -150,8 +157,20 @@ void MyApplication::loop() {
                  GL_UNSIGNED_INT,      // type
                  NULL                  // element array buffer offset
   );
+  shaderProgram.unuse();
 
+  wireframeShaderProgram.use();
+  wireframeShaderProgram.setUniform("projection", projection);
+  wireframeShaderProgram.setUniform("view", view);
+  wireframeShaderProgram.setUniform("model", model);
+
+  glDrawElements(GL_TRIANGLES,         // mode
+                 size * size * 2 * 3,  // count
+                 GL_UNSIGNED_INT,      // type
+                 NULL                  // element array buffer offset
+  );
+
+  wireframeShaderProgram.unuse();
   glBindVertexArray(0);
 
-  shaderProgram.unuse();
 }

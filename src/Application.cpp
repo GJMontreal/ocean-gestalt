@@ -8,12 +8,16 @@
 
 #include "Application.hpp"
 
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <stdexcept>
 
 using namespace std;
+  
+static bool firstMouse = true;
+static float lastX, lastY;
 
 Application* currentApplication = NULL;
 
@@ -73,6 +77,12 @@ Application::Application()
 
   // vsync
   // glfwSwapInterval(false);
+  camera = new Camera(glm::vec3(0.0f,0.0f,3.0f));
+
+  //bind the callbacks
+  glfwSetWindowUserPointer(window , this);
+  glfwSetScrollCallback(window, Application::scrollCallback);
+  glfwSetCursorPosCallback(window, Application::mouseCallback);
 }
 
 GLFWwindow* Application::getWindow() const {
@@ -108,6 +118,7 @@ void Application::run() {
     // detech window related changes
     detectWindowDimensionChange();
 
+    processInput(window);
     // execute the frame code
     loop();
 
@@ -150,4 +161,57 @@ float Application::getWindowRatio() {
 
 bool Application::windowDimensionChanged() {
   return dimensionChanged;
+}
+
+Camera* Application::getCamera() {
+  return camera;
+}
+
+void Application::scrollCallback(GLFWwindow* window, double xoffset, double yoffset){
+  Application *app = (Application*)glfwGetWindowUserPointer(window);
+  Camera *camera = app->getCamera();
+  camera->ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+void Application::mouseCallback(GLFWwindow* window, double xposIn, double yposIn)
+{
+  Application *app = (Application*)glfwGetWindowUserPointer(window);
+  Camera *camera = app->getCamera();
+  float xpos = static_cast<float>(xposIn);
+  float ypos = static_cast<float>(yposIn);
+
+  if (firstMouse)
+  {
+      lastX = xpos;
+      lastY = ypos;
+      firstMouse = false;
+  }
+
+  float xoffset = xpos - lastX;
+  float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+  lastX = xpos;
+  lastY = ypos;
+
+  camera->ProcessMouseMovement(xoffset, yoffset);
+}
+
+// ---------------------------------------------------------------------------------------------------------
+// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
+void Application::processInput(GLFWwindow *window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera->ProcessKeyboard(FORWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera->ProcessKeyboard(BACKWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera->ProcessKeyboard(LEFT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera->ProcessKeyboard(RIGHT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+        camera->ProcessKeyboard(UP, deltaTime);
+    if (glfwGetKey(window,GLFW_KEY_DOWN) == GLFW_PRESS)
+        camera->ProcessKeyboard(DOWN, deltaTime);
 }
