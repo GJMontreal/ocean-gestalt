@@ -7,6 +7,9 @@
  */
 #include "MyApplication.hpp"
 
+#include "Wave.hpp"
+#include "Vertex.hpp"
+
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -16,12 +19,13 @@
 #include "asset.hpp"
 #include "glError.hpp"
 
-struct VertexType {
-  glm::vec3 position;
-  glm::vec3 normal;
-  glm::vec4 color;
-};
+// struct VertexType {
+//   glm::vec3 position;
+//   glm::vec3 normal;
+//   glm::vec4 color;
+// };
 
+Wave awave(10.0f,10.0f,10.0f);
 float heightMap(const glm::vec2 position) {
   return 2.0 * sin(position.x) * sin(position.y);
 }
@@ -35,7 +39,7 @@ VertexType getHeightMap(const glm::vec2 position) {
   float hx = 100.f * (heightMap(position + 0.01f * dx) - h);
   float hy = 100.f * (heightMap(position + 0.01f * dy) - h);
 
-  v.position = glm::vec3(position, 0);
+  v.position = glm::vec3(position, h);
   v.normal = glm::normalize(glm::vec3(-hx, -hy, 1.0));
 
   float c = sin(h * 5.f) * 0.5 + 0.5;
@@ -51,70 +55,8 @@ MyApplication::MyApplication()
       wireframeVertexShader(SHADER_DIR "/wireframe.vs", GL_VERTEX_SHADER),
       wireframeFragmentShader(SHADER_DIR "/wireframe.fs", GL_FRAGMENT_SHADER),
       wireframeGeometryShader(SHADER_DIR "/wireframe.gs", GL_GEOMETRY_SHADER),
-      wireframeShaderProgram({wireframeVertexShader,wireframeFragmentShader,wireframeGeometryShader}) {
-  glCheckError(__FILE__, __LINE__);
-
-  // creation of the mesh ------------------------------------------------------
-  std::vector<VertexType> vertices;
-  std::vector<GLuint> index;
-
-  for (int y = 0; y <= size; ++y)
-    for (int x = 0; x <= size; ++x) {
-      float xx = (x - size / 2) * 0.1f;
-      float yy = (y - size / 2) * 0.1f;
-      vertices.push_back(getHeightMap({xx, yy}));
-    }
-
-  for (int y = 0; y < size; ++y)
-    for (int x = 0; x < size; ++x) {
-      index.push_back((x + 0) + (size + 1) * (y + 0));
-      index.push_back((x + 1) + (size + 1) * (y + 0));
-      index.push_back((x + 1) + (size + 1) * (y + 1));
-
-      index.push_back((x + 1) + (size + 1) * (y + 1));
-      index.push_back((x + 0) + (size + 1) * (y + 1));
-      index.push_back((x + 0) + (size + 1) * (y + 0));
-    }
-
-  std::cout << "vertices=" << vertices.size() << std::endl;
-  std::cout << "index=" << index.size() << std::endl;
-
-  // creation of the vertex array buffer----------------------------------------
-
-  // vbo
-  glGenBuffers(1, &vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(VertexType),
-               vertices.data(), GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-  // ibo
-  glGenBuffers(1, &ibo);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, index.size() * sizeof(GLuint),
-               index.data(), GL_STATIC_DRAW);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-  // vao
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
-
-  // bind vbo
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-  // map vbo to shader attributes
-  shaderProgram.setAttribute("position", 3, sizeof(VertexType),
-                             offsetof(VertexType, position));
-  shaderProgram.setAttribute("normal", 3, sizeof(VertexType),
-                             offsetof(VertexType, normal));
-  shaderProgram.setAttribute("color", 4, sizeof(VertexType),
-                             offsetof(VertexType, color));
-
-  // bind the ibo
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-
-  // vao end
-  glBindVertexArray(0);
+      wireframeShaderProgram({wireframeVertexShader,wireframeFragmentShader,wireframeGeometryShader}),
+      mesh(100) {
 }
 
 void MyApplication::loop() {
@@ -122,55 +64,17 @@ void MyApplication::loop() {
   if (glfwWindowShouldClose(getWindow()))
     exit();
 
-  // float t = getTime();
-  // set matrix : projection + view
+  // float t = fmod(getTime(),6.0f);
+
   projection = glm::perspective(glm::radians(getCamera()->Zoom),
                                 getWindowRatio(), 0.1f, 100.f);
-  // view = glm::lookAt(glm::vec3(20.0 * sin(t), 20.0 * cos(t), 20.0),
-                    //  glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
+
   Camera *camera = getCamera();
   view = camera->GetViewMatrix();
+
   // clear
   glClear(GL_COLOR_BUFFER_BIT);
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  shaderProgram.use();
-  glm::mat4 model = glm::mat4(1.0f);
-  model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
-  // send uniforms
-  shaderProgram.setUniform("projection", projection);
-  shaderProgram.setUniform("view", view);
-  shaderProgram.setUniform("model", model);
-
-  glCheckError(__FILE__, __LINE__);
-
-  glBindVertexArray(vao);
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-
-  glCheckError(__FILE__, __LINE__);
-  glDrawElements(GL_TRIANGLES,         // mode
-                 size * size * 2 * 3,  // count
-                 GL_UNSIGNED_INT,      // type
-                 NULL                  // element array buffer offset
-  );
-  shaderProgram.unuse();
-
-  wireframeShaderProgram.use();
-  wireframeShaderProgram.setUniform("projection", projection);
-  wireframeShaderProgram.setUniform("view", view);
-  wireframeShaderProgram.setUniform("model", model);
-
-  glDrawElements(GL_TRIANGLES,         // mode
-                 size * size * 2 * 3,  // count
-                 GL_UNSIGNED_INT,      // type
-                 NULL                  // element array buffer offset
-  );
-
-  wireframeShaderProgram.unuse();
-  glBindVertexArray(0);
-
+  mesh.draw(view,projection);
 }

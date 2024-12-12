@@ -132,6 +132,10 @@ GLint ShaderProgram::attribute(const std::string& name) {
   return attrib;
 }
 
+
+// It might make more sense to store a list of attributes, and set them when a shader is activated
+// This way we can do multiple passes with differing shaders, using different attributes
+// I don't think attributes belong to the shader, no?
 void ShaderProgram::setAttribute(const std::string& name,
                                  GLint size,
                                  GLsizei stride,

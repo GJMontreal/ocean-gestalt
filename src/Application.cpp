@@ -75,6 +75,7 @@ Application::Application()
   glEnable(GL_DEPTH_TEST);  // enable depth-testing
   glDepthFunc(GL_LESS);  // depth-testing interprets a smaller value as "closer"
 
+  glEnable(GL_CULL_FACE);  
   // vsync
   // glfwSwapInterval(false);
   camera = new Camera(glm::vec3(0.0f,0.0f,3.0f));

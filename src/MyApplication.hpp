@@ -11,6 +11,7 @@
 
 #include "Application.hpp"
 #include "Shader.hpp"
+#include "Mesh.hpp"
 
 class MyApplication : public Application {
  public:
@@ -20,7 +21,7 @@ class MyApplication : public Application {
   virtual void loop();
 
  private:
-  const int size = 1;
+  const int size = 100;
 
   // shader
   Shader vertexShader;
@@ -38,6 +39,8 @@ class MyApplication : public Application {
 
   // VBO/VAO/ibo
   GLuint vao, vbo, ibo;
+
+  Mesh mesh;
 };
 
 #endif  // OPENGL_CMAKE_SKELETON_MYAPPLICATION

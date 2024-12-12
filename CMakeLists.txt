@@ -13,6 +13,8 @@ add_executable(opengl-cmake-skeleton
   src/main.cpp
   src/Shader.hpp
   src/Shader.cpp
+  src/Wave.cpp
+  src/Mesh.cpp
 )
 
 set_property(TARGET opengl-cmake-skeleton PROPERTY CXX_STANDARD 11)

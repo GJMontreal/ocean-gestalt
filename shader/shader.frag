@@ -20,5 +20,5 @@ void main(void)
 
     color = fColor * ( ambient + diffus + specular );
 
-	/*color = vec3(1,0,0);*/
+	/*color = vec4(1,0,0,1)*/;
 }
