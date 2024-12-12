@@ -56,7 +56,7 @@ MyApplication::MyApplication()
       wireframeFragmentShader(SHADER_DIR "/wireframe.fs", GL_FRAGMENT_SHADER),
       wireframeGeometryShader(SHADER_DIR "/wireframe.gs", GL_GEOMETRY_SHADER),
       wireframeShaderProgram({wireframeVertexShader,wireframeFragmentShader,wireframeGeometryShader}),
-      mesh(100) {
+      models{Model(10)} {
 }
 
 void MyApplication::loop() {
@@ -76,5 +76,7 @@ void MyApplication::loop() {
   glClear(GL_COLOR_BUFFER_BIT);
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  mesh.draw(view,projection);
+  for(int i=0; i < models.size(); i++){
+    models[i].draw(view,projection);
+  }
 }
