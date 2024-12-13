@@ -16,6 +16,7 @@ add_executable(ocean-gestalt
   src/Wave.cpp
   src/Mesh.cpp
   src/Model.cpp
+  src/Ocean.cpp
 )
 
 set_property(TARGET ocean-gestalt PROPERTY CXX_STANDARD 11)

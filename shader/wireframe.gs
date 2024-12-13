@@ -2,14 +2,17 @@
 layout (triangles) in;
 layout (line_strip, max_vertices = 6) out;
 
+layout(std140) uniform Matrices
+{
+    mat4 projection;
+    mat4 view;
+};
+
 in VS_OUT {
     vec3 normal;
 } gs_in[];
 
 const float MAGNITUDE = 0.2;
-
-uniform mat4 projection;
-uniform mat4 view;
 
 void GenerateLine(int start, int stop )
 {

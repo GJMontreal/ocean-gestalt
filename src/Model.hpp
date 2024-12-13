@@ -7,8 +7,8 @@
 
 class Model {
  public:
-  Model(int meshSize);
-  void draw(glm::mat4 view, glm::mat4 projection);
+  Model(int meshSize, std::vector<ShaderProgram> shaderPrograms);
+  void draw();
 
   void setTransform(glm::mat4 transform);
  
@@ -17,7 +17,6 @@ class Model {
 
   std::vector<Mesh> meshes;
   std::vector<ShaderProgram> shaderPrograms;
-  GLuint uboMatrices;
 };
 
 #endif

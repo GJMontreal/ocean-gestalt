@@ -34,6 +34,7 @@ class MyApplication : public Application {
   // shader matrix uniform
   glm::mat4 projection = glm::mat4(1.0);
   glm::mat4 view = glm::mat4(1.0);
+  GLuint uboMatrices;
 
   std::vector<Model> models;
 };

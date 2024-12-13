@@ -3,7 +3,7 @@
 
 class Wave{
   public:
-    Wave(float amplitude, float period, float direction);
+    Wave(float amplitude=0, float period=0, float direction=0);
 
     void setAmplitude(float amplitude);
     void setPeriod(float period);

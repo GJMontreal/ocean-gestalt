@@ -47,8 +47,8 @@ class ShaderProgram {
   ShaderProgram(std::initializer_list<Shader> shaderList);
 
   // bind the program
-  void use() const;
-  void unuse() const;
+  void activate() const;
+  void deactivate() const;
 
   // provide the opengl identifiant
   GLuint getHandle() const;

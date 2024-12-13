@@ -214,10 +214,10 @@ ShaderProgram::~ShaderProgram() {
   // glDeleteProgram(handle);
 }
 
-void ShaderProgram::use() const {
+void ShaderProgram::activate() const {
   glUseProgram(handle);
 }
-void ShaderProgram::unuse() const {
+void ShaderProgram::deactivate() const {
   glUseProgram(0);
 }
 
