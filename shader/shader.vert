@@ -7,6 +7,7 @@ in vec4 color;
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
+
 out vec4 fPosition;
 out vec4 fColor;
 out vec4 fLightPosition;

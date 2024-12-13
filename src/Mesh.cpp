@@ -3,55 +3,30 @@
 #include "asset.hpp"
 #include "glError.hpp"
 
-#include <glm/gtc/matrix_transform.hpp>
-#include <vector>
 #include <iostream>
+#include <vector>
 
 Mesh::Mesh(int meshSize): 
 // all these should be customizable
 // get it working first
-  color(1.0f,1.0,0.0f,1.0f),
-  vertexShader(SHADER_DIR "/shader.vert", GL_VERTEX_SHADER),
-  fragmentShader(SHADER_DIR "/shader.frag", GL_FRAGMENT_SHADER),
-  shaderProgram({vertexShader, fragmentShader})
+  color(1.0f,1.0,0.0f,1.0f)
 {
   size = meshSize;
-
-  // I'd rather there was an explicit call to set the model transform
-  model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-  // model = glm::scale(model,{.10,.10,.10});  // we'll figure out later how to scale our model
-  // our shader seems to be taking the scaling into account incorrectly
   generateMesh(size);
 }
 
-Mesh::~Mesh(){
+Mesh::~Mesh() {}
 
-}
-
-
-// why is this messing up and drawing the previous set of vertices?
-// maybe a shader shouldn't be attached to a mesh?
-void Mesh::draw(glm::mat4 view, glm::mat4 projection){
-  shaderProgram.use();
-
-  // send uniforms
-  shaderProgram.setUniform("projection", projection);
-  shaderProgram.setUniform("view", view);
-  shaderProgram.setUniform("model", model);
-
-  glCheckError(__FILE__, __LINE__);
-
+void Mesh::draw(ShaderProgram program) {
   glBindVertexArray(vao);
-// not sure we need to do this
-  // glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 
-  shaderProgram.setAttribute("position", 3, sizeof(VertexType),
-                             offsetof(VertexType, position));
-  shaderProgram.setAttribute("normal", 3, sizeof(VertexType),
-                             offsetof(VertexType, normal));
-  shaderProgram.setAttribute("color", 4, sizeof(VertexType),
-                             offsetof(VertexType, color));
+  // the vertexArray needs to be bound before setting the program attributes
+  program.setAttribute("position", 3, sizeof(VertexType),
+                       offsetof(VertexType, position));
+  program.setAttribute("normal", 3, sizeof(VertexType),
+                       offsetof(VertexType, normal));
+  program.setAttribute("color", 4, sizeof(VertexType),
+                       offsetof(VertexType, color));
 
   glCheckError(__FILE__, __LINE__);
   glDrawElements(GL_TRIANGLES,         // mode
@@ -59,21 +34,21 @@ void Mesh::draw(glm::mat4 view, glm::mat4 projection){
                  GL_UNSIGNED_INT,      // type
                  NULL                  // element array buffer offset
   );
-  shaderProgram.unuse();
+
   glBindVertexArray(0);
 }
 
 // The mesh will be symmetrical in x and y
-void Mesh::generateMesh(int size){
+void Mesh::generateMesh(int size) {
   // Mesh will have vertex and normal for the moment
   std::vector<VertexType> vertices;
   std::vector<GLuint> index;
 
   for (int y = 0; y <= size; ++y)
     for (int x = 0; x <= size; ++x) {
-      float xx = (x - size / 2 );
-      float yy = (y - size / 2 );
-      vertices.push_back(generateVertex({xx, yy},color));
+      float xx = (x - size / 2);
+      float yy = (y - size / 2);
+      vertices.push_back(generateVertex({xx, yy}, color));
     }
 
   for (int y = 0; y < size; ++y)
@@ -110,7 +85,7 @@ void Mesh::generateMesh(int size){
 
   // bind vbo
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
- 
+
   // bind the ibo
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 

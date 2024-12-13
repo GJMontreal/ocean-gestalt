@@ -13,10 +13,11 @@ class Model {
   void setTransform(glm::mat4 transform);
  
  private:
-  std::vector<Mesh> meshes;
-  std::vector<Shader> shaders;
-
   glm::mat4 transform = glm::mat4(1.0);
+
+  std::vector<Mesh> meshes;
+  std::vector<ShaderProgram> shaderPrograms;
+
 };
 
 #endif
