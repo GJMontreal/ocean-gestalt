@@ -114,3 +114,4 @@ _deps
 
 build
 .cache
+.vscode
