@@ -20,20 +20,13 @@ Mesh::~Mesh() {}
 void Mesh::draw(ShaderProgram program) {
   glBindVertexArray(vao);
 
-  // the vertexArray needs to be bound before setting the program attributes
-  program.setAttribute("position", 3, sizeof(VertexType),
-                       offsetof(VertexType, position));
-  program.setAttribute("normal", 3, sizeof(VertexType),
-                       offsetof(VertexType, normal));
-  program.setAttribute("color", 4, sizeof(VertexType),
-                       offsetof(VertexType, color));
-
-  glCheckError(__FILE__, __LINE__);
   glDrawElements(GL_TRIANGLES,         // mode
                  size * size * 2 * 3,  // count
                  GL_UNSIGNED_INT,      // type
                  NULL                  // element array buffer offset
   );
+
+  glCheckError(__FILE__, __LINE__);
 
   glBindVertexArray(0);
 }
@@ -89,6 +82,18 @@ void Mesh::generateMesh(int size) {
   // bind the ibo
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 
+  // position attribute
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(0);
+  
+  // normal attribute
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)(3 * sizeof(float)));
+  glEnableVertexAttribArray(1);
+
+  // color attribute
+  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)(6 * sizeof(float)));
+  glEnableVertexAttribArray(2);
+  
   // vao end
   glBindVertexArray(0);
 }

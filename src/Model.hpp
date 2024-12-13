@@ -17,7 +17,7 @@ class Model {
 
   std::vector<Mesh> meshes;
   std::vector<ShaderProgram> shaderPrograms;
-
+  GLuint uboMatrices;
 };
 
 #endif
