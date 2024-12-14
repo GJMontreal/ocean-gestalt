@@ -33,7 +33,7 @@ MyApplication::MyApplication()
       // the order of our shader programs is important
       // models{Ocean(20,{wireframeShaderProgram,shaderProgram})} 
       {
-  models.push_back(new Ocean(20,{wireframeShaderProgram,shaderProgram}));
+  models.push_back(new Ocean(20,{wireframeShaderProgram,shaderProgram},this->getCamera()));
   // models.push_back(new Model(10,{wireframeShaderProgram}));
 
   glEnable(GL_BLEND);

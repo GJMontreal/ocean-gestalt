@@ -78,7 +78,7 @@ Application::Application()
   glEnable(GL_CULL_FACE);  
   // vsync
   // glfwSwapInterval(false);
-  camera = new Camera(glm::vec3(0.0f,0.0f,5.0f));
+  camera = new Camera(glm::vec3(0.0f,0.0f,0.1f));
 
   //bind the callbacks
   glfwSetWindowUserPointer(window , this);

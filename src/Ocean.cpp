@@ -5,10 +5,11 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-Ocean::Ocean(int meshSize, std::vector<ShaderProgram> shaderPrograms)
+Ocean::Ocean(int meshSize, std::vector<ShaderProgram> shaderPrograms, Camera* camera)
     : Model(meshSize, shaderPrograms) {
   initParticles();
   resetParticles();
+  this->camera = camera;
   waves.push_back(new Wave(1, 10));
   waves.push_back(new Wave(1, 13,0.3f));
   waves.push_back(new Wave(.05,2,M_PI/7));
@@ -76,7 +77,11 @@ void Ocean::moveParticles(float time) {
         iter->position.y +=
             wave->amplitude * sin(innerProd) * wave->k.y / wave->kMagnitude;
       }
-
+      //match up the camera position
+      if(particle.position.x == 0 && particle.position.y == 0){
+        //translate the camera
+        camera->Position = glm::vec3(0,iter->position.z,0);
+      }
       //recalculate the normals
       iter++;
     }
