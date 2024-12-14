@@ -16,13 +16,14 @@ class Mesh{
   int getSize();
   void draw(ShaderProgram program); 
 
+  GLuint getVbo();
+
   private:
     int size;
     glm::vec4 color;
 
     // VBO/VAO/ibo
     GLuint vao, vbo, ibo;
-
 
     void generateMesh(int size);
     VertexType generateVertex(const glm::vec2 position, glm::vec4 color);

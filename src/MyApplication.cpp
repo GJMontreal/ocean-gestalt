@@ -21,12 +21,6 @@
 #include "asset.hpp"
 #include "glError.hpp"
 
-Wave awave(10.0f,10.0f,10.0f);
-float heightMap(const glm::vec2 position) {
-  return 2.0 * sin(position.x) * sin(position.y);
-}
-
-
 MyApplication::MyApplication()
     : Application(),
       vertexShader(SHADER_DIR "/shader.vert", GL_VERTEX_SHADER),
@@ -39,7 +33,9 @@ MyApplication::MyApplication()
       // the order of our shader programs is important
       // models{Ocean(20,{wireframeShaderProgram,shaderProgram})} 
       {
-  models.push_back(new Ocean(5,{wireframeShaderProgram,shaderProgram}));
+  models.push_back(new Ocean(20,{wireframeShaderProgram,shaderProgram}));
+  // models.push_back(new Model(10,{wireframeShaderProgram}));
+
   glEnable(GL_BLEND);
   glBlendFunc(GL_ONE, GL_ONE);
 

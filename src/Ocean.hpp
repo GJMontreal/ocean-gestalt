@@ -9,11 +9,11 @@ public:
   virtual ~Ocean();
   void draw()override;
 private:
-  std::vector<glm::vec3*> particles;
+  std::vector<VertexType> particles;
   void initParticles();
   void resetParticles();
   void moveParticles(float time);
-  std::vector<Wave> waves;
+  std::vector<Wave*> waves;
 };
 
 #endif

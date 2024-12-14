@@ -21,6 +21,10 @@ int Mesh::getSize(){
   return size;
 }
 
+GLuint Mesh::getVbo(){
+  return vbo;
+}
+
 void Mesh::draw(ShaderProgram program) {
   glBindVertexArray(vao);
 
@@ -109,7 +113,8 @@ VertexType Mesh::generateVertex(const glm::vec2 position, glm::vec4 color) {
   VertexType v;
   float h = 0;
   v.position = glm::vec3(position, h);
-  v.normal = glm::normalize(glm::vec3(-h, h, 1.0));
+  // I'm not sure that our normals are being calculated properly
+  v.normal = glm::normalize(glm::vec3(position.x, position.y, 1.0));
 
   v.color = color;
   return v;
