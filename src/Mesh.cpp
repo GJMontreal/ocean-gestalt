@@ -17,6 +17,10 @@ Mesh::Mesh(int meshSize):
 
 Mesh::~Mesh() {}
 
+int Mesh::getSize(){
+  return size;
+}
+
 void Mesh::draw(ShaderProgram program) {
   glBindVertexArray(vao);
 

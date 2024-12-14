@@ -13,14 +13,16 @@ class Mesh{
   Mesh(int size);
   ~Mesh();
 
-  void draw(ShaderProgram program); // should these be pointers?
-  
+  int getSize();
+  void draw(ShaderProgram program); 
+
   private:
     int size;
     glm::vec4 color;
 
     // VBO/VAO/ibo
     GLuint vao, vbo, ibo;
+
 
     void generateMesh(int size);
     VertexType generateVertex(const glm::vec2 position, glm::vec4 color);

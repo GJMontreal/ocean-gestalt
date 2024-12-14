@@ -36,7 +36,7 @@ class MyApplication : public Application {
   glm::mat4 view = glm::mat4(1.0);
   GLuint uboMatrices;
 
-  std::vector<Model> models;
+  std::vector<Model*> models;
 };
 
 #endif  // OPENGL_CMAKE_SKELETON_MYAPPLICATION

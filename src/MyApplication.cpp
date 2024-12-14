@@ -35,10 +35,11 @@ MyApplication::MyApplication()
       wireframeVertexShader(SHADER_DIR "/wireframe.vs", GL_VERTEX_SHADER),
       wireframeFragmentShader(SHADER_DIR "/wireframe.fs", GL_FRAGMENT_SHADER),
       wireframeGeometryShader(SHADER_DIR "/wireframe.gs", GL_GEOMETRY_SHADER),
-      wireframeShaderProgram({wireframeVertexShader,wireframeFragmentShader,wireframeGeometryShader}),
+      wireframeShaderProgram({wireframeVertexShader,wireframeFragmentShader,wireframeGeometryShader})
       // the order of our shader programs is important
-      models{Ocean(20,{wireframeShaderProgram,shaderProgram})} {
-
+      // models{Ocean(20,{wireframeShaderProgram,shaderProgram})} 
+      {
+  models.push_back(new Ocean(5,{wireframeShaderProgram,shaderProgram}));
   glEnable(GL_BLEND);
   glBlendFunc(GL_ONE, GL_ONE);
 
@@ -75,6 +76,6 @@ void MyApplication::loop() {
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   for(int i=0; i < models.size(); i++){
-    models[i].draw();
+    models[i]->draw();
   }
 }

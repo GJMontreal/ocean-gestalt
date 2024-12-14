@@ -8,13 +8,13 @@
 class Model {
  public:
   Model(int meshSize, std::vector<ShaderProgram> shaderPrograms);
-  void draw();
+  virtual ~Model() = default;
 
   void setTransform(glm::mat4 transform);
- 
+   virtual void draw();
  private:
   glm::mat4 transform = glm::mat4(1.0);
-
+protected:
   std::vector<Mesh> meshes;
   std::vector<ShaderProgram> shaderPrograms;
 };
