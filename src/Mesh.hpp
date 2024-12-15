@@ -27,6 +27,7 @@ class Mesh{
 
     void generateMesh(int size);
     VertexType generateVertex(const glm::vec2 position, glm::vec4 color);
+    void generateNormals(std::vector<VertexType> &vertices, std::vector<GLuint> indices);
 };
 
 #endif

@@ -2,9 +2,12 @@
 
 #include "asset.hpp"
 #include "glError.hpp"
+#include "glm/fwd.hpp"
 
 #include <iostream>
 #include <vector>
+
+#include <glm/gtx/normal.hpp>
 
 Mesh::Mesh(int meshSize): 
 // all these should be customizable
@@ -43,7 +46,7 @@ void Mesh::draw(ShaderProgram program) {
 void Mesh::generateMesh(int size) {
   // Mesh will have vertex and normal for the moment
   std::vector<VertexType> vertices;
-  std::vector<GLuint> index;
+  std::vector<GLuint> indices;
 
   for (int y = 0; y <= size; ++y)
     for (int x = 0; x <= size; ++x) {
@@ -54,18 +57,21 @@ void Mesh::generateMesh(int size) {
 
   for (int y = 0; y < size; ++y)
     for (int x = 0; x < size; ++x) {
-      index.push_back((x + 0) + (size + 1) * (y + 0));
-      index.push_back((x + 1) + (size + 1) * (y + 0));
-      index.push_back((x + 1) + (size + 1) * (y + 1));
+      //one triangle
+      indices.push_back((x + 0) + (size + 1) * (y + 0));
+      indices.push_back((x + 1) + (size + 1) * (y + 0));
+      indices.push_back((x + 1) + (size + 1) * (y + 1));
 
-      index.push_back((x + 1) + (size + 1) * (y + 1));
-      index.push_back((x + 0) + (size + 1) * (y + 1));
-      index.push_back((x + 0) + (size + 1) * (y + 0));
+      //second triangle
+      indices.push_back((x + 1) + (size + 1) * (y + 1));
+      indices.push_back((x + 0) + (size + 1) * (y + 1));
+      indices.push_back((x + 0) + (size + 1) * (y + 0));
     }
   // creation of the vertex array buffer----------------------------------------
   std::cout << "vertices=" << vertices.size() << std::endl;
-  std::cout << "index=" << index.size() << std::endl;
-
+  std::cout << "index=" << indices.size() << std::endl;
+// given a vector of vertices and a vector of indices - generate normals
+  generateNormals(vertices, indices);
   // vbo
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -76,8 +82,8 @@ void Mesh::generateMesh(int size) {
   // ibo
   glGenBuffers(1, &ibo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, index.size() * sizeof(GLuint),
-               index.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint),
+               indices.data(), GL_STATIC_DRAW);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   // vao
@@ -114,8 +120,21 @@ VertexType Mesh::generateVertex(const glm::vec2 position, glm::vec4 color) {
   float h = 0;
   v.position = glm::vec3(position, h);
   // I'm not sure that our normals are being calculated properly
-  v.normal = glm::normalize(glm::vec3(position.x, position.y, 1.0));
-
+  v.normal = glm::vec3(0.0f,0.0f,0.0f);
   v.color = color;
   return v;
+}
+
+// change this to calculate normals
+void Mesh::generateNormals(std::vector<VertexType> &vertices, std::vector<GLuint> indices){
+  // go through all the indices 3 at a time
+  for( int i = 0; i < indices.size() ; i+=3){
+    glm::vec3 u = vertices[indices[i]].position - vertices[indices[i+1]].position;
+    glm::vec3 v = vertices[indices[i+2]].position - vertices[indices[i+1]].position;
+    glm::vec3 normal = glm::cross(u,v);
+    
+    vertices[i].normal += normal;
+    vertices[i+1].normal += normal;
+    vertices[i+2].normal += normal;
+  }
 }
