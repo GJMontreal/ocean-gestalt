@@ -7,27 +7,50 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
-
-class Mesh{
-  public:
+class Mesh {
+ public:
   Mesh(int size);
   ~Mesh();
 
   int getSize();
-  void draw(ShaderProgram program); 
+  void draw(
+      ShaderProgram program);  // Not certain we actually need the shaderprogram
+  void calculateNormals(
+      std::vector<VertexType>& vertices,
+      std::vector<GLuint>
+          indices);  // this could also return an array of vertices that
+                     // corresponds to the face normals
 
   GLuint getVbo();
+  // we'll hang onto the mesh indices to simplify recalculating our normals
+  // later
+  std::vector<GLuint> getTriangularIndices();
 
-  private:
-    int size;
-    glm::vec4 color;
+  glm::vec4 color;
 
-    // VBO/VAO/ibo
-    GLuint vao, vbo, ibo;
+  bool drawWireframe = true;
+  bool drawMesh = false;
 
-    void generateMesh(int size);
-    VertexType generateVertex(const glm::vec2 position, glm::vec4 color);
-    void generateNormals(std::vector<VertexType> &vertices, std::vector<GLuint> indices);
+ private:
+  int size;
+
+  // Our vertices and elements are shared between the triangular mesh and line
+  // strips
+  GLuint vao, vbo, ibo;
+
+  GLuint wireframeVao, wireframeIbo;
+  GLuint meshVao;
+  GLuint normalsVao, NormalsVbo, NormalsIbo;
+
+  std::vector<GLuint> triangularMeshIndices;
+
+  void generateMesh(int size);
+  VertexType generateVertex(const glm::vec2 position, glm::vec4 color);
+
+  std::vector<GLuint> generateTriangularIndices(
+      int size);  // is it possible that our mix of stack and heap is causing us
+                  // trouble?
+  std::vector<GLuint> generateWireframeIndices(int size);
 };
 
 #endif

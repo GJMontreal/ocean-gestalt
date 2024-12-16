@@ -9,6 +9,8 @@ public:
   Ocean(int meshSize, std::vector<ShaderProgram>shaderPrograms, Camera *camera);
   virtual ~Ocean();
   void draw()override;
+  bool running = true;
+  bool animateCamera = false;
 private:
   Camera *camera;
   std::vector<VertexType> particles;

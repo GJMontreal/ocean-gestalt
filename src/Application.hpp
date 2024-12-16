@@ -75,6 +75,8 @@ class Application {
   void detectWindowDimensionChange();
   void processInput(GLFWwindow *window);
   
+  // Simulation:
+  bool running = false;
  protected:
   Application(const Application&){};
 

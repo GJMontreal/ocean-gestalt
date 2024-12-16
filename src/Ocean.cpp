@@ -19,8 +19,10 @@ Ocean::Ocean(int meshSize, std::vector<ShaderProgram> shaderPrograms, Camera* ca
 
 void Ocean::draw() {
   // calculate new positions for our particles
-  float time = glfwGetTime();
-  moveParticles(time);
+  if(running){
+    float time = glfwGetTime();
+    moveParticles(time);
+  }
   Model::draw();
 }
 
@@ -34,7 +36,6 @@ void Ocean::initParticles() {
   int size = meshes[0].getSize();
   for (int i = 0; i < (size + 1) * (size + 1); i++) {
     particles.resize((size+1)*(size+1));
-    // particles.push_back(new VertexType());
   }
 }
 
@@ -78,17 +79,22 @@ void Ocean::moveParticles(float time) {
             wave->amplitude * sin(innerProd) * wave->k.y / wave->kMagnitude;
       }
       //match up the camera position
-      if(particle.position.x == 0 && particle.position.y == 0){
+      if(animateCamera && (abs(particle.position.x - camera->Position.x) < 1.0f ) && (abs(particle.position.y - camera->Position.y) < 1.0f)){
         //translate the camera
-        camera->Position = glm::vec3(0,iter->position.z,0);
+        // std::cout << "camera: " << iter->position.z << std::endl;
+        camera->Position = glm::vec3(camera->Position.x,camera->Position.y,iter->position.z);
       }
-      //recalculate the normals
       iter++;
     }
   }
   //update the vertices
+  
   glBindBuffer(GL_ARRAY_BUFFER, meshes[0].getVbo());
   glBufferSubData(GL_ARRAY_BUFFER,0,particles.size() * sizeof(VertexType),
                particles.data());
   glBindBuffer(GL_ARRAY_BUFFER,0);
+
+  //recalculate normals
+  // Mesh mesh = meshes[0];
+  // mesh.calculateNormals(particles, mesh.getTriangularIndices());
 }

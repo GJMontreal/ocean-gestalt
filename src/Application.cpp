@@ -215,4 +215,8 @@ void Application::processInput(GLFWwindow *window)
         camera->ProcessKeyboard(UP, deltaTime);
     if (glfwGetKey(window,GLFW_KEY_DOWN) == GLFW_PRESS)
         camera->ProcessKeyboard(DOWN, deltaTime);
+    if (glfwGetKey(window,GLFW_KEY_R) == GLFW_PRESS){
+      std::cout << "Toggling simulation" << std::endl;
+      running = !running;
+    }
 }

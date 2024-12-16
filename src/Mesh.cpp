@@ -4,6 +4,7 @@
 #include "glError.hpp"
 #include "glm/fwd.hpp"
 
+// #include <cmath>
 #include <iostream>
 #include <vector>
 
@@ -28,25 +29,44 @@ GLuint Mesh::getVbo(){
   return vbo;
 }
 
+std::vector<GLuint> Mesh::getTriangularIndices(){
+  return triangularMeshIndices;
+}
+
 void Mesh::draw(ShaderProgram program) {
-  glBindVertexArray(vao);
+  if (drawMesh) {
+    glBindVertexArray(vao);
 
-  glDrawElements(GL_TRIANGLES,         // mode
-                 size * size * 2 * 3,  // count
-                 GL_UNSIGNED_INT,      // type
-                 NULL                  // element array buffer offset
-  );
+    glDrawElements(GL_TRIANGLES,         // mode
+                   size * size * 2 * 3,  // count
+                   GL_UNSIGNED_INT,      // type
+                   NULL                  // element array buffer offset
+    );
 
-  glCheckError(__FILE__, __LINE__);
+    glCheckError(__FILE__, __LINE__);
 
-  glBindVertexArray(0);
+    glBindVertexArray(0);
+  }
+  if (drawWireframe) {
+    glBindVertexArray(wireframeVao);
+
+    glDrawElements(GL_LINES,         // mode
+                   size * size * 6,  // count // how did we calculate this
+                   GL_UNSIGNED_INT,  // type
+                   NULL              // element array buffer offset
+    );
+
+    glCheckError(__FILE__, __LINE__);
+
+    glBindVertexArray(0);
+  }
 }
 
 // The mesh will be symmetrical in x and y
 void Mesh::generateMesh(int size) {
   // Mesh will have vertex and normal for the moment
   std::vector<VertexType> vertices;
-  std::vector<GLuint> indices;
+  // std::vector<GLuint> indices;
 
   for (int y = 0; y <= size; ++y)
     for (int x = 0; x <= size; ++x) {
@@ -55,23 +75,14 @@ void Mesh::generateMesh(int size) {
       vertices.push_back(generateVertex({xx, yy}, color));
     }
 
-  for (int y = 0; y < size; ++y)
-    for (int x = 0; x < size; ++x) {
-      //one triangle
-      indices.push_back((x + 0) + (size + 1) * (y + 0));
-      indices.push_back((x + 1) + (size + 1) * (y + 0));
-      indices.push_back((x + 1) + (size + 1) * (y + 1));
-
-      //second triangle
-      indices.push_back((x + 1) + (size + 1) * (y + 1));
-      indices.push_back((x + 0) + (size + 1) * (y + 1));
-      indices.push_back((x + 0) + (size + 1) * (y + 0));
-    }
+  // generate indices for a triangular mesh
+  triangularMeshIndices = generateTriangularIndices(size);
   // creation of the vertex array buffer----------------------------------------
   std::cout << "vertices=" << vertices.size() << std::endl;
-  std::cout << "index=" << indices.size() << std::endl;
-// given a vector of vertices and a vector of indices - generate normals
-  generateNormals(vertices, indices);
+  std::cout << "index=" << triangularMeshIndices.size() << std::endl;
+
+  // given a vector of vertices and a vector of indices - generate normals
+  // calculateNormals(vertices, triangularMeshIndices);
   // vbo
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -82,8 +93,8 @@ void Mesh::generateMesh(int size) {
   // ibo
   glGenBuffers(1, &ibo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint),
-               indices.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, triangularMeshIndices.size() * sizeof(GLuint),
+               triangularMeshIndices.data(), GL_STATIC_DRAW);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   // vao
@@ -110,6 +121,37 @@ void Mesh::generateMesh(int size) {
   
   // vao end
   glBindVertexArray(0);
+  glCheckError(__FILE__, __LINE__);
+
+  std::vector<GLuint> wireframeIndices = generateWireframeIndices(size);
+  
+  //repeat to generate buffers for wireframe
+  glGenBuffers(1, &wireframeIbo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wireframeIbo);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, wireframeIndices.size() * sizeof(GLuint),
+               wireframeIndices.data(), GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+  glGenVertexArrays(1, &wireframeVao);
+  glBindVertexArray(wireframeVao);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);  //it's the same vertex data
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wireframeIbo);
+
+    // position attribute
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(0);
+  
+  // normal attribute
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)(3 * sizeof(float)));
+  glEnableVertexAttribArray(1);
+
+  // color attribute
+  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)(6 * sizeof(float)));
+  glEnableVertexAttribArray(2);
+
+  glBindVertexArray(0);
+  glCheckError(__FILE__, __LINE__);
 }
 
 VertexType Mesh::generateVertex(const glm::vec2 position, glm::vec4 color) {
@@ -119,15 +161,15 @@ VertexType Mesh::generateVertex(const glm::vec2 position, glm::vec4 color) {
   VertexType v;
   float h = 0;
   v.position = glm::vec3(position, h);
-  // I'm not sure that our normals are being calculated properly
+
+  // We'll calculate normals once we have our triangles 
   v.normal = glm::vec3(0.0f,0.0f,0.0f);
   v.color = color;
   return v;
 }
 
-// change this to calculate normals
-void Mesh::generateNormals(std::vector<VertexType> &vertices, std::vector<GLuint> indices){
-  // go through all the indices 3 at a time
+void Mesh::calculateNormals(std::vector<VertexType> &vertices, std::vector<GLuint> indices){
+  // go through the indices 3 at a time
   for( int i = 0; i < indices.size() ; i+=3){
     glm::vec3 u = vertices[indices[i]].position - vertices[indices[i+1]].position;
     glm::vec3 v = vertices[indices[i+2]].position - vertices[indices[i+1]].position;
@@ -137,4 +179,47 @@ void Mesh::generateNormals(std::vector<VertexType> &vertices, std::vector<GLuint
     vertices[i+1].normal += normal;
     vertices[i+2].normal += normal;
   }
+}
+
+std::vector<GLuint> Mesh::generateTriangularIndices(int size) {
+  std::vector<GLuint> indices;
+  
+  // indices.resize((size+1) * (size+1)); // not sure why this wouldn't work?
+  for (int y = 0; y < size; ++y) {
+    for (int x = 0; x < size; ++x) {
+      // first triangle
+      indices.push_back((x + 0) + (size + 1) * (y + 0));
+      indices.push_back((x + 1) + (size + 1) * (y + 0));
+      indices.push_back((x + 1) + (size + 1) * (y + 1));
+
+      // second triangle
+      indices.push_back((x + 1) + (size + 1) * (y + 1));
+      indices.push_back((x + 0) + (size + 1) * (y + 1));
+      indices.push_back((x + 0) + (size + 1) * (y + 0));
+    }
+  }
+  std::cout << "indices " << indices.size() << std::endl;
+  return indices;
+}
+
+// using GL_LINES
+std::vector<GLuint> Mesh::generateWireframeIndices(int size){
+  std::vector<GLuint> indices;
+  //across
+  for(int i=0; i <= size; i++){
+    for(int j=0; j < size; j++){
+      indices.push_back((i * (size+1)) + j);
+      indices.push_back((i * (size+1)) + j + 1);
+    }
+  }
+  
+  // down
+  for(int i=0; i <= size; i++ ){
+    for(int j=0; j < size; j++){
+      indices.push_back((i + (size+1)*j));
+      indices.push_back((1+j) * (size + 1) + i);
+    }
+  }
+  
+  return indices;
 }
