@@ -13,8 +13,12 @@ class Mesh {
   ~Mesh();
 
   int getSize();
-  void draw(
-      ShaderProgram program);  // Not certain we actually need the shaderprogram
+  
+  // So that we can specify different shaders for each
+  void draw();  
+  void drawWireframe();
+  void drawNormals();
+
   void calculateNormals(
       std::vector<VertexType>& vertices,
       std::vector<GLuint>
@@ -27,10 +31,7 @@ class Mesh {
   std::vector<GLuint> getTriangularIndices();
 
   glm::vec4 color;
-
-  bool drawWireframe = true;
-  bool drawMesh = false;
-
+  
  private:
   int size;
 
@@ -48,9 +49,11 @@ class Mesh {
   VertexType generateVertex(const glm::vec2 position, glm::vec4 color);
 
   std::vector<GLuint> generateTriangularIndices(
-      int size);  // is it possible that our mix of stack and heap is causing us
-                  // trouble?
+      int size);  
   std::vector<GLuint> generateWireframeIndices(int size);
+  
+  void setupWireframeBuffers(GLuint vba);
+  void setupMeshBuffers(GLuint vba);
 };
 
 #endif

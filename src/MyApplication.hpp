@@ -28,7 +28,7 @@ class MyApplication : public Application {
 
   Shader wireframeVertexShader;
   Shader wireframeFragmentShader;
-  Shader wireframeGeometryShader;
+  // Shader wireframeGeometryShader;
   ShaderProgram wireframeShaderProgram;
 
   // shader matrix uniform

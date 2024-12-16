@@ -10,7 +10,7 @@ public:
   virtual ~Ocean();
   void draw()override;
   bool running = true;
-  bool animateCamera = false;
+  bool animateCamera = true;
 private:
   Camera *camera;
   std::vector<VertexType> particles;

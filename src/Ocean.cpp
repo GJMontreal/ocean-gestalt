@@ -82,7 +82,7 @@ void Ocean::moveParticles(float time) {
       if(animateCamera && (abs(particle.position.x - camera->Position.x) < 1.0f ) && (abs(particle.position.y - camera->Position.y) < 1.0f)){
         //translate the camera
         // std::cout << "camera: " << iter->position.z << std::endl;
-        camera->Position = glm::vec3(camera->Position.x,camera->Position.y,iter->position.z);
+        camera->Position = glm::vec3(camera->Position.x,camera->Position.y,iter->position.z+5.0f);
       }
       iter++;
     }

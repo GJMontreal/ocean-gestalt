@@ -26,15 +26,13 @@ MyApplication::MyApplication()
       vertexShader(SHADER_DIR "/shader.vert", GL_VERTEX_SHADER),
       fragmentShader(SHADER_DIR "/shader.frag", GL_FRAGMENT_SHADER),
       shaderProgram({vertexShader, fragmentShader}),
-      wireframeVertexShader(SHADER_DIR "/wireframe.vs", GL_VERTEX_SHADER),
+      wireframeVertexShader(SHADER_DIR "/shader.vert", GL_VERTEX_SHADER),
       wireframeFragmentShader(SHADER_DIR "/wireframe.fs", GL_FRAGMENT_SHADER),
-      wireframeGeometryShader(SHADER_DIR "/wireframe.gs", GL_GEOMETRY_SHADER),
-      wireframeShaderProgram({wireframeVertexShader,wireframeFragmentShader,wireframeGeometryShader})
+      wireframeShaderProgram({wireframeVertexShader,wireframeFragmentShader})
       // the order of our shader programs is important
-      // models{Ocean(20,{wireframeShaderProgram,shaderProgram})} 
       {
-  models.push_back(new Ocean(20,{wireframeShaderProgram,shaderProgram},this->getCamera()));
-  // models.push_back(new Model(10,{wireframeShaderProgram}));
+  // models.push_back(new Ocean(20,{wireframeShaderProgram,shaderProgram},this->getCamera()));
+  models.push_back(new Ocean(40,{shaderProgram}, this->getCamera()));
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_ONE, GL_ONE);

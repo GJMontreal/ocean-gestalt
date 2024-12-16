@@ -33,8 +33,25 @@ std::vector<GLuint> Mesh::getTriangularIndices(){
   return triangularMeshIndices;
 }
 
-void Mesh::draw(ShaderProgram program) {
-  if (drawMesh) {
+void Mesh::drawWireframe() {
+  glBindVertexArray(wireframeVao);
+
+  glDrawElements(GL_LINES,         // mode
+                 size * size * 6,  // count // how did we calculate this
+                 GL_UNSIGNED_INT,  // type
+                 NULL              // element array buffer offset
+  );
+
+  glCheckError(__FILE__, __LINE__);
+
+  glBindVertexArray(0);
+}
+
+void Mesh::drawNormals(){
+
+}
+
+void Mesh::draw() {
     glBindVertexArray(vao);
 
     glDrawElements(GL_TRIANGLES,         // mode
@@ -46,20 +63,6 @@ void Mesh::draw(ShaderProgram program) {
     glCheckError(__FILE__, __LINE__);
 
     glBindVertexArray(0);
-  }
-  if (drawWireframe) {
-    glBindVertexArray(wireframeVao);
-
-    glDrawElements(GL_LINES,         // mode
-                   size * size * 6,  // count // how did we calculate this
-                   GL_UNSIGNED_INT,  // type
-                   NULL              // element array buffer offset
-    );
-
-    glCheckError(__FILE__, __LINE__);
-
-    glBindVertexArray(0);
-  }
 }
 
 // The mesh will be symmetrical in x and y
