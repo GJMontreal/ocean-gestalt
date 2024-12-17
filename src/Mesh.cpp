@@ -186,20 +186,20 @@ VertexType Mesh::generateVertex(const glm::vec2 position, glm::vec4 color) {
   return v;
 }
 
-void Mesh::calculateNormals(std::vector<VertexType> &vertices, std::vector<GLuint> indices){
+void Mesh::calculateNormals(std::vector<VertexType>& vertices,
+                            std::vector<GLuint> indices) {
   // go through the indices 3 at a time
-  for( int i = 0; i < indices.size() - 3 ; i+=3){
-    glm::vec3 u = vertices[indices[i]].position - vertices[indices[i+1]].position;
-    glm::vec3 v = vertices[indices[i+2]].position - vertices[indices[i+1]].position;
-    glm::vec3 normal = glm::cross(u,v);
-    
+  for (int i = 0; i < indices.size() - 3; i += 3) {
+    glm::vec3 normal =
+        -1.0f * glm::triangleNormal(vertices[indices[i + 1]].position,
+                                    vertices[indices[i]].position,
+                                    vertices[indices[i + 2]].position);
+
     vertices[indices[i]].normal += normal;
-    vertices[indices[i+1]].normal += normal;
-    vertices[indices[i+2]].normal += normal;
+    vertices[indices[i + 1]].normal += normal;
+    vertices[indices[i + 2]].normal += normal;
   }
 }
-
-
 
 NormalVertices Mesh::generateNormalVertices(std::vector<VertexType> vertices){
   NormalVertices normalVertices;
