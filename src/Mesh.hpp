@@ -7,6 +7,10 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
+struct NormalVertices{
+  std::vector<VertexType> vertices;
+  std::vector<GLuint> indices;
+};
 class Mesh {
  public:
   Mesh(int size);
@@ -32,6 +36,8 @@ class Mesh {
 
   glm::vec4 color;
   
+  NormalVertices generateNormalVertices(std::vector<VertexType> vertices);
+
  private:
   int size;
 
@@ -41,7 +47,7 @@ class Mesh {
 
   GLuint wireframeVao, wireframeIbo;
   GLuint meshVao;
-  GLuint normalsVao, NormalsVbo, NormalsIbo;
+  GLuint normalsVao, normalsVbo, normalsIbo;
 
   std::vector<GLuint> triangularMeshIndices;
 
@@ -54,6 +60,8 @@ class Mesh {
   
   void setupWireframeBuffers(GLuint vba);
   void setupMeshBuffers(GLuint vba);
+
+  void setVertexAttributes();
 };
 
 #endif

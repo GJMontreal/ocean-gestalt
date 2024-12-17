@@ -78,17 +78,18 @@ void Ocean::moveParticles(float time) {
         iter->position.y +=
             wave->amplitude * sin(innerProd) * wave->k.y / wave->kMagnitude;
       }
+      //we need to account for the view and projection when doing this
       //match up the camera position
-      if(animateCamera && (abs(particle.position.x - camera->Position.x) < 1.0f ) && (abs(particle.position.y - camera->Position.y) < 1.0f)){
-        //translate the camera
-        // std::cout << "camera: " << iter->position.z << std::endl;
-        camera->Position = glm::vec3(camera->Position.x,camera->Position.y,iter->position.z+5.0f);
-      }
+      // if(animateCamera && (abs(particle.position.x - camera->Position.x) < 1.0f ) && (abs(particle.position.y - camera->Position.y) < 1.0f)){
+      //   //translate the camera
+      //   // std::cout << "camera: " << iter->position.z << std::endl;
+      //   camera->Position = glm::vec3(camera->Position.x,camera->Position.y,iter->position.z+5.0f);
+      // }
       iter++;
     }
   }
   //update the vertices
-  
+  meshes[0].calculateNormals(particles, meshes[0].getTriangularIndices());
   glBindBuffer(GL_ARRAY_BUFFER, meshes[0].getVbo());
   glBufferSubData(GL_ARRAY_BUFFER,0,particles.size() * sizeof(VertexType),
                particles.data());

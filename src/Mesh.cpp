@@ -47,10 +47,6 @@ void Mesh::drawWireframe() {
   glBindVertexArray(0);
 }
 
-void Mesh::drawNormals(){
-
-}
-
 void Mesh::draw() {
     glBindVertexArray(vao);
 
@@ -63,6 +59,20 @@ void Mesh::draw() {
     glCheckError(__FILE__, __LINE__);
 
     glBindVertexArray(0);
+}
+
+void Mesh::drawNormals(){
+  glBindVertexArray(normalsVao);
+
+  glDrawElements(GL_LINES,         // mode
+                 size * size * 6,  // count // how did we calculate this
+                 GL_UNSIGNED_INT,  // type
+                 NULL              // element array buffer offset
+  );
+
+  glCheckError(__FILE__, __LINE__);
+
+  glBindVertexArray(0);
 }
 
 // The mesh will be symmetrical in x and y
@@ -85,7 +95,8 @@ void Mesh::generateMesh(int size) {
   std::cout << "index=" << triangularMeshIndices.size() << std::endl;
 
   // given a vector of vertices and a vector of indices - generate normals
-  // calculateNormals(vertices, triangularMeshIndices);
+   calculateNormals(vertices, triangularMeshIndices);
+   generateNormalVertices(vertices);
   // vbo
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -110,18 +121,7 @@ void Mesh::generateMesh(int size) {
   // bind the ibo
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 
-  // position attribute
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(0);
-  
-  // normal attribute
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)(3 * sizeof(float)));
-  glEnableVertexAttribArray(1);
-
-  // color attribute
-  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)(6 * sizeof(float)));
-  glEnableVertexAttribArray(2);
-  
+  setVertexAttributes();
   // vao end
   glBindVertexArray(0);
   glCheckError(__FILE__, __LINE__);
@@ -141,17 +141,32 @@ void Mesh::generateMesh(int size) {
   glBindBuffer(GL_ARRAY_BUFFER, vbo);  //it's the same vertex data
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wireframeIbo);
 
-    // position attribute
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(0);
-  
-  // normal attribute
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)(3 * sizeof(float)));
-  glEnableVertexAttribArray(1);
+  setVertexAttributes();
 
-  // color attribute
-  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)(6 * sizeof(float)));
-  glEnableVertexAttribArray(2);
+  glBindVertexArray(0);
+  glCheckError(__FILE__, __LINE__);
+
+  NormalVertices normalVertices = generateNormalVertices(vertices);
+
+  glGenBuffers(1, &normalsVbo);
+  glBindBuffer(GL_ARRAY_BUFFER, normalsVbo);
+  glBufferData(GL_ARRAY_BUFFER, normalVertices.vertices.size() * sizeof(VertexType),
+               normalVertices.vertices.data(), GL_STATIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  glGenBuffers(1, &normalsIbo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, normalsIbo);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, normalVertices.indices.size() * sizeof(GLuint),
+               normalVertices.indices.data(), GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+  glGenVertexArrays(1, &normalsVao);
+  glBindVertexArray(normalsVao);
+
+  glBindBuffer(GL_ARRAY_BUFFER, normalsVbo); 
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, normalsIbo);
+
+  setVertexAttributes();
 
   glBindVertexArray(0);
   glCheckError(__FILE__, __LINE__);
@@ -173,15 +188,35 @@ VertexType Mesh::generateVertex(const glm::vec2 position, glm::vec4 color) {
 
 void Mesh::calculateNormals(std::vector<VertexType> &vertices, std::vector<GLuint> indices){
   // go through the indices 3 at a time
-  for( int i = 0; i < indices.size() ; i+=3){
+  for( int i = 0; i < indices.size() - 3 ; i+=3){
     glm::vec3 u = vertices[indices[i]].position - vertices[indices[i+1]].position;
     glm::vec3 v = vertices[indices[i+2]].position - vertices[indices[i+1]].position;
     glm::vec3 normal = glm::cross(u,v);
     
-    vertices[i].normal += normal;
-    vertices[i+1].normal += normal;
-    vertices[i+2].normal += normal;
+    vertices[indices[i]].normal += normal;
+    vertices[indices[i+1]].normal += normal;
+    vertices[indices[i+2]].normal += normal;
   }
+}
+
+
+
+NormalVertices Mesh::generateNormalVertices(std::vector<VertexType> vertices){
+  NormalVertices normalVertices;
+  int i = 0 ;
+  for( VertexType vertex: vertices){
+    glm::vec4 normalColor({1.0f,0.0f,0.0f,1.0f});
+    VertexType vertex1{.position=vertex.position,.normal=glm::vec3{0.0f,0.0f,0.0f},.color = normalColor};
+    normalVertices.vertices.push_back(vertex1);
+    VertexType vertex2{.position=vertex.position - glm::normalize(vertex.normal), .normal = glm::vec3{0.0f,0.0f,0.0f},.color = normalColor};
+    normalVertices.vertices.push_back(vertex2);
+    normalVertices.indices.push_back(i);
+    normalVertices.indices.push_back(i+1);
+    i+=2;
+  }
+  return normalVertices;
+
+  // bind to the appropriate buffer
 }
 
 std::vector<GLuint> Mesh::generateTriangularIndices(int size) {
@@ -225,4 +260,18 @@ std::vector<GLuint> Mesh::generateWireframeIndices(int size){
   }
   
   return indices;
+}
+
+void Mesh::setVertexAttributes(){
+  // position attribute
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(0);
+  
+  // normal attribute
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)(3 * sizeof(float)));
+  glEnableVertexAttribArray(1);
+
+  // color attribute
+  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)(6 * sizeof(float)));
+  glEnableVertexAttribArray(2);
 }

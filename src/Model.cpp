@@ -25,12 +25,21 @@ Model::Model(int meshSize, std::vector<ShaderProgram> shaderPrograms)
 void Model::draw() {
   // for each shader
   for (int i = 0; i < meshes.size(); i++) {
+    if(drawWireframe){
+      wireframeShaderProgram.activate();
+      wireframeShaderProgram.setUniform("model", transform);
+      meshes[i].drawWireframe();
+      wireframeShaderProgram.deactivate();
+    }
+
+    if(drawNormals){
+      normalShader.activate();
+      normalShader.setUniform("model",transform);
+      meshes[i].draw();
+      normalShader.deactivate();
+    }
+
     // for each program
-    wireframeShaderProgram.activate();
-    wireframeShaderProgram.setUniform("model", transform);
-    meshes[i].drawWireframe();
-    wireframeShaderProgram.deactivate();
-    
     for (int j = 0; j < shaderPrograms.size(); j++) {
       ShaderProgram program = shaderPrograms[j];
       program.activate();
@@ -39,9 +48,13 @@ void Model::draw() {
 
       glCheckError(__FILE__, __LINE__);
       meshes[i].draw(); 
-      meshes[i].drawWireframe();
+      meshes[i].drawWireframe();   
+    
       program.deactivate();
     }
+
+
+
   }
 }
 

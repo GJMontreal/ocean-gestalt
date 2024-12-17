@@ -84,6 +84,7 @@ Application::Application()
   glfwSetWindowUserPointer(window , this);
   glfwSetScrollCallback(window, Application::scrollCallback);
   glfwSetCursorPosCallback(window, Application::mouseCallback);
+  // glFrontFace(GL_CW);
 }
 
 GLFWwindow* Application::getWindow() const {
