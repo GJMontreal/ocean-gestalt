@@ -206,8 +206,10 @@ void Application::mouseCallback(GLFWwindow* window,
   // Ignore if the mouse button is not pressed
   int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);  
   if(state == GLFW_RELEASE){
+    firstMouse = true;
     return;
   }
+  
   Application* app = (Application*)glfwGetWindowUserPointer(window);
   Camera* camera = app->getCamera();
   float xpos = static_cast<float>(xposIn);
