@@ -48,6 +48,7 @@ void Model::draw(Uniforms uniforms) {
       mesh.draw();
       normalShader.deactivate();
     }
+  #endif
 
   for(ShaderProgram program: shaderPrograms){
       program.activate();
@@ -55,6 +56,10 @@ void Model::draw(Uniforms uniforms) {
       program.setUniform("model", transform);
       program.setUniform("viewPos",camera->Position);
       program.setUniform("lightPos", lightPos);
+       #ifdef __EMSCRIPTEN__
+      program.setUniform("projection", uniforms.projection);
+      program.setUniform("view", uniforms.view);
+      #endif
       glCheckError(__FILE__, __LINE__);
 
       mesh.draw(); 
@@ -62,9 +67,6 @@ void Model::draw(Uniforms uniforms) {
     
       program.deactivate();
     }
-#endif
-
-
   }
 }
 
