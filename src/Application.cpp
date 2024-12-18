@@ -203,6 +203,11 @@ void Application::scrollCallback(GLFWwindow* window,
 void Application::mouseCallback(GLFWwindow* window,
                                 double xposIn,
                                 double yposIn) {
+  // Ignore if the mouse button is not pressed
+  int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);  
+  if(state == GLFW_RELEASE){
+    return;
+  }
   Application* app = (Application*)glfwGetWindowUserPointer(window);
   Camera* camera = app->getCamera();
   float xpos = static_cast<float>(xposIn);
