@@ -1,5 +1,5 @@
 # Projects Settings
-cmake_minimum_required (VERSION 3.1)
+cmake_minimum_required (VERSION 3.5)
 project (ocean-gestalt)
 
 # The main executable
@@ -18,21 +18,43 @@ add_executable(ocean-gestalt
   src/Model.cpp
   src/Ocean.cpp
 )
-
 set_property(TARGET ocean-gestalt PROPERTY CXX_STANDARD 11)
-target_compile_options(ocean-gestalt PRIVATE -Wall)
+# target_compile_options(ocean-gestalt PRIVATE -Wall)
 add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
 
-add_definitions(-DGLEW_STATIC)
-add_subdirectory(lib/glfw EXCLUDE_FROM_ALL)
-add_subdirectory(lib/glew EXCLUDE_FROM_ALL)
-add_subdirectory(lib/glm EXCLUDE_FROM_ALL)
+if (EMSCRIPTEN)
+  target_link_libraries(ocean-gestalt PUBLIC "-s USE_GLFW=3")
+  target_link_libraries(ocean-gestalt PUBLIC "-s USE_WEBGL2=1")
+  target_link_libraries(ocean-gestalt PUBLIC "-s WASM=1")
 
-target_link_libraries(ocean-gestalt
+
+  # Copy the index.html file.
+  foreach(file "index.html" "run_webassembly.py")
+    configure_file(src/${file} ${file})
+  endforeach(file)
+
+  foreach(file "shader/webgl/shader.frag" "shader/webgl/shader.vert")
+    configure_file(${file} ${file})
+  endforeach(file)
+
+  # Allow the directories /shader and /data to be fetched by the web browser.
+  set_property(TARGET ocean-gestalt APPEND_STRING PROPERTY LINK_FLAGS
+    "--preload-file ${CMAKE_CURRENT_BINARY_DIR}/shader/@/shader/")
+  
+else() # Not Web
+
+  add_definitions(-DGLEW_STATIC)
+  add_subdirectory(lib/glfw EXCLUDE_FROM_ALL)
+  add_subdirectory(lib/glew EXCLUDE_FROM_ALL)
+
+  target_link_libraries(ocean-gestalt
   PRIVATE glfw
   PRIVATE libglew_static
-  PRIVATE glm
-)
+  )
+endif()
+
+add_subdirectory(lib/glm)
+target_link_libraries(ocean-gestalt PRIVATE glm)
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/src/asset.hpp.in

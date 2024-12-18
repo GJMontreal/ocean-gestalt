@@ -19,11 +19,11 @@ class Mesh {
   int getSize();
   
   // So that we can specify different shaders for each
-  void draw();  
-  void drawWireframe();
-  void drawNormals();
+  const void draw();  
+  const void drawWireframe();
+  const void drawNormals();
 
-  void calculateNormals(
+  const void calculateNormals(
       std::vector<VertexType>& vertices,
       std::vector<GLuint>
           indices);  // this could also return an array of vertices that
@@ -32,7 +32,7 @@ class Mesh {
   GLuint getVbo();
   // we'll hang onto the mesh indices to simplify recalculating our normals
   // later
-  std::vector<GLuint> getTriangularIndices();
+  const std::vector<GLuint> getTriangularIndices();
 
   glm::vec4 color;
   
@@ -52,16 +52,16 @@ class Mesh {
   std::vector<GLuint> triangularMeshIndices;
 
   void generateMesh(int size);
-  VertexType generateVertex(const glm::vec2 position, glm::vec4 color);
+  const VertexType generateVertex(const glm::vec2 position, glm::vec4 color);
 
-  std::vector<GLuint> generateTriangularIndices(
+  const std::vector<GLuint> generateTriangularIndices(
       int size);  
-  std::vector<GLuint> generateWireframeIndices(int size);
+  const std::vector<GLuint> generateWireframeIndices(int size);
   
-  void setupWireframeBuffers(GLuint vba);
-  void setupMeshBuffers(GLuint vba);
+  const void setupWireframeBuffers(GLuint vba);
+  const void setupMeshBuffers(GLuint vba);
 
-  void setVertexAttributes();
+  const void setVertexAttributes();
 };
 
 #endif

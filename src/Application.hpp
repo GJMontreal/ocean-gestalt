@@ -56,7 +56,7 @@ class Application {
  private:
   enum State { stateReady, stateRun, stateExit };
 
-  Camera *camera;
+  Camera camera;
 
   State state;
 
@@ -74,7 +74,7 @@ class Application {
   bool dimensionChanged;
   void detectWindowDimensionChange();
   void processInput(GLFWwindow *window);
-  
+  void dumpCameraMatrices();
   // Simulation:
   bool running = false;
  protected:

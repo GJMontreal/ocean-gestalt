@@ -18,16 +18,30 @@
 using namespace std;
 using namespace glm;
 
+const std::string shader_header = 
+#ifdef __EMSCRIPTEN__
+"#version 300 es\n"
+"precision mediump float;\n"
+"precision mediump int;\n"
+"precision mediump sampler2DArray;\n";
+#else
+"#version 330\n";
+#endif
+
 // file reading
 void getFileContents(const char* filename, vector<char>& buffer) {
   ifstream file(filename, ios_base::binary);
   if (file) {
+     // Load shader header.
+    for (const auto& c : shader_header)
+      buffer.push_back(c);
+
     file.seekg(0, ios_base::end);
     streamsize size = file.tellg();
     if (size > 0) {
       file.seekg(0, ios_base::beg);
-      buffer.resize(static_cast<size_t>(size));
-      file.read(&buffer[0], size);
+      buffer.resize(static_cast<size_t>(size + shader_header.size()));
+      file.read(&buffer[shader_header.size()], size);
     }
     buffer.push_back('\0');
   } else {

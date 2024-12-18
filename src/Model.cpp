@@ -6,9 +6,10 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-Model::Model(int meshSize, std::vector<ShaderProgram> shaderPrograms)
+Model::Model(int meshSize, std::vector<ShaderProgram> shaderPrograms, Camera *camera)
     : transform(1.0),
       meshes({Mesh(meshSize)}) {
+      this->camera = camera;
   transform =
       glm::rotate(transform, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
   this->shaderPrograms = shaderPrograms;
@@ -22,37 +23,46 @@ Model::Model(int meshSize, std::vector<ShaderProgram> shaderPrograms)
 }
 
 // specify different shaders for mesh, wireframe, and normals
-void Model::draw() {
+void Model::draw(Uniforms uniforms) {
+  glm::vec3 lightPos(0.0f, 0.0f, 10.0f); // what coordinate system is this in
+
   // for each shader
-  for (int i = 0; i < meshes.size(); i++) {
+  for(Mesh mesh: meshes){
     if(drawWireframe){
-      wireframeShaderProgram.activate();
-      wireframeShaderProgram.setUniform("model", transform);
-      meshes[i].drawWireframe();
-      wireframeShaderProgram.deactivate();
-    }
-
-    if(drawNormals){
-      normalShader.activate();
-      normalShader.setUniform("model",transform);
-      meshes[i].draw();
-      normalShader.deactivate();
-    }
-
-    // for each program
-    for (int j = 0; j < shaderPrograms.size(); j++) {
-      ShaderProgram program = shaderPrograms[j];
+      ShaderProgram program = shaderPrograms[0];
       program.activate();
-
       program.setUniform("model", transform);
-
+      #ifdef __EMSCRIPTEN__
+      program.setUniform("projection", uniforms.projection);
+      program.setUniform("view", uniforms.view);
+      #endif
       glCheckError(__FILE__, __LINE__);
-      meshes[i].draw(); 
-      meshes[i].drawWireframe();   
-    
+      mesh.drawWireframe();
       program.deactivate();
     }
 
+  #ifndef __EMSCRIPTEN__
+    if(drawNormals){
+      normalShader.activate();
+      normalShader.setUniform("model",transform);
+      mesh.draw();
+      normalShader.deactivate();
+    }
+
+  for(ShaderProgram program: shaderPrograms){
+      program.activate();
+
+      program.setUniform("model", transform);
+      program.setUniform("viewPos",camera->Position);
+      program.setUniform("lightPos", lightPos);
+      glCheckError(__FILE__, __LINE__);
+
+      mesh.draw(); 
+      mesh.drawWireframe();   
+    
+      program.deactivate();
+    }
+#endif
 
 
   }

@@ -8,16 +8,28 @@
 
 #include "Application.hpp"
 
-
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <stdexcept>
+#include "DebugMatrix.hpp"
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include <emscripten/html5.h>
+#include <cmath>
+#endif
 
 using namespace std;
-  
+
 static bool firstMouse = true;
-static float lastX, lastY;
+static float lastX;
+static float lastY;
+
+std::function<void()> registered_loop;
+void loop_iteration() {
+  registered_loop();
+}
 
 Application* currentApplication = NULL;
 
@@ -29,7 +41,7 @@ Application& Application::getInstance() {
 }
 
 Application::Application()
-    : state(stateReady), width(640), height(480), title("Application") {
+    : state(stateReady), width(1280), height(480), title("Application") {
   currentApplication = this;
 
   cout << "[Info] GLFW initialisation" << endl;
@@ -39,16 +51,21 @@ Application::Application()
     throw std::runtime_error("Couldn't init GLFW");
   }
 
-  // setting the opengl version
+// setting the opengl version
+#ifdef __EMSCRIPTEN__
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+#else
   int major = 3;
   int minor = 2;
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, major);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minor);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
 
   // create the window
-  window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
+  window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
   if (!window) {
     glfwTerminate();
     throw std::runtime_error("Couldn't create a window");
@@ -75,16 +92,17 @@ Application::Application()
   glEnable(GL_DEPTH_TEST);  // enable depth-testing
   glDepthFunc(GL_LESS);  // depth-testing interprets a smaller value as "closer"
 
-  glEnable(GL_CULL_FACE);  
+  glEnable(GL_CULL_FACE);
   // vsync
   // glfwSwapInterval(false);
-  camera = new Camera(glm::vec3(0.0f,0.0f,0.1f));
+  // camera = Camera(glm::vec3(0.0f, 0.0f, .1f));
+  camera = Camera(glm::vec3{15,3.8,15},glm::vec3{-.002,1,-.02},-138,-1.3);
 
-  //bind the callbacks
-  glfwSetWindowUserPointer(window , this);
+
+  // bind the callbacks
+  glfwSetWindowUserPointer(window, this);
   glfwSetScrollCallback(window, Application::scrollCallback);
   glfwSetCursorPosCallback(window, Application::mouseCallback);
-  // glFrontFace(GL_CW);
 }
 
 GLFWwindow* Application::getWindow() const {
@@ -110,8 +128,7 @@ void Application::run() {
   glfwMakeContextCurrent(window);
 
   time = glfwGetTime();
-
-  while (state == stateRun) {
+  registered_loop = [&]() {
     // compute new time and delta time
     float t = glfwGetTime();
     deltaTime = t - time;
@@ -129,9 +146,15 @@ void Application::run() {
 
     // Pool and process events
     glfwPollEvents();
+  };
+#ifdef __EMSCRIPTEN__
+  emscripten_set_main_loop(loop_iteration, 0, 1);
+#else
+  while (state == stateRun) {
+    loop_iteration();
   }
-
   glfwTerminate();
+#endif
 }
 
 void Application::detectWindowDimensionChange() {
@@ -166,31 +189,34 @@ bool Application::windowDimensionChanged() {
 }
 
 Camera* Application::getCamera() {
-  return camera;
+  return &camera;
 }
 
-void Application::scrollCallback(GLFWwindow* window, double xoffset, double yoffset){
-  Application *app = (Application*)glfwGetWindowUserPointer(window);
-  Camera *camera = app->getCamera();
+void Application::scrollCallback(GLFWwindow* window,
+                                 double xoffset,
+                                 double yoffset) {
+  Application* app = (Application*)glfwGetWindowUserPointer(window);
+  Camera* camera = app->getCamera();
   camera->ProcessMouseScroll(static_cast<float>(yoffset));
 }
 
-void Application::mouseCallback(GLFWwindow* window, double xposIn, double yposIn)
-{
-  Application *app = (Application*)glfwGetWindowUserPointer(window);
-  Camera *camera = app->getCamera();
+void Application::mouseCallback(GLFWwindow* window,
+                                double xposIn,
+                                double yposIn) {
+  Application* app = (Application*)glfwGetWindowUserPointer(window);
+  Camera* camera = app->getCamera();
   float xpos = static_cast<float>(xposIn);
   float ypos = static_cast<float>(yposIn);
 
-  if (firstMouse)
-  {
-      lastX = xpos;
-      lastY = ypos;
-      firstMouse = false;
+  if (firstMouse) {
+    lastX = xpos;
+    lastY = ypos;
+    firstMouse = false;
   }
 
   float xoffset = xpos - lastX;
-  float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+  float yoffset =
+      lastY - ypos;  // reversed since y-coordinates go from bottom to top
 
   lastX = xpos;
   lastY = ypos;
@@ -199,25 +225,37 @@ void Application::mouseCallback(GLFWwindow* window, double xposIn, double yposIn
 }
 
 // ---------------------------------------------------------------------------------------------------------
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-void Application::processInput(GLFWwindow *window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera->ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera->ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera->ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera->ProcessKeyboard(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        camera->ProcessKeyboard(UP, deltaTime);
-    if (glfwGetKey(window,GLFW_KEY_DOWN) == GLFW_PRESS)
-        camera->ProcessKeyboard(DOWN, deltaTime);
-    if (glfwGetKey(window,GLFW_KEY_R) == GLFW_PRESS){
-      std::cout << "Toggling simulation" << std::endl;
-      running = !running;
-    }
+// process all input: query GLFW whether relevant keys are pressed/released this
+// frame and react accordingly
+void Application::processInput(GLFWwindow* window) {
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    glfwSetWindowShouldClose(window, true);
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    camera.ProcessKeyboard(FORWARD, deltaTime);
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    camera.ProcessKeyboard(BACKWARD, deltaTime);
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    camera.ProcessKeyboard(LEFT, deltaTime);
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    camera.ProcessKeyboard(RIGHT, deltaTime);
+  if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+    camera.ProcessKeyboard(UP, deltaTime);
+  if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+    camera.ProcessKeyboard(DOWN, deltaTime);
+  if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS){
+    dumpCameraMatrices();
+  }
+  if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+    std::cout << "Toggling simulation" << std::endl;
+    running = !running;
+  }
 }
+
+void Application::dumpCameraMatrices(){
+  dumpVector("Front", camera.Front);
+  dumpVector("Position", camera.Position);
+  dumpVector("Up", camera.Up);
+  std::cout << "Yaw " << camera.Yaw << std::endl;
+  std::cout << "Pitch " << camera.Pitch << std::endl;
+}
+

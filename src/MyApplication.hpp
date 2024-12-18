@@ -26,10 +26,10 @@ class MyApplication : public Application {
   Shader fragmentShader;
   ShaderProgram shaderProgram;
 
-  Shader wireframeVertexShader;
-  Shader wireframeFragmentShader;
+  // Shader wireframeVertexShader;
+  // Shader wireframeFragmentShader;
   // Shader wireframeGeometryShader;
-  ShaderProgram wireframeShaderProgram;
+  // ShaderProgram wireframeShaderProgram;
 
   // shader matrix uniform
   glm::mat4 projection = glm::mat4(1.0);

@@ -8,11 +8,11 @@ class Ocean : public Model{
 public:
   Ocean(int meshSize, std::vector<ShaderProgram>shaderPrograms, Camera *camera);
   virtual ~Ocean();
-  void draw()override;
+  void draw(Uniforms uniforms)override;
   bool running = true;
   bool animateCamera = true;
 private:
-  Camera *camera;
+
   std::vector<VertexType> particles;
   void initParticles();
   void resetParticles();

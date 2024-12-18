@@ -2,9 +2,7 @@
 
 #include "asset.hpp"
 #include "glError.hpp"
-#include "glm/fwd.hpp"
 
-// #include <cmath>
 #include <iostream>
 #include <vector>
 
@@ -13,13 +11,15 @@
 Mesh::Mesh(int meshSize): 
 // all these should be customizable
 // get it working first
-  color(1.0f,1.0,0.0f,1.0f)
+  color(1.0f,1.0,0.0f,1.0f) // is this used anywhere?
 {
   size = meshSize;
   generateMesh(size);
 }
 
-Mesh::~Mesh() {}
+Mesh::~Mesh() {
+
+}
 
 int Mesh::getSize(){
   return size;
@@ -29,15 +29,14 @@ GLuint Mesh::getVbo(){
   return vbo;
 }
 
-std::vector<GLuint> Mesh::getTriangularIndices(){
+const std::vector<GLuint> Mesh::getTriangularIndices(){
   return triangularMeshIndices;
 }
 
-void Mesh::drawWireframe() {
+const void Mesh::drawWireframe() {
   glBindVertexArray(wireframeVao);
-
   glDrawElements(GL_LINES,         // mode
-                 size * size * 6,  // count // how did we calculate this
+                 size * (size + 1) * 4 ,  // number of lines * number of directions * number of vertices
                  GL_UNSIGNED_INT,  // type
                  NULL              // element array buffer offset
   );
@@ -47,7 +46,7 @@ void Mesh::drawWireframe() {
   glBindVertexArray(0);
 }
 
-void Mesh::draw() {
+const void Mesh::draw() {
     glBindVertexArray(vao);
 
     glDrawElements(GL_TRIANGLES,         // mode
@@ -61,7 +60,7 @@ void Mesh::draw() {
     glBindVertexArray(0);
 }
 
-void Mesh::drawNormals(){
+const void Mesh::drawNormals(){
   glBindVertexArray(normalsVao);
 
   glDrawElements(GL_LINES,         // mode
@@ -172,7 +171,7 @@ void Mesh::generateMesh(int size) {
   glCheckError(__FILE__, __LINE__);
 }
 
-VertexType Mesh::generateVertex(const glm::vec2 position, glm::vec4 color) {
+const VertexType Mesh::generateVertex(const glm::vec2 position, glm::vec4 color) {
   const glm::vec2 dx(1.0, 0.0);
   const glm::vec2 dy(0.0, 1.0);
 
@@ -186,7 +185,7 @@ VertexType Mesh::generateVertex(const glm::vec2 position, glm::vec4 color) {
   return v;
 }
 
-void Mesh::calculateNormals(std::vector<VertexType>& vertices,
+const void Mesh::calculateNormals(std::vector<VertexType>& vertices,
                             std::vector<GLuint> indices) {
   // go through the indices 3 at a time
   for (int i = 0; i < indices.size() - 3; i += 3) {
@@ -219,7 +218,7 @@ NormalVertices Mesh::generateNormalVertices(std::vector<VertexType> vertices){
   // bind to the appropriate buffer
 }
 
-std::vector<GLuint> Mesh::generateTriangularIndices(int size) {
+const std::vector<GLuint> Mesh::generateTriangularIndices(int size) {
   std::vector<GLuint> indices;
   
   // indices.resize((size+1) * (size+1)); // not sure why this wouldn't work?
@@ -241,7 +240,7 @@ std::vector<GLuint> Mesh::generateTriangularIndices(int size) {
 }
 
 // using GL_LINES
-std::vector<GLuint> Mesh::generateWireframeIndices(int size){
+const std::vector<GLuint> Mesh::generateWireframeIndices(int size){
   std::vector<GLuint> indices;
   //across
   for(int i=0; i <= size; i++){
@@ -262,7 +261,7 @@ std::vector<GLuint> Mesh::generateWireframeIndices(int size){
   return indices;
 }
 
-void Mesh::setVertexAttributes(){
+const void Mesh::setVertexAttributes(){
   // position attribute
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);

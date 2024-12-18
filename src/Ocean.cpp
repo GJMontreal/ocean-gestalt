@@ -6,10 +6,10 @@
 #include <iostream>
 
 Ocean::Ocean(int meshSize, std::vector<ShaderProgram> shaderPrograms, Camera* camera)
-    : Model(meshSize, shaderPrograms) {
+    : Model(meshSize, shaderPrograms, camera) {
   initParticles();
   resetParticles();
-  this->camera = camera;
+  // this->camera = camera;
   waves.push_back(new Wave(1, 10));
   waves.push_back(new Wave(1, 13,0.3f));
   waves.push_back(new Wave(.05,2,M_PI/7));
@@ -17,13 +17,13 @@ Ocean::Ocean(int meshSize, std::vector<ShaderProgram> shaderPrograms, Camera* ca
   waves.push_back(new Wave(1.5f,12.0f,1.2f));
 }
 
-void Ocean::draw() {
+void Ocean::draw(Uniforms uniforms) {
   // calculate new positions for our particles
   if(running){
     float time = glfwGetTime();
     moveParticles(time);
   }
-  Model::draw();
+  Model::draw(uniforms);
 }
 
 Ocean::~Ocean() {
@@ -51,7 +51,7 @@ void Ocean::resetParticles() {
       (particle)->position.y = yy;
       (particle)->position.z = 0;
       (particle)->normal = glm::normalize(glm::vec3(xx, yy, 1.0));
-      particle->color = glm::vec4({.7f,.7f,0.7f,0.0f});
+      particle->color = glm::vec4({.01f,.15f,.210f,0.0f});
       particle++;
     }
 }
