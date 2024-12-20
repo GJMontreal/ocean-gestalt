@@ -8,32 +8,28 @@
 
 #include <glm/gtx/normal.hpp>
 
-Mesh::Mesh(int meshSize): 
-// all these should be customizable
-// get it working first
-  color(1.0f,1.0,0.0f,1.0f) // is this used anywhere?
+using namespace  glm;
+
+Mesh::Mesh(int meshSize, glm::vec4 aColor)
 {
+  color = aColor;
   size = meshSize;
   generateMesh(size);
 }
 
-Mesh::~Mesh() {
-
-}
-
-int Mesh::getSize(){
+int Mesh::getSize()const{
   return size;
 }
 
-GLuint Mesh::getVbo(){
+GLuint Mesh::getVbo()const{
   return vbo;
 }
 
-const std::vector<GLuint> Mesh::getTriangularIndices(){
+std::vector<GLuint> Mesh::getTriangularIndices()const{
   return triangularMeshIndices;
 }
 
-const void Mesh::drawWireframe() {
+void Mesh::drawWireframe()const{
   glBindVertexArray(wireframeVao);
   glDrawElements(GL_LINES,         // mode
                  size * (size + 1) * 4 ,  // number of lines * number of directions * number of vertices
@@ -46,7 +42,7 @@ const void Mesh::drawWireframe() {
   glBindVertexArray(0);
 }
 
-const void Mesh::draw() {
+void Mesh::draw()const {
     glBindVertexArray(vao);
 
     glDrawElements(GL_TRIANGLES,         // mode
@@ -60,7 +56,7 @@ const void Mesh::draw() {
     glBindVertexArray(0);
 }
 
-const void Mesh::drawNormals(){
+void Mesh::drawNormals()const{
   glBindVertexArray(normalsVao);
 
   glDrawElements(GL_LINES,         // mode
@@ -75,15 +71,14 @@ const void Mesh::drawNormals(){
 }
 
 // The mesh will be symmetrical in x and y
-void Mesh::generateMesh(int size) {
+void Mesh::generateMesh(int aSize){
   // Mesh will have vertex and normal for the moment
   std::vector<VertexType> vertices;
-  // std::vector<GLuint> indices;
 
-  for (int y = 0; y <= size; ++y)
-    for (int x = 0; x <= size; ++x) {
-      float xx = (x - size / 2);
-      float yy = (y - size / 2);
+  for (int y = 0; y <= aSize; ++y)
+    for (int x = 0; x <= aSize; ++x) {
+      float xx = (float)x - (float)aSize / 2.0f;
+      float yy = (float)y - (float)aSize / 2.0f;
       vertices.push_back(generateVertex({xx, yy}, color));
     }
 
@@ -171,7 +166,7 @@ void Mesh::generateMesh(int size) {
   glCheckError(__FILE__, __LINE__);
 }
 
-const VertexType Mesh::generateVertex(const glm::vec2 position, glm::vec4 color) {
+VertexType Mesh::generateVertex(const glm::vec2 position, glm::vec4 color) const{
   const glm::vec2 dx(1.0, 0.0);
   const glm::vec2 dy(0.0, 1.0);
 
@@ -185,7 +180,7 @@ const VertexType Mesh::generateVertex(const glm::vec2 position, glm::vec4 color)
   return v;
 }
 
-const void Mesh::calculateNormals(std::vector<VertexType>& vertices,
+void Mesh::calculateNormals(std::vector<VertexType>& vertices,
                             std::vector<GLuint> indices) {
   // go through the indices 3 at a time
   for (int i = 0; i < indices.size() - 3; i += 3) {
@@ -200,7 +195,7 @@ const void Mesh::calculateNormals(std::vector<VertexType>& vertices,
   }
 }
 
-NormalVertices Mesh::generateNormalVertices(std::vector<VertexType> vertices){
+NormalVertices Mesh::generateNormalVertices(std::vector<VertexType>& vertices)const{
   NormalVertices normalVertices;
   int i = 0 ;
   for( VertexType vertex: vertices){
@@ -218,7 +213,7 @@ NormalVertices Mesh::generateNormalVertices(std::vector<VertexType> vertices){
   // bind to the appropriate buffer
 }
 
-const std::vector<GLuint> Mesh::generateTriangularIndices(int size) {
+std::vector<GLuint> Mesh::generateTriangularIndices(int size)const{
   std::vector<GLuint> indices;
   
   // indices.resize((size+1) * (size+1)); // not sure why this wouldn't work?
@@ -240,7 +235,7 @@ const std::vector<GLuint> Mesh::generateTriangularIndices(int size) {
 }
 
 // using GL_LINES
-const std::vector<GLuint> Mesh::generateWireframeIndices(int size){
+std::vector<GLuint> Mesh::generateWireframeIndices(int size)const{
   std::vector<GLuint> indices;
   //across
   for(int i=0; i <= size; i++){
@@ -261,7 +256,7 @@ const std::vector<GLuint> Mesh::generateWireframeIndices(int size){
   return indices;
 }
 
-const void Mesh::setVertexAttributes(){
+void Mesh::setVertexAttributes()const{
   // position attribute
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);

@@ -86,20 +86,20 @@ void MyApplication::loop() {
 void MyApplication::toggleNormalDisplay(){
   std::cout << "Toggle normals" << std::endl;
   for(Model* model: models){
-    model->drawNormals = !model->drawNormals;
+    model->toggleDrawNormals();
   }
 }
 
 void MyApplication::toggleSimulation(){
   std::cout << "Toggle simulation" << std::endl;
   for(Model* model: models){
-    model->running = !model->running;
+    model->toggleRunning();
   }
 }
 
 void MyApplication::toggleWireframe(){
   std::cout << "Toggle wireframe" << std::endl;
   for(Model* model: models){
-    model->drawWireframe = !model->drawWireframe;
+    model->toggleDrawWireframe();
   }
 }

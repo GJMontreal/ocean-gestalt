@@ -13,55 +13,58 @@ struct NormalVertices{
 };
 class Mesh {
  public:
-  Mesh(int size);
-  ~Mesh();
+  Mesh(int size, glm::vec4 aColor = glm::vec4(1.0f,1.0f,0.0f,1.0f));
+  ~Mesh() = default;
 
-  int getSize();
+  int getSize()const;
   
   // So that we can specify different shaders for each
-  const void draw();  
-  const void drawWireframe();
-  const void drawNormals();
+  void draw()const;  
+  void drawWireframe()const;
+  void drawNormals()const;
 
-  const void calculateNormals(
+  void calculateNormals(
       std::vector<VertexType>& vertices,
       std::vector<GLuint>
           indices);  // this could also return an array of vertices that
                      // corresponds to the face normals
 
-  GLuint getVbo();
+  GLuint getVbo()const;
   // we'll hang onto the mesh indices to simplify recalculating our normals
   // later
-  const std::vector<GLuint> getTriangularIndices();
+  std::vector<GLuint> getTriangularIndices()const;
 
-  glm::vec4 color;
-  
-  NormalVertices generateNormalVertices(std::vector<VertexType> vertices);
+  NormalVertices generateNormalVertices(std::vector<VertexType>& vertices)const;
 
  private:
   int size;
+  glm::vec4 color;
+  // Our vertices are shared between the triangular mesh and line strips
+  GLuint vao;
+  GLuint vbo;
+  GLuint ibo;
 
-  // Our vertices and elements are shared between the triangular mesh and line
-  // strips
-  GLuint vao, vbo, ibo;
-
-  GLuint wireframeVao, wireframeIbo;
+  GLuint wireframeVao;
+  GLuint wireframeIbo;
   GLuint meshVao;
-  GLuint normalsVao, normalsVbo, normalsIbo;
+
+  GLuint normalsVao;
+  GLuint normalsVbo;
+  GLuint normalsIbo;
 
   std::vector<GLuint> triangularMeshIndices;
 
   void generateMesh(int size);
-  const VertexType generateVertex(const glm::vec2 position, glm::vec4 color);
+  VertexType generateVertex(const glm::vec2 position, glm::vec4 color)const;
 
-  const std::vector<GLuint> generateTriangularIndices(
-      int size);  
-  const std::vector<GLuint> generateWireframeIndices(int size);
+  std::vector<GLuint> generateTriangularIndices(
+      int size)const;  
+  std::vector<GLuint> generateWireframeIndices(int size)const;
   
-  const void setupWireframeBuffers(GLuint vba);
-  const void setupMeshBuffers(GLuint vba);
+  void setupWireframeBuffers(GLuint vba);
+  void setupMeshBuffers(GLuint vba);
 
-  const void setVertexAttributes();
+  void setVertexAttributes()const;
 };
 
 #endif

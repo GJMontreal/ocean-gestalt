@@ -2,11 +2,10 @@
 
 #include "asset.hpp"
 #include "glError.hpp"
-#include "glm/gtc/type_ptr.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 
-Model::Model(int meshSize, std::vector<ShaderProgram> shaderPrograms, Camera *camera)
+Model::Model(int meshSize, const std::vector<ShaderProgram>& shaderPrograms, Camera *camera)
     : transform(1.0),
       meshes({Mesh(meshSize)}) {
       this->camera = camera;
@@ -23,7 +22,7 @@ Model::Model(int meshSize, std::vector<ShaderProgram> shaderPrograms, Camera *ca
 }
 
 // specify different shaders for mesh, wireframe, and normals
-void Model::draw(Uniforms uniforms) {
+void Model::draw(const Uniforms& uniforms) {
   glm::vec3 lightPos(0.0f, 0.0f, 10.0f); // what coordinate system is this in
 
   // for each shader
@@ -70,6 +69,34 @@ void Model::draw(Uniforms uniforms) {
   }
 }
 
-void Model::setTransform(glm::mat4 transform) {
+Mesh* Model::getMesh(int index){
+  return &(meshes[index]);
+}
+
+void Model::setTransform(const glm::mat4& transform){
   this->transform = transform;
+}
+
+void Model::toggleDrawNormals(){
+  drawNormals = !drawNormals;
+}
+
+void Model::toggleDrawWireframe(){
+  drawWireframe = !drawWireframe;
+}
+
+void Model::toggleRunning(){
+  running = !running;
+}
+
+bool Model::isRunning()const{
+  return running;
+}
+
+bool Model::shouldDrawNormals()const{
+  return drawNormals;
+}
+
+bool Model::shouldDrawWireframe()const{
+  return drawWireframe;
 }

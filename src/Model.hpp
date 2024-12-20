@@ -10,22 +10,33 @@
 
 class Model {
  public:
-  Model(int meshSize, std::vector<ShaderProgram> shaderPrograms, Camera *camera);
+  Model(int meshSize, const std::vector<ShaderProgram>& shaderPrograms, Camera *camera);
   virtual ~Model() = default;
 
-  void setTransform(glm::mat4 transform);
-  virtual void draw(Uniforms uniforms);
-  bool drawWireframe = true;
-  bool drawNormals = true;
-  bool running = true;
+  void setTransform(const glm::mat4& transform);
+  virtual void draw(const Uniforms& uniforms);
+  
+  void toggleDrawWireframe();
+  void toggleDrawNormals();
+  void toggleRunning();
+
+  bool isRunning()const;
+  bool shouldDrawNormals()const;
+  bool shouldDrawWireframe()const;
+
+  Mesh* getMesh(int index);
+
  private:
   glm::mat4 transform = glm::mat4(1.0);
-
- protected:
+  
   Camera *camera;
   std::vector<Mesh> meshes;
   std::vector<ShaderProgram> shaderPrograms;
   
+  bool drawWireframe = true;
+  bool drawNormals = true;
+  bool running = true;
+
 #ifndef __EMSCRIPTEN__
 //are these being used
   ShaderProgram wireframeShaderProgram =
