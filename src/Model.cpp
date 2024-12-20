@@ -12,11 +12,6 @@ Model::Model(int meshSize, const std::vector<ShaderProgram>& shaderPrograms, Cam
   transform =
       glm::rotate(transform, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
   this->shaderPrograms = shaderPrograms;
-  // this->wireframeShaderProgram = ShaderProgram({Shader(SHADER_DIR "/shader.vert", GL_VERTEX_SHADER),Shader(SHADER_DIR "/wireframe.fs", GL_FRAGMENT_SHADER)});
-  // why isn't this necessary ???
-  // GLuint handle = vertexShader.getHandle();
-  // GLuint index = glGetUniformBlockIndex(handle, "Matrices"); 
-  // glUniformBlockBinding(handle,index,0);
 
   glCheckError(__FILE__, __LINE__);
 }
@@ -73,8 +68,8 @@ Mesh* Model::getMesh(int index){
   return &(meshes[index]);
 }
 
-void Model::setTransform(const glm::mat4& transform){
-  this->transform = transform;
+void Model::setTransform(const glm::mat4& aTransform){
+  transform = aTransform;
 }
 
 void Model::toggleDrawNormals(){

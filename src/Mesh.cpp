@@ -34,7 +34,7 @@ void Mesh::drawWireframe()const{
   glDrawElements(GL_LINES,         // mode
                  size * (size + 1) * 4 ,  // number of lines * number of directions * number of vertices
                  GL_UNSIGNED_INT,  // type
-                 NULL              // element array buffer offset
+                 nullptr              // element array buffer offset
   );
 
   glCheckError(__FILE__, __LINE__);
@@ -48,7 +48,7 @@ void Mesh::draw()const {
     glDrawElements(GL_TRIANGLES,         // mode
                    size * size * 2 * 3,  // count
                    GL_UNSIGNED_INT,      // type
-                   NULL                  // element array buffer offset
+                   nullptr                  // element array buffer offset
     );
 
     glCheckError(__FILE__, __LINE__);
@@ -62,7 +62,7 @@ void Mesh::drawNormals()const{
   glDrawElements(GL_LINES,         // mode
                  size * size * 6,  // count // how did we calculate this
                  GL_UNSIGNED_INT,  // type
-                 NULL              // element array buffer offset
+                 nullptr              // element array buffer offset
   );
 
   glCheckError(__FILE__, __LINE__);
@@ -166,7 +166,7 @@ void Mesh::generateMesh(int aSize){
   glCheckError(__FILE__, __LINE__);
 }
 
-VertexType Mesh::generateVertex(const glm::vec2 position, glm::vec4 color) const{
+VertexType Mesh::generateVertex(const glm::vec2 position, const glm::vec4& color) const{
   const glm::vec2 dx(1.0, 0.0);
   const glm::vec2 dy(0.0, 1.0);
 
@@ -181,7 +181,7 @@ VertexType Mesh::generateVertex(const glm::vec2 position, glm::vec4 color) const
 }
 
 void Mesh::calculateNormals(std::vector<VertexType>& vertices,
-                            std::vector<GLuint> indices) {
+                            std::vector<GLuint> indices) const{
   // go through the indices 3 at a time
   for (int i = 0; i < indices.size() - 3; i += 3) {
     glm::vec3 normal =
@@ -195,7 +195,7 @@ void Mesh::calculateNormals(std::vector<VertexType>& vertices,
   }
 }
 
-NormalVertices Mesh::generateNormalVertices(std::vector<VertexType>& vertices)const{
+NormalVertices Mesh::generateNormalVertices(const std::vector<VertexType>& vertices)const{
   NormalVertices normalVertices;
   int i = 0 ;
   for( VertexType vertex: vertices){
@@ -213,21 +213,19 @@ NormalVertices Mesh::generateNormalVertices(std::vector<VertexType>& vertices)co
   // bind to the appropriate buffer
 }
 
-std::vector<GLuint> Mesh::generateTriangularIndices(int size)const{
+std::vector<GLuint> Mesh::generateTriangularIndices(int aSize)const{
   std::vector<GLuint> indices;
-  
-  // indices.resize((size+1) * (size+1)); // not sure why this wouldn't work?
-  for (int y = 0; y < size; ++y) {
-    for (int x = 0; x < size; ++x) {
+  for (int y = 0; y < aSize; ++y) {
+    for (int x = 0; x < aSize; ++x) {
       // first triangle
-      indices.push_back((x + 0) + (size + 1) * (y + 0));
-      indices.push_back((x + 1) + (size + 1) * (y + 0));
-      indices.push_back((x + 1) + (size + 1) * (y + 1));
+      indices.push_back((x + 0) + (aSize + 1) * (y + 0));
+      indices.push_back((x + 1) + (aSize + 1) * (y + 0));
+      indices.push_back((x + 1) + (aSize + 1) * (y + 1));
 
       // second triangle
-      indices.push_back((x + 1) + (size + 1) * (y + 1));
-      indices.push_back((x + 0) + (size + 1) * (y + 1));
-      indices.push_back((x + 0) + (size + 1) * (y + 0));
+      indices.push_back((x + 1) + (aSize + 1) * (y + 1));
+      indices.push_back((x + 0) + (aSize + 1) * (y + 1));
+      indices.push_back((x + 0) + (aSize + 1) * (y + 0));
     }
   }
   std::cout << "indices " << indices.size() << std::endl;
@@ -235,21 +233,21 @@ std::vector<GLuint> Mesh::generateTriangularIndices(int size)const{
 }
 
 // using GL_LINES
-std::vector<GLuint> Mesh::generateWireframeIndices(int size)const{
+std::vector<GLuint> Mesh::generateWireframeIndices(int aSize)const{
   std::vector<GLuint> indices;
   //across
-  for(int i=0; i <= size; i++){
-    for(int j=0; j < size; j++){
-      indices.push_back((i * (size+1)) + j);
-      indices.push_back((i * (size+1)) + j + 1);
+  for(int i=0; i <= aSize; i++){
+    for(int j=0; j < aSize; j++){
+      indices.push_back((i * (aSize+1)) + j);
+      indices.push_back((i * (aSize+1)) + j + 1);
     }
   }
   
   // down
-  for(int i=0; i <= size; i++ ){
-    for(int j=0; j < size; j++){
-      indices.push_back((i + (size+1)*j));
-      indices.push_back((1+j) * (size + 1) + i);
+  for(int i=0; i <= aSize; i++ ){
+    for(int j=0; j < aSize; j++){
+      indices.push_back((i + (aSize+1)*j));
+      indices.push_back((1+j) * (aSize + 1) + i);
     }
   }
   
@@ -258,7 +256,7 @@ std::vector<GLuint> Mesh::generateWireframeIndices(int size)const{
 
 void Mesh::setVertexAttributes()const{
   // position attribute
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)nullptr);
   glEnableVertexAttribArray(0);
   
   // normal attribute

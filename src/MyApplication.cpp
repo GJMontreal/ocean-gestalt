@@ -57,8 +57,6 @@ void MyApplication::loop() {
   if (glfwWindowShouldClose(getWindow()))
     exit();
 
-  // float t = fmod(getTime(),6.0f);
-
   projection = glm::perspective(glm::radians(getCamera()->Zoom),
                                 getWindowRatio(), 0.1f, 100.f);
 

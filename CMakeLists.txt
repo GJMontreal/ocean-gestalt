@@ -17,6 +17,7 @@ add_executable(ocean-gestalt
   src/Mesh.cpp
   src/Model.cpp
   src/Ocean.cpp
+  src/Debug.cpp
 )
 set_property(TARGET ocean-gestalt PROPERTY CXX_STANDARD 11)
 # target_compile_options(ocean-gestalt PRIVATE -Wall)

@@ -26,7 +26,7 @@ class Mesh {
   void calculateNormals(
       std::vector<VertexType>& vertices,
       std::vector<GLuint>
-          indices);  // this could also return an array of vertices that
+          indices)const;  // this could also return an array of vertices that
                      // corresponds to the face normals
 
   GLuint getVbo()const;
@@ -34,7 +34,7 @@ class Mesh {
   // later
   std::vector<GLuint> getTriangularIndices()const;
 
-  NormalVertices generateNormalVertices(std::vector<VertexType>& vertices)const;
+  NormalVertices generateNormalVertices(const std::vector<VertexType>& vertices)const;
 
  private:
   int size;
@@ -55,7 +55,7 @@ class Mesh {
   std::vector<GLuint> triangularMeshIndices;
 
   void generateMesh(int size);
-  VertexType generateVertex(const glm::vec2 position, glm::vec4 color)const;
+  VertexType generateVertex(const glm::vec2 position, const glm::vec4& color)const;
 
   std::vector<GLuint> generateTriangularIndices(
       int size)const;  

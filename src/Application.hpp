@@ -28,6 +28,7 @@ struct GLFWwindow;
 class Application {
  public:
   Application();
+  virtual ~Application() = default;
 
   static Application& getInstance();
 

@@ -16,23 +16,19 @@
 class MyApplication : public Application {
  public:
   MyApplication();
-
+ 
  protected:
-  virtual void loop() override;
+  void loop() override;
   void toggleNormalDisplay() override;
   void toggleSimulation() override;
   void toggleWireframe() override;
 
  private:
+  // I don't think we use application level shaders
   // shader
   Shader vertexShader;
   Shader fragmentShader;
   ShaderProgram shaderProgram;
-
-  // Shader wireframeVertexShader;
-  // Shader wireframeFragmentShader;
-  // Shader wireframeGeometryShader;
-  // ShaderProgram wireframeShaderProgram;
 
   // shader matrix uniform
   glm::mat4 projection = glm::mat4(1.0);

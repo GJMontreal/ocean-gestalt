@@ -12,7 +12,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <stdexcept>
-#include "DebugMatrix.hpp"
+#include "Debug.hpp"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
