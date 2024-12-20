@@ -17,6 +17,8 @@ private:
   void initParticles();
   void resetParticles();
   void moveParticles(float time);
+  vec3 gerstnerWave(float time, vec2 position, Wave* wave);  //we're only using pointers here to take advantage of the . members
+  vec3 numericalDerivativeNormal(vec3 lastPosition, vec2 position, Wave* wave, float time, float offset = 0.01f);
   std::vector<Wave*> waves;
 };
 

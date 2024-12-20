@@ -5,7 +5,7 @@ in VS_OUT {
     vec3 normal;
 } gs_in[];
 
-const float MAGNITUDE = 0.2;
+const float MAGNITUDE = 1.0;
 
 layout(std140) uniform Matrices
 {

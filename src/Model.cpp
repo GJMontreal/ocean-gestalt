@@ -29,7 +29,7 @@ void Model::draw(Uniforms uniforms) {
   // for each shader
   for(Mesh mesh: meshes){
     if(drawWireframe){
-      ShaderProgram program = shaderPrograms[0];
+      ShaderProgram program = wireframeShaderProgram;
       program.activate();
       program.setUniform("model", transform);
       #ifdef __EMSCRIPTEN__

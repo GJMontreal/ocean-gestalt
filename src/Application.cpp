@@ -95,8 +95,8 @@ Application::Application()
   glEnable(GL_CULL_FACE);
   // vsync
   // glfwSwapInterval(false);
-  // camera = Camera(glm::vec3(0.0f, 0.0f, .1f));
-  camera = Camera(glm::vec3{15,3.8,15},glm::vec3{-.002,1,-.02},-138,-1.3);
+  camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f));
+  // camera = Camera(glm::vec3{15,3.8,15},glm::vec3{-.002,1,-.02},-138,-1.3);
 
 
   // bind the callbacks
@@ -209,7 +209,7 @@ void Application::mouseCallback(GLFWwindow* window,
     firstMouse = true;
     return;
   }
-  
+
   Application* app = (Application*)glfwGetWindowUserPointer(window);
   Camera* camera = app->getCamera();
   float xpos = static_cast<float>(xposIn);

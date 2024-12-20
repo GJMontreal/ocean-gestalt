@@ -16,7 +16,7 @@ class Model {
   void setTransform(glm::mat4 transform);
   virtual void draw(Uniforms uniforms);
   bool drawWireframe = true;
-  bool drawNormals = false;
+  bool drawNormals = true;
 
  private:
   glm::mat4 transform = glm::mat4(1.0);
@@ -25,11 +25,12 @@ class Model {
   Camera *camera;
   std::vector<Mesh> meshes;
   std::vector<ShaderProgram> shaderPrograms;
+  
 #ifndef __EMSCRIPTEN__
 //are these being used
   ShaderProgram wireframeShaderProgram =
       ShaderProgram({Shader(SHADER_DIR "/shader.vert", GL_VERTEX_SHADER),
-                     Shader(SHADER_DIR "/wireframe.fs", GL_FRAGMENT_SHADER)});
+                     Shader(SHADER_DIR "/simple.frag", GL_FRAGMENT_SHADER)});
 
 
   ShaderProgram normalShader =
