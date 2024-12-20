@@ -19,6 +19,7 @@
 #include "asset.hpp"
 #include "glError.hpp"
 
+#include <nlohmann/json.hpp>
 
 MyApplication::MyApplication()
 #ifndef __EMSCRIPTEN__
@@ -34,7 +35,7 @@ MyApplication::MyApplication()
       shaderProgram({vertexShader, fragmentShader})
       #endif
       {
-  // models.push_back(new Ocean(20,{wireframeShaderProgram,shaderProgram},this->getCamera()));
+  
   models.push_back(new Ocean(20,{shaderProgram}, this->getCamera()));
     // models.push_back(new Model(5,{shaderProgram}, this->getCamera()));
   glEnable(GL_BLEND);

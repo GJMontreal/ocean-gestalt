@@ -57,6 +57,13 @@ endif()
 add_subdirectory(lib/glm)
 target_link_libraries(ocean-gestalt PRIVATE glm)
 
+include(FetchContent)
+
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
+FetchContent_MakeAvailable(json)
+
+target_link_libraries(ocean-gestalt PRIVATE nlohmann_json::nlohmann_json)
+
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/src/asset.hpp.in
   ${CMAKE_CURRENT_BINARY_DIR}/src/asset.hpp

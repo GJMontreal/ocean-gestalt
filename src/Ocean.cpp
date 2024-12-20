@@ -11,7 +11,7 @@ Ocean::Ocean(int meshSize,
     : Model(meshSize, shaderPrograms, camera) {
   initParticles();
   resetParticles();
-  waves.push_back(new Wave(2, 10, vec2(0, 1)));
+  waves.push_back(new Wave(2, 10, vec2(0, 1),2));
    waves.push_back(new Wave(4,17,vec2(0.4,1)));
   waves.push_back(new Wave(0.1f,2,vec2(.5,1)));
 }
