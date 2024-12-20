@@ -1,21 +1,30 @@
 #include <Wave.hpp>
 
-#include <cmath>
+// #include <cmath>
 
-Wave::Wave(float amplitude, float wavelength, vec2 direction){
-  m_amplitude = amplitude;
-  // m_period = period;
-  m_wavelength = wavelength;
-  m_direction = direction;
-  m_steepness = 1.0f;
-  update();
+Wave::Wave(float aAmplitude, float aWavelength, vec2 aDirection, float aSteepness){
+  amplitude = aAmplitude;
+  wavelength = aWavelength;
+  direction = aDirection;
+  steepness = aSteepness;
 }
 
-void Wave::update(){
-  m_k = 2.0f * M_PI / m_wavelength;
-  m_velocity = 1.0f;
-  // float velocitySqr = velocity * velocity;
-  // m_k.x = velocitySqr * sin(direction);
-  // m_k.y = velocitySqr * cos(direction);
-  m_kMagnitude = length(m_k);
-} 
+float Wave::getVelocity()const{
+  return 2.0f * (float)M_PI / wavelength;
+}
+
+float Wave::getAmplitude()const{
+  return amplitude;
+}
+
+float Wave::getWavelength()const{
+  return wavelength;
+}
+
+float Wave::getSteepness()const{
+  return steepness;
+}
+
+vec2 Wave::getDirection()const{
+  return direction;
+}

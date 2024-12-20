@@ -34,7 +34,7 @@ class Model {
   std::vector<ShaderProgram> shaderPrograms;
   
   bool drawWireframe = true;
-  bool drawNormals = true;
+  bool drawNormals = false;
   bool running = true;
 
 #ifndef __EMSCRIPTEN__

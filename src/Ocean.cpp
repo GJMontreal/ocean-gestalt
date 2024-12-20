@@ -11,17 +11,9 @@ Ocean::Ocean(int meshSize,
     : Model(meshSize, shaderPrograms, camera) {
   initParticles();
   resetParticles();
-  // this->camera = camera;
   waves.push_back(new Wave(2, 10, vec2(0, 1)));
    waves.push_back(new Wave(4,17,vec2(0.4,1)));
-  waves.push_back(new Wave(0.05f,2,vec2(.5,1)));
-  //    waves.push_back(new Wave(.1,1,vec2(0,1)));
-  // waves.push_back(new Wave(2,10,vec2(0,1)));
-  // waves.push_back(new Wave(1, 10));
-  // waves.push_back(new Wave(1, 13,0.3f));
-  // waves.push_back(new Wave(.05,2,M_PI/7));
-  // waves.push_back(new Wave(.05,2.5,M_PI/2 + .1));
-  // waves.push_back(new Wave(1.5f,12.0f,1.2f));
+  waves.push_back(new Wave(0.1f,2,vec2(.5,1)));
 }
 
 void Ocean::draw(const Uniforms& uniforms) {
@@ -111,17 +103,10 @@ void Ocean::moveParticles(float time) {
 // From
 // https://www.gamedev.net/forums/topic/687501-how-to-compute-normal-vectors-for-gerstner-waves/5337386/
 // https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-1-effective-water-simulation-physical-models
-vec3 Ocean::gerstnerWave(float time, vec2 position, Wave* wave) const{
-  // TO DO: rename these variables to make it clearer what they are
-  //   float L = waveLength; // wave crest to crest length in metres
-  //   float A = amplitude; // amplitude - wave height (crest to trough)
-  float k = 2.0f * 3.1416f / wave->wavelength;  // wave length
-  // I think I've confused period and wavelength
-  // float k = wave->velocity;
+vec3 Ocean::gerstnerWave(float time, vec2 position, const Wave* wave) const{
+  float k = wave->getVelocity();
 
-  float kA = k * wave->amplitude;
-
-  vec2 D = normalize(wave->direction);  // normalized direction
+  vec2 D = normalize(wave->getDirection());  // normalized direction
   vec2 K = D * k;                       // wave vector and magnitude (direction)
 
   // peak/crest steepness high means steeper, but too much
@@ -136,9 +121,9 @@ vec3 Ocean::gerstnerWave(float time, vec2 position, Wave* wave) const{
   float w = speed * k;  // Phase/frequency //we need to work out th velocity
   float wT = w * time;
 
-  // Unoptimized:
-  // float2 xz = position.xz - K/k*Q*A*sin(dot(K,position.xz)- wT);
-  // float y = A*cos(dot(K,position.xz)- wT);
+  // Unoptimized
+  // xz = position.xz - K/k*Q*A*sin(dot(K,position.xz)- wT);
+  //  y = A*cos(dot(K,position.xz)- wT);
 
   // Calculate once instead of 4 times
   // I think we should rely on the compiler optimizing things, at least at first
@@ -148,9 +133,9 @@ vec3 Ocean::gerstnerWave(float time, vec2 position, Wave* wave) const{
 
   VertexType vertex;
 
-  vec2 xy = position - D * wave->steepness * wave->amplitude * S0;
-  float z = wave->amplitude * C0;
-  return vec3(position, z);
+  vec2 xy = position - D * wave->getSteepness() * wave->getAmplitude() * S0;
+  float z = wave->getAmplitude() * C0;
+  return vec3(xy, z);
 }
 
 vec3 Ocean::numericalDerivativeNormal(vec3 lastPosition,

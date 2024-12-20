@@ -6,33 +6,24 @@
 using namespace glm;
 class Wave{
   public:
-    // Wave(float amplitude=0, float period=0, float direction=0);
-    Wave(float amplitude, float wavelength, vec2 direction);
+    Wave(float amplitude = 0.0f, float wavelength = 0.0f, vec2 direction = vec2(0.0f,0.0f), float steepness = 1.0f);
 
     void setAmplitude(float amplitude);
-    // void setPeriod(float period);
     void setDirection(glm::vec2 direction);
+    void setWavelength(float wavelength);
+    
+    float getAmplitude()const;
+    vec2 getDirection()const;
+    float getWavelength()const;
+    float getVelocity()const;
+    float getSteepness()const;
 
-    const float &amplitude = m_amplitude ;
-    // const float &period = m_period;
-    const float &wavelength = m_wavelength;
-    const vec2 &direction = m_direction;
-    const float &velocity = m_velocity;
-    const float &k = m_k; //wavevector?
-    const float &kMagnitude = m_kMagnitude;
-    const float &steepness = m_steepness;
   private:
-    float m_amplitude;
-    float m_period;
-    vec2 m_direction;
-    float m_velocity;
-    float m_k;
-    float m_kMagnitude;
-    float m_wavelength;
-    float m_steepness;
-
-    void update();
-
+    float amplitude;
+    float period;
+    vec2 direction;
+    float wavelength;
+    float steepness;
 };
 
 #endif
