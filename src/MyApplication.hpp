@@ -18,7 +18,10 @@ class MyApplication : public Application {
   MyApplication();
 
  protected:
-  virtual void loop();
+  virtual void loop() override;
+  void toggleNormalDisplay() override;
+  void toggleSimulation() override;
+  void toggleWireframe() override;
 
  private:
   // shader
@@ -37,6 +40,7 @@ class MyApplication : public Application {
   GLuint uboMatrices;
 
   std::vector<Model*> models;
+
 };
 
 #endif  // OPENGL_CMAKE_SKELETON_MYAPPLICATION

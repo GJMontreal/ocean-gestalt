@@ -249,13 +249,54 @@ void Application::processInput(GLFWwindow* window) {
     camera.ProcessKeyboard(UP, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
     camera.ProcessKeyboard(DOWN, deltaTime);
-  if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS){
-    dumpCameraMatrices();
+
+  // These are problematic because they might get called many times
+  // for each; save the state and only call the function when it changes
+  // to release
+  if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
+    if (keyPressState[GLFW_KEY_C] == GLFW_RELEASE) {
+      dumpCameraMatrices();
+      keyPressState[GLFW_KEY_C] = GLFW_PRESS;
+    }
+  } else {
+    keyPressState[GLFW_KEY_C] = GLFW_RELEASE;
   }
+  
+  if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) {
+    if (keyPressState[GLFW_KEY_N] == GLFW_RELEASE) {
+      toggleNormalDisplay();
+      keyPressState[GLFW_KEY_N] = GLFW_PRESS;
+    }
+  } else {
+    keyPressState[GLFW_KEY_N] = GLFW_RELEASE;
+  }
+
   if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-    std::cout << "Toggling simulation" << std::endl;
-    running = !running;
+    if(keyPressState[GLFW_KEY_R] == GLFW_RELEASE){
+      toggleSimulation();
+      keyPressState[GLFW_KEY_R] = GLFW_PRESS;
+    }
+  }else{
+    keyPressState[GLFW_KEY_R] = GLFW_RELEASE;
   }
+
+  if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+    if(keyPressState[GLFW_KEY_L] == GLFW_RELEASE){
+      toggleWireframe();
+      keyPressState[GLFW_KEY_L] = GLFW_PRESS;
+    }
+  }else{
+    keyPressState[GLFW_KEY_L] = GLFW_RELEASE;
+  }
+}
+
+void Application::toggleNormalDisplay(){
+}
+
+void Application::toggleSimulation(){
+}
+
+void Application::toggleWireframe (){
 }
 
 void Application::dumpCameraMatrices(){

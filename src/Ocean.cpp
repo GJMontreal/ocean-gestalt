@@ -14,7 +14,7 @@ Ocean::Ocean(int meshSize,
   resetParticles();
   // this->camera = camera;
   waves.push_back(new Wave(2, 10, vec2(0, 1)));
-   waves.push_back(new Wave(3,13,vec2(0.4,1)));
+   waves.push_back(new Wave(11,17,vec2(0.4,1)));
   waves.push_back(new Wave(.05,2,vec2(.5,1)));
   //    waves.push_back(new Wave(.1,1,vec2(0,1)));
   // waves.push_back(new Wave(2,10,vec2(0,1)));
@@ -58,8 +58,8 @@ void Ocean::resetParticles() {
       (particle)->position.x = xx;
       (particle)->position.y = yy;
       (particle)->position.z = 0;
-      (particle)->normal = glm::normalize(glm::vec3(xx, yy, 1.0));
-      particle->color = glm::vec4({.01f, .15f, .210f, 0.0f});
+      (particle)->normal = glm::normalize(glm::vec3(xx, yy, 1.0)); //TO DO: do we care about this
+      particle->color = glm::vec4({.01f, .15f, .210f, 0.0f});  //TO DO: we should specify this
       particle++;
     }
 }

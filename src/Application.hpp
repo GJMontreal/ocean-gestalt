@@ -11,6 +11,8 @@
 
 #include <camera.h>
 #include <string>
+#include <map>
+#include <GLFW/glfw3.h>
 
 struct GLFWwindow;
 
@@ -77,12 +79,18 @@ class Application {
   void dumpCameraMatrices();
   // Simulation:
   bool running = false;
+
  protected:
   Application(const Application&){};
 
   std::string title;
 
   virtual void loop();
+  virtual void toggleNormalDisplay();
+  virtual void toggleSimulation();
+  virtual void toggleWireframe();
+
+  std::map<char, int> keyPressState;
 };
 
 #endif /* end of include guard: OPENGL_CMAKE_SKELETON_APPLICATION_HPP */

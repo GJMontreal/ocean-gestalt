@@ -7,7 +7,7 @@ Wave::Wave(float amplitude, float wavelength, vec2 direction){
   // m_period = period;
   m_wavelength = wavelength;
   m_direction = direction;
-  m_steepness = .75f;
+  m_steepness = 1.0f;
   update();
 }
 

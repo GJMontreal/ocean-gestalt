@@ -9,7 +9,7 @@ public:
   Ocean(int meshSize, std::vector<ShaderProgram>shaderPrograms, Camera *camera);
   virtual ~Ocean();
   void draw(Uniforms uniforms)override;
-  bool running = true;
+
   bool animateCamera = true;
 private:
 

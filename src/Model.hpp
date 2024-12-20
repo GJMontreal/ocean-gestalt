@@ -17,7 +17,7 @@ class Model {
   virtual void draw(Uniforms uniforms);
   bool drawWireframe = true;
   bool drawNormals = true;
-
+  bool running = true;
  private:
   glm::mat4 transform = glm::mat4(1.0);
 

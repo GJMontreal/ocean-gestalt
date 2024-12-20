@@ -78,7 +78,28 @@ void MyApplication::loop() {
   glClear(GL_COLOR_BUFFER_BIT);
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  for(Model *model: models){
+  for(Model* model: models){
     model->draw(uniforms);
+  }
+}
+
+void MyApplication::toggleNormalDisplay(){
+  std::cout << "Toggle normals" << std::endl;
+  for(Model* model: models){
+    model->drawNormals = !model->drawNormals;
+  }
+}
+
+void MyApplication::toggleSimulation(){
+  std::cout << "Toggle simulation" << std::endl;
+  for(Model* model: models){
+    model->running = !model->running;
+  }
+}
+
+void MyApplication::toggleWireframe(){
+  std::cout << "Toggle wireframe" << std::endl;
+  for(Model* model: models){
+    model->drawWireframe = !model->drawWireframe;
   }
 }
