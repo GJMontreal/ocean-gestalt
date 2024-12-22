@@ -3,27 +3,21 @@
 
 #include <glm/glm.hpp>
 
-using namespace glm;
-class Wave{
-  public:
-    Wave(float amplitude = 0.0f, float wavelength = 0.0f, vec2 direction = vec2(0.0f,0.0f), float steepness = 1.0f);
+using vec2 = glm::vec2;
 
-    void setAmplitude(float amplitude);
-    void setDirection(glm::vec2 direction);
-    void setWavelength(float wavelength);
-    
-    float getAmplitude()const;
-    vec2 getDirection()const;
-    float getWavelength()const;
-    float getVelocity()const;
-    float getSteepness()const;
+class Wave {
+ public:
+  Wave(float amplitude = 0.0f,
+       float wavelength = 0.0f,
+       vec2 direction = vec2(0.0f, 0.0f),
+       float steepness = 1.0f);
 
-  private:
-    float amplitude;
-    float period;
-    vec2 direction;
-    float wavelength;
-    float steepness;
+  vec2 direction;
+  float wavelength;
+  float steepness;
+  float amplitude;
+
+  float getVelocity() const;
 };
 
 #endif

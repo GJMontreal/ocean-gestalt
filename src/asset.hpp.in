@@ -3,5 +3,6 @@ namespace asset {
 #define SHADER_DIR "/shader/webgl"
 #else
 #define SHADER_DIR "@CMAKE_SOURCE_DIR@/shader"
+#define CONFIGURATION_DIR "@CMAKE_SOURCE_DIR@/config"
 #endif
 }  // namespace asset

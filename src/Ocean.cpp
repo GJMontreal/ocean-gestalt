@@ -12,7 +12,7 @@ Ocean::Ocean(int meshSize,
   initParticles();
   resetParticles();
   waves.push_back(new Wave(2, 10, vec2(0, 1),2));
-   waves.push_back(new Wave(4,17,vec2(0.4,1)));
+  waves.push_back(new Wave(4,17,vec2(0.4,1)));
   waves.push_back(new Wave(0.1f,2,vec2(.5,1)));
 }
 
@@ -106,7 +106,7 @@ void Ocean::moveParticles(float time) {
 vec3 Ocean::gerstnerWave(float time, vec2 position, const Wave* wave) const{
   float k = wave->getVelocity();
 
-  vec2 D = normalize(wave->getDirection());  // normalized direction
+  vec2 D = normalize(wave->direction);  // normalized direction
   vec2 K = D * k;                       // wave vector and magnitude (direction)
 
   // peak/crest steepness high means steeper, but too much
@@ -133,8 +133,8 @@ vec3 Ocean::gerstnerWave(float time, vec2 position, const Wave* wave) const{
 
   VertexType vertex;
 
-  vec2 xy = position - D * wave->getSteepness() * wave->getAmplitude() * S0;
-  float z = wave->getAmplitude() * C0;
+  vec2 xy = position - D * wave->steepness * wave->amplitude * S0;
+  float z = wave->amplitude * C0;
   return vec3(xy, z);
 }
 

@@ -4,6 +4,11 @@
 #include "Model.hpp"
 #include "Wave.hpp"
 #include "camera.h"
+
+#include <glm/glm.hpp>
+
+using vec3 = glm::vec3;
+
 class Ocean : public Model{
 public:
   Ocean(int meshSize, std::vector<ShaderProgram> shaderPrograms, Camera *camera);

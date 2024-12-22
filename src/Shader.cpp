@@ -46,7 +46,7 @@ void getFileContents(const char* filename, vector<char>& buffer) {
     buffer.push_back('\0');
   } else {
     throw std::invalid_argument(string("The file ") + filename +
-                                " doesn't exists");
+                                " doesn't exist");
   }
 }
 

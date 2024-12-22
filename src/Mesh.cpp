@@ -70,7 +70,7 @@ void Mesh::drawNormals()const{
   glBindVertexArray(0);
 }
 
-// The mesh will be symmetrical in x and y
+// The mesh is symmetrical in x and y
 void Mesh::generateMesh(int aSize){
   // Mesh will have vertex and normal for the moment
   std::vector<VertexType> vertices;

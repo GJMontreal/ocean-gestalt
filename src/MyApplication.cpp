@@ -9,6 +9,7 @@
 
 #include "Ocean.hpp"
 #include "Uniforms.hpp"
+#include "Configuration.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -35,7 +36,7 @@ MyApplication::MyApplication()
       shaderProgram({vertexShader, fragmentShader})
       #endif
       {
-  
+  Configuration config(CONFIGURATION_DIR "/wave.json");
   models.push_back(new Ocean(20,{shaderProgram}, this->getCamera()));
     // models.push_back(new Model(5,{shaderProgram}, this->getCamera()));
   glEnable(GL_BLEND);

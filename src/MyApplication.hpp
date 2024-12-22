@@ -12,6 +12,7 @@
 #include "Application.hpp"
 #include "Shader.hpp"
 #include "Model.hpp"
+#include <map>
 
 class MyApplication : public Application {
  public:
@@ -30,13 +31,15 @@ class MyApplication : public Application {
   Shader fragmentShader;
   ShaderProgram shaderProgram;
 
+
+
   // shader matrix uniform
   glm::mat4 projection = glm::mat4(1.0);
   glm::mat4 view = glm::mat4(1.0);
   GLuint uboMatrices;
 
   std::vector<Model*> models;
-
+  std::map<std::string, ShaderProgram*> shaderPrograms;
 };
 
 #endif  // OPENGL_CMAKE_SKELETON_MYAPPLICATION
