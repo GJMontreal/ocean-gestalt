@@ -8,7 +8,7 @@
 using json = nlohmann::json;
 
 // Wave
-void to_json(json& j, const Wave& wave);
+void to_json(json& j, const Wave& wave); // I don't think we need this
 void from_json(const json& j, Wave& wave);
 
 namespace glm {

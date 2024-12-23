@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+using vec3 = glm::vec3;
+
 #include <iostream>
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
 enum Camera_Movement {
@@ -47,15 +49,21 @@ public:
     int Counter;
 
     // constructor with vectors
-    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
-    {
-        Position = position;
-        WorldUp = up;
-        Yaw = yaw;
-        Pitch = pitch;
-        updateCameraVectors();
-        Counter = 0;
-        std::cout << "creating camera" << std::endl;
+    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 3.0f),
+           glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
+           float yaw = YAW,
+           float pitch = PITCH)
+        : Front(glm::vec3(0.0f, 0.0f, -1.0f)),
+          MovementSpeed(SPEED),
+          MouseSensitivity(SENSITIVITY),
+          Zoom(ZOOM) {
+      Position = position;
+      WorldUp = up;
+      Yaw = yaw;
+      Pitch = pitch;
+      updateCameraVectors();
+      Counter = 0;
+      std::cout << "creating camera" << std::endl;
     }
     // constructor with scalar values
     Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
@@ -143,8 +151,7 @@ private:
         dolly.z = sin(glm::radians(Yaw));
 
         DollyFront = glm::normalize(dolly);
-        DollyRight = glm::normalize(glm::cross(DollyFront, WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-        
+        DollyRight = glm::normalize(glm::cross(DollyFront, WorldUp));
     }
 };
 #endif

@@ -33,10 +33,6 @@ git submodule update
 
 usage (WebAssembly) : 
 ---------------------
-Switch to the webassembly branch
-```
-git checkout webassembly
-```
 
 Install emscripten, then
 ```bash
@@ -70,3 +66,10 @@ For instance :
 * Configure (Choose for example Visual Studio generator)
 * Generate
 Launch the generated project in your favorite IDE and run it.
+
+git@github.com:ArthurSonzogni/OpenGL_CMake_Skeleton.git
+
+https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-1-effective-water-simulation-physical-models
+
+https://learnopengl.com/About
+
