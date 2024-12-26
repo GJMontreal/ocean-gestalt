@@ -1,8 +1,9 @@
 #include "Model.hpp"
+#include "Wave.hpp"
 
 #include "asset.hpp"
 #include "glError.hpp"
-
+#include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 
 Model::Model(int meshSize, const std::vector<ShaderProgram>& shaderPrograms, Camera *camera)
@@ -15,17 +16,21 @@ Model::Model(int meshSize, const std::vector<ShaderProgram>& shaderPrograms, Cam
 
   glCheckError(__FILE__, __LINE__);
 }
+void Model::beginDrawing(ShaderProgram &program, Uniforms& uniforms){
+
+}
 
 // specify different shaders for mesh, wireframe, and normals
-void Model::draw(const Uniforms& uniforms) {
+void Model::draw(Uniforms& uniforms) {
   glm::vec3 lightPos(0.0f, 0.0f, 10.0f); // what coordinate system is this in
 
-  // for each shader
   for(Mesh mesh: meshes){
     if(drawWireframe){
       ShaderProgram program = wireframeShaderProgram;
       program.activate();
+      beginDrawing(program, uniforms);
       program.setUniform("model", transform);
+   
       #ifdef __EMSCRIPTEN__
       program.setUniform("projection", uniforms.projection);
       program.setUniform("view", uniforms.view);
@@ -46,17 +51,19 @@ void Model::draw(const Uniforms& uniforms) {
 
   for(ShaderProgram program: shaderPrograms){
       program.activate();
-
+      beginDrawing(program, uniforms);
       program.setUniform("model", transform);
       program.setUniform("viewPos",camera->Position);
       program.setUniform("lightPos", lightPos);
+      
+
        #ifdef __EMSCRIPTEN__
       program.setUniform("projection", uniforms.projection);
       program.setUniform("view", uniforms.view);
       #endif
       glCheckError(__FILE__, __LINE__);
 
-      mesh.draw(); 
+      // mesh.draw(); 
       mesh.drawWireframe();   
     
       program.deactivate();
@@ -66,6 +73,10 @@ void Model::draw(const Uniforms& uniforms) {
 
 Mesh* Model::getMesh(int index){
   return &(meshes[index]);
+}
+
+ShaderProgram* Model::getShaderProgram(int index){
+  return &(shaderPrograms[index]);
 }
 
 void Model::setTransform(const glm::mat4& aTransform){

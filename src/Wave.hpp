@@ -17,6 +17,7 @@ class Wave {
   float steepness;
   float amplitude;
 
+
   float getVelocity() const;
 };
 

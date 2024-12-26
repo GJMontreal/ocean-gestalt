@@ -1,9 +1,26 @@
 #include "Ocean.hpp"
 #include "Mesh.hpp"
+#include "Shader.hpp"
 #include "Vertex.hpp"
 
 #include <GLFW/glfw3.h>
 #include <cmath>
+#include <cstdio>
+
+#include <memory>
+#include <string>
+#include <stdexcept>
+
+template<typename ... Args>
+std::string string_format( const std::string& format, Args ... args )
+{
+    int size_s = std::snprintf( nullptr, 0, format.c_str(), args ... ) + 1; // Extra space for '\0'
+    if( size_s <= 0 ){ throw std::runtime_error( "Error during formatting." ); }
+    auto size = static_cast<size_t>( size_s );
+    std::unique_ptr<char[]> buf( new char[ size ] );
+    std::snprintf( buf.get(), size, format.c_str(), args ... );
+    return std::string( buf.get(), buf.get() + size - 1 ); // We don't want the '\0' inside
+}
 
 Ocean::Ocean(int meshSize,
              std::vector<ShaderProgram> shaderPrograms,
@@ -11,17 +28,27 @@ Ocean::Ocean(int meshSize,
     : Model(meshSize, shaderPrograms, camera) {
   initParticles();
   resetParticles();
+
   waves.push_back(new Wave(2, 10, vec2(0, 1),2));
   waves.push_back(new Wave(4,17,vec2(0.4,1)));
   waves.push_back(new Wave(0.1f,2,vec2(.5,1)));
+  
+  setShaderUniforms(waves, getShaderProgram(0));
+}
+void Ocean::beginDrawing(ShaderProgram& program, Uniforms& uniforms){
+   program.setUniform("time",uniforms.time);
 }
 
-void Ocean::draw(const Uniforms& uniforms) {
+void Ocean::draw(Uniforms& uniforms) {
   // calculate new positions for our particles
+  auto time = float(glfwGetTime());
+  uniforms.time = time;
   if (isRunning()) {
-    auto time = float(glfwGetTime());
-    moveParticles(time);
+    // auto time = float(glfwGetTime());
+    // uniforms.time = time;
+    // moveParticles(time);
   }
+ 
   Model::draw(uniforms);
 }
 
@@ -105,7 +132,6 @@ void Ocean::moveParticles(float time) {
 // https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-1-effective-water-simulation-physical-models
 vec3 Ocean::gerstnerWave(float time, vec2 position, const Wave* wave) const{
   float k = wave->getVelocity();
-
   vec2 D = normalize(wave->direction);  // normalized direction
   vec2 K = D * k;                       // wave vector and magnitude (direction)
 
@@ -144,10 +170,34 @@ vec3 Ocean::numericalDerivativeNormal(vec3 lastPosition,
                                       float time,
                                       float offset) {
   // discrete/numerical derivative
-  vec3 dx = vec3(0.01, 0, 0) +
+  vec3 dx = vec3(offset, 0, 0) +
             gerstnerWave(time, vec2(position.x + offset, position.y), wave);
-  vec3 dy = vec3(0, 0.01, 0) +
-            gerstnerWave(time, vec2(position.x, position.y + .01), wave);
-  vec3 normal = normalize(cross(dy - lastPosition, dx - lastPosition));
-  return -normal;  // flip the normal because of our winding order
+  vec3 dy = vec3(0, offset, 0) +
+            gerstnerWave(time, vec2(position.x, position.y + offset), wave);
+            //   vec3 dt = vec3(offset, offset, 0) +
+            // gerstnerWave(time, vec2(position.x+offset, position.y + offset), wave);
+  vec3 normal = normalize(cross(dx - lastPosition, dy - lastPosition));
+  return normal;  // flip the normal because of our winding order
+}
+
+void Ocean::setShaderUniforms(const std::vector<Wave*>& waves,
+                              ShaderProgram* program) {
+  program->activate();
+  int i = 0;
+  for (const Wave* wave : waves) {
+    std::string uniformName = string_format("waves[%i].amplitude", i);
+
+    program->setUniform(uniformName, wave->amplitude);
+
+    uniformName = string_format("waves[%i].steepness", i);
+    program->setUniform(uniformName, wave->steepness);
+
+    uniformName = string_format("waves[%i].wavelength", i);
+    program->setUniform(uniformName, wave->wavelength);
+
+    uniformName = string_format("waves[%i].direction", i);
+    program->setUniform(uniformName, glm::vec3(wave->direction, 0));
+
+    i++;
+  }
 }

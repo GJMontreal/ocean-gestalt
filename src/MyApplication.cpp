@@ -25,8 +25,8 @@
 MyApplication::MyApplication()
 #ifndef __EMSCRIPTEN__
     : Application(),
-      vertexShader(SHADER_DIR "/shader.vert", GL_VERTEX_SHADER),
-      fragmentShader(SHADER_DIR "/shader.frag", GL_FRAGMENT_SHADER),
+      vertexShader(SHADER_DIR "/gerstner.vert", GL_VERTEX_SHADER),
+      fragmentShader(SHADER_DIR "/simple.frag", GL_FRAGMENT_SHADER),
       shaderProgram({vertexShader, fragmentShader})
       // the order of our shader programs is important
       #else

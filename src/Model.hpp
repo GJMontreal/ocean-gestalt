@@ -14,8 +14,8 @@ class Model {
   virtual ~Model() = default;
 
   void setTransform(const glm::mat4& transform);
-  virtual void draw(const Uniforms& uniforms);
-  
+  virtual void draw(Uniforms& uniforms);
+  virtual void beginDrawing(ShaderProgram& program,  Uniforms& uniforms);
   void toggleDrawWireframe();
   void toggleDrawNormals();
   void toggleRunning();
@@ -25,22 +25,31 @@ class Model {
   bool shouldDrawWireframe()const;
 
   Mesh* getMesh(int index);
+  ShaderProgram* getShaderProgram(int index);
+ 
+  // virtual void setupWireframeShader();
+  // virtual void setupMeshShader();
+
+//These probably need to be pointers in order to work
+  // ShaderProgram meshShader;
+  // ShaderProgram wireframeShader;
 
  private:
   glm::mat4 transform = glm::mat4(1.0);
   
+  std::vector<ShaderProgram> shaderPrograms;
+ 
   Camera *camera;
   std::vector<Mesh> meshes;
-  std::vector<ShaderProgram> shaderPrograms;
+ 
   
   bool drawWireframe = true;
   bool drawNormals = false;
   bool running = true;
 
 #ifndef __EMSCRIPTEN__
-//are these being used
   ShaderProgram wireframeShaderProgram =
-      ShaderProgram({Shader(SHADER_DIR "/shader.vert", GL_VERTEX_SHADER),
+      ShaderProgram({Shader(SHADER_DIR "/gerstner.vert", GL_VERTEX_SHADER),
                      Shader(SHADER_DIR "/simple.frag", GL_FRAGMENT_SHADER)});
 
 
