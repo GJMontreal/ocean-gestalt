@@ -5,12 +5,14 @@
 #include "Mesh.hpp"
 #include "Shader.hpp"
 #include "asset.hpp"
-#include "camera.h"
+#include "Camera.hpp"
 #include "Uniforms.hpp"
+
+#include <memory>
 
 class Model {
  public:
-  Model(int meshSize, const std::vector<ShaderProgram>& shaderPrograms, Camera *camera);
+  Model(int meshSize, const std::vector<ShaderProgram>& shaderPrograms, std::shared_ptr<Camera> camera);
   virtual ~Model() = default;
 
   void setTransform(const glm::mat4& transform);
@@ -26,7 +28,7 @@ class Model {
 
   Mesh* getMesh(int index);
   ShaderProgram* getShaderProgram(int index);
- 
+  
   // virtual void setupWireframeShader();
   // virtual void setupMeshShader();
 
@@ -34,15 +36,15 @@ class Model {
   // ShaderProgram meshShader;
   // ShaderProgram wireframeShader;
 
+// these could all be public, simplifying things
  private:
   glm::mat4 transform = glm::mat4(1.0);
   
   std::vector<ShaderProgram> shaderPrograms;
  
-  Camera *camera;
+  std::shared_ptr<Camera> camera;
   std::vector<Mesh> meshes;
  
-  
   bool drawWireframe = true;
   bool drawNormals = false;
   bool running = true;

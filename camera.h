@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+
 using vec3 = glm::vec3;
 
 #include <iostream>
@@ -46,7 +47,6 @@ public:
     float MovementSpeed;
     float MouseSensitivity;
     float Zoom;
-    int Counter;
 
     // constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 3.0f),
@@ -62,7 +62,6 @@ public:
       Yaw = yaw;
       Pitch = pitch;
       updateCameraVectors();
-      Counter = 0;
       std::cout << "creating camera" << std::endl;
     }
     // constructor with scalar values
@@ -130,7 +129,6 @@ public:
             Zoom = 45.0f;
     }
 
-private:
     // calculates the front vector from the Camera's (updated) Euler Angles
     void updateCameraVectors()
     {

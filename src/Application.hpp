@@ -9,9 +9,10 @@
 #ifndef OPENGL_CMAKE_SKELETON_APPLICATION_HPP
 #define OPENGL_CMAKE_SKELETON_APPLICATION_HPP
 
-#include <camera.h>
+#include "Camera.hpp"
 #include <string>
 #include <map>
+#include <memory>
 #include <GLFW/glfw3.h>
 
 struct GLFWwindow;
@@ -54,12 +55,10 @@ class Application {
   int getHeight();
   float getWindowRatio();
   bool windowDimensionChanged();
-  Camera *getCamera();
+  std::shared_ptr<Camera> getCamera();
 
  private:
   enum State { stateReady, stateRun, stateExit };
-
-  Camera camera;
 
   State state;
 
@@ -85,6 +84,8 @@ class Application {
   Application(const Application&){};
 
   std::string title;
+
+  std::shared_ptr<Camera> camera;
 
   virtual void loop();
   virtual void toggleNormalDisplay();

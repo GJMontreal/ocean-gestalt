@@ -3,7 +3,7 @@
 
 #include "Model.hpp"
 #include "Wave.hpp"
-#include "camera.h"
+#include "Camera.hpp"
 
 #include <glm/glm.hpp>
 
@@ -13,7 +13,7 @@ class Ocean : public Model {
  public:
   Ocean(int meshSize,
         std::vector<ShaderProgram> shaderPrograms,
-        Camera* camera);
+        std::shared_ptr<Camera> camera);
   ~Ocean() override = default;
   void draw(Uniforms& uniforms) override;
   void beginDrawing(ShaderProgram& program, Uniforms& uniforms) override;

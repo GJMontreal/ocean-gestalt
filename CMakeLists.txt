@@ -20,6 +20,7 @@ add_executable(ocean-gestalt
   src/Debug.cpp
   src/Configuration.cpp
   src/jsonloader.cpp
+  src/Camera.cpp
 )
 set_property(TARGET ocean-gestalt PROPERTY CXX_STANDARD 11)
 # target_compile_options(ocean-gestalt PRIVATE -Wall)

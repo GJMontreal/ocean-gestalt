@@ -24,7 +24,7 @@ std::string string_format( const std::string& format, Args ... args )
 
 Ocean::Ocean(int meshSize,
              std::vector<ShaderProgram> shaderPrograms,
-             Camera* camera)
+             std::shared_ptr<Camera> camera)
     : Model(meshSize, shaderPrograms, camera) {
   initParticles();
   resetParticles();

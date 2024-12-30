@@ -95,7 +95,7 @@ Application::Application()
   glEnable(GL_CULL_FACE);
   // vsync
   // glfwSwapInterval(false);
-  camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f));
+  // camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f));// replace with configuration.camera
   // camera = Camera(glm::vec3{15,3.8,15},glm::vec3{-.002,1,-.02},-138,-1.3);
 
 
@@ -188,15 +188,15 @@ bool Application::windowDimensionChanged() {
   return dimensionChanged;
 }
 
-Camera* Application::getCamera() {
-  return &camera;
+std::shared_ptr<Camera> Application::getCamera() {
+  return camera;
 }
 
 void Application::scrollCallback(GLFWwindow* window,
                                  double xoffset,
                                  double yoffset) {
-  Application* app = (Application*)glfwGetWindowUserPointer(window);
-  Camera* camera = app->getCamera();
+  auto app = (Application*)glfwGetWindowUserPointer(window);
+  auto camera = app->getCamera();
   camera->ProcessMouseScroll(static_cast<float>(yoffset));
 }
 
@@ -211,7 +211,7 @@ void Application::mouseCallback(GLFWwindow* window,
   }
 
   Application* app = (Application*)glfwGetWindowUserPointer(window);
-  Camera* camera = app->getCamera();
+  auto camera = app->getCamera();
   float xpos = static_cast<float>(xposIn);
   float ypos = static_cast<float>(yposIn);
 
@@ -238,17 +238,17 @@ void Application::processInput(GLFWwindow* window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    camera.ProcessKeyboard(FORWARD, deltaTime);
+    camera->ProcessKeyboard(Camera_Movement::FORWARD, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    camera.ProcessKeyboard(BACKWARD, deltaTime);
+    camera->ProcessKeyboard(Camera_Movement::BACKWARD, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    camera.ProcessKeyboard(LEFT, deltaTime);
+    camera->ProcessKeyboard(Camera_Movement::LEFT, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    camera.ProcessKeyboard(RIGHT, deltaTime);
+    camera->ProcessKeyboard(Camera_Movement::RIGHT, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-    camera.ProcessKeyboard(UP, deltaTime);
+    camera->ProcessKeyboard(Camera_Movement::UP, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-    camera.ProcessKeyboard(DOWN, deltaTime);
+    camera->ProcessKeyboard(Camera_Movement::DOWN, deltaTime);
 
   // These are problematic because they might get called many times
   // for each; save the state and only call the function when it changes
@@ -300,10 +300,10 @@ void Application::toggleWireframe (){
 }
 
 void Application::dumpCameraMatrices(){
-  dumpVector("Front", camera.Front);
-  dumpVector("Position", camera.Position);
-  dumpVector("Up", camera.Up);
-  std::cout << "Yaw " << camera.Yaw << std::endl;
-  std::cout << "Pitch " << camera.Pitch << std::endl;
+  dumpVector("Front", camera->Front);
+  dumpVector("Position", camera->Position);
+  dumpVector("Up", camera->Up);
+  std::cout << "Yaw " << camera->Yaw << std::endl;
+  std::cout << "Pitch " << camera->Pitch << std::endl;
 }
 

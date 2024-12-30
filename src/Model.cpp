@@ -6,7 +6,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 
-Model::Model(int meshSize, const std::vector<ShaderProgram>& shaderPrograms, Camera *camera)
+Model::Model(int meshSize, const std::vector<ShaderProgram>& shaderPrograms, std::shared_ptr<Camera> camera)
     : transform(1.0),
       meshes({Mesh(meshSize)}) {
       this->camera = camera;
@@ -53,8 +53,8 @@ void Model::draw(Uniforms& uniforms) {
       program.activate();
       beginDrawing(program, uniforms);
       program.setUniform("model", transform);
-      program.setUniform("viewPos",camera->Position);
-      program.setUniform("lightPos", lightPos);
+      // program.setUniform("viewPos",camera->Position);
+      // program.setUniform("lightPos", lightPos);
       
 
        #ifdef __EMSCRIPTEN__
