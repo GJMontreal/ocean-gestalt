@@ -23,6 +23,11 @@ struct WAVE{
 
 uniform WAVE waves[3];  // increase this to 10?
 
+struct PARTICLE{
+  vec3 position;
+  vec3 normal;
+};
+
 //TO DO: make capitalization consistent throughout
 out VS_OUT {
     vec3 FragPos;
@@ -62,7 +67,7 @@ vec3 numericalDerivativeNormal(vec3 lastPosition,
   return normal; 
 }
 
-vec3 calcWaves(vec3 aPosition){
+PARTICLE calcWaves(vec3 aPosition){
   float scale = 1;
   vec3 offset = aPosition;
   vec3 normal = vec3(0.0,0.0,0.0);
@@ -71,16 +76,17 @@ vec3 calcWaves(vec3 aPosition){
     offset += newOffset * scale;
     normal = normal + numericalDerivativeNormal(newOffset,aPosition,waves[i],time,.1);
   }
-  // vs_out.Normal = normal * mat3(transpose(inverse(view * model)));
-  vs_out.Normal = normal * normalMatrix;
-  return offset;
+  PARTICLE particle;
+  particle.normal = normal * normalMatrix;
+  particle.position = offset;
+  return particle;
 }
 
 void main(void)
 {
-    vs_out.Normal = normal;
     vs_out.Color = vec3(color);
-    vec3 offset = calcWaves(position); 
-    gl_Position = projection * view * model * vec4(offset, 1.0) ;
-    vs_out.FragPos = vec3(view*model*vec4(offset,1.0));
+    PARTICLE particle = calcWaves(position); 
+    gl_Position = projection * view * model * vec4(particle.position, 1.0) ;
+    vs_out.FragPos = vec3(view*model*vec4(particle.position,1.0));
+    vs_out.Normal = particle.normal;
 }
