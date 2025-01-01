@@ -1,4 +1,5 @@
 #include "Camera.hpp"
+#include "Debug.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -17,6 +18,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
 
 // returns the view matrix calculated using Euler Angles and the LookAt Matrix
 glm::mat4 Camera::GetViewMatrix() const {
+  // if these values aren't changing, then how is the view changing?
   return glm::lookAt(Position, Position + Front, Up);
 }
 

@@ -2,6 +2,7 @@
 #define OCEAN_HPP
 
 #include "Model.hpp"
+#include "Configuration.hpp"
 #include "Wave.hpp"
 #include "Camera.hpp"
 
@@ -14,9 +15,11 @@ class Ocean : public Model {
   Ocean(int meshSize,
         std::vector<ShaderProgram> shaderPrograms,
         std::shared_ptr<Camera> camera);
+  Ocean(int meshSize, std::shared_ptr<Configuration> configuration);
+
   ~Ocean() override = default;
   void draw(Uniforms& uniforms) override;
-  void beginDrawing(ShaderProgram& program, Uniforms& uniforms) override;
+  void beginDrawing(std::shared_ptr<ShaderProgram> program, Uniforms& uniforms) override;
 
   void setupWireframeShader();
   void setupMeshShader();
@@ -36,10 +39,10 @@ class Ocean : public Model {
                                  float offset = 0.01f);
   // end CPU routines
 
-  std::vector<Wave*> waves;
+  std::vector<Wave*> waves; //this is moving to the configuration
 
-  void setShaderUniforms(const std::vector<Wave*>& waves,
-                         ShaderProgram* program);
+  void setShaderUniforms(const vector<shared_ptr<Wave>>& waves,
+                         shared_ptr<ShaderProgram> program)const;
 };
 
 #endif

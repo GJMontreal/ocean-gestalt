@@ -18,25 +18,11 @@
 #include <nlohmann/json.hpp>
 
 MyApplication::MyApplication()
-#ifndef __EMSCRIPTEN__
-    : Application(),
-      vertexShader(SHADER_DIR "/gerstner.vert", GL_VERTEX_SHADER),
-      fragmentShader(SHADER_DIR "/simple.frag", GL_FRAGMENT_SHADER),
-      shaderProgram({vertexShader, fragmentShader})
-// the order of our shader programs is 
-// fix that
-// shaders will belong in our configuration
-#else
-    : Application(),
-      vertexShader(SHADER_DIR "/shader.vert", GL_VERTEX_SHADER),
-      fragmentShader(SHADER_DIR "/shader.frag", GL_FRAGMENT_SHADER),
-      shaderProgram({vertexShader, fragmentShader})
-#endif
+    : Application()
 {
-  Configuration config(CONFIGURATION_DIR "/config.json");
-  this->camera = std::move(config.camera);
-  models.push_back(new Ocean(20, {shaderProgram}, this->getCamera()));
-  // models.push_back(new Model(5,{shaderProgram}, this->getCamera()));
+  auto config = std::make_shared<Configuration>(CONFIGURATION_DIR "/config.json");
+  this->camera = config->camera;
+  models.push_back(new Ocean(20,config));
   glEnable(GL_BLEND);
   glBlendFunc(GL_ONE, GL_ONE);  // Not certain what our blend mode should be?
 
@@ -64,7 +50,6 @@ void MyApplication::loop() {
 
   auto camera = getCamera();
   view = camera->GetViewMatrix();
-
   Uniforms uniforms{.projection = projection, .view = view};
 #ifndef __EMSCRIPTEN__
   // Set common shader uniforms
@@ -103,5 +88,12 @@ void MyApplication::toggleWireframe() {
   std::cout << "Toggle wireframe" << std::endl;
   for (Model* model : models) {
     model->toggleDrawWireframe();
+  }
+}
+
+void MyApplication::toggleMesh() {
+  std::cout << "Toggle mesh" << std::endl;
+  for (Model* model : models) {
+    model->toggleDrawMesh();
   }
 }

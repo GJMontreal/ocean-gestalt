@@ -91,6 +91,7 @@ class Application {
   virtual void toggleNormalDisplay();
   virtual void toggleSimulation();
   virtual void toggleWireframe();
+  virtual void toggleMesh();
 
   std::map<char, int> keyPressState;
 };

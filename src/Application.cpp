@@ -288,6 +288,15 @@ void Application::processInput(GLFWwindow* window) {
   }else{
     keyPressState[GLFW_KEY_L] = GLFW_RELEASE;
   }
+
+  if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
+    if(keyPressState[GLFW_KEY_M] == GLFW_RELEASE){
+      toggleMesh();
+      keyPressState[GLFW_KEY_M] = GLFW_PRESS;
+    }
+  }else{
+    keyPressState[GLFW_KEY_M] = GLFW_RELEASE;
+  }
 }
 
 void Application::toggleNormalDisplay(){
@@ -297,6 +306,10 @@ void Application::toggleSimulation(){
 }
 
 void Application::toggleWireframe (){
+}
+
+void Application::toggleMesh(){
+
 }
 
 void Application::dumpCameraMatrices(){

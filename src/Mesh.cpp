@@ -57,14 +57,12 @@ void Mesh::draw()const {
 }
 
 void Mesh::drawNormals()const{
-  glBindVertexArray(normalsVao);
-
+  glBindVertexArray(wireframeVao);
   glDrawElements(GL_LINES,         // mode
-                 size * size * 6,  // count // how did we calculate this
+                 size * (size + 1) * 4 ,  // number of lines * number of directions * number of vertices
                  GL_UNSIGNED_INT,  // type
                  nullptr              // element array buffer offset
   );
-
   glCheckError(__FILE__, __LINE__);
 
   glBindVertexArray(0);

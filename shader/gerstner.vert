@@ -6,10 +6,13 @@ layout(std140) uniform Matrices
 {
     uniform mat4 projection;
     uniform mat4 view;
+
 };
 
 uniform mat4 model;
+
 uniform float time;
+uniform mat3 normalMatrix;
 
 struct WAVE{  
   vec3 direction;
@@ -18,8 +21,9 @@ struct WAVE{
   float steepness;
 };
 
-uniform WAVE waves[3];
+uniform WAVE waves[3];  // increase this to 10?
 
+//TO DO: make capitalization consistent throughout
 out VS_OUT {
     vec3 FragPos;
     vec3 Normal;
@@ -27,18 +31,20 @@ out VS_OUT {
 } vs_out;
 
 const float PI = 3.14159265358979323;
+const float speedScale = 3.0;
 
-vec3 waveOffset(float time, vec3 position, WAVE wave){
-    float k = 2.0f * PI / wave.wavelength;
+//Why is it moving with the camera
+vec3 waveOffset(float time, vec3 aPosition, WAVE wave){
+    float k =  2.0f * PI / wave.wavelength;
     vec2 D = normalize(wave.direction.xy);  // normalized direction
     vec2 K = D * k;              
-    float w = 2.0 * k;
+    float w = speedScale * k; // where does 2 come from?
     float wT = w * time;        
-    float KPwT = dot(K, vec2(position)) - wT;
+    float KPwT = dot(K, vec2(aPosition)) - wT;
     float S0 = sin(KPwT);
     float C0 = cos(KPwT);
     float z = wave.amplitude * C0;
-    vec2 xy = position.xy - D * wave.steepness * wave.amplitude * S0;
+    vec2 xy = aPosition.xy - D * wave.steepness * wave.amplitude * S0;
     return vec3(xy,z);
 }
 
@@ -53,28 +59,28 @@ vec3 numericalDerivativeNormal(vec3 lastPosition,
   vec3 dy = vec3(0, offset, 0) +
             waveOffset(time, vec3(position.x, position.y + offset,position.z), wave);
   vec3 normal = normalize(cross(dx - lastPosition, dy - lastPosition));
-  return normal;  // flip the normal because of our winding order
+  return normal; 
 }
 
 vec3 calcWaves(vec3 aPosition){
+  float scale = 1;
   vec3 offset = aPosition;
   vec3 normal = vec3(0.0,0.0,0.0);
   for(int i=0; i < waves.length(); i++){
     vec3 newOffset = waveOffset(time, aPosition, waves[i] );
-    offset += newOffset;
-    normal = normal + numericalDerivativeNormal(newOffset,aPosition,waves[i],time,.01);
+    offset += newOffset * scale;
+    normal = normal + numericalDerivativeNormal(newOffset,aPosition,waves[i],time,.1);
   }
-  vs_out.Normal = normal * mat3(transpose(inverse(view * model)));
+  // vs_out.Normal = normal * mat3(transpose(inverse(view * model)));
+  vs_out.Normal = normal * normalMatrix;
   return offset;
 }
 
-
-
 void main(void)
 {
-    vs_out.FragPos = position;
     vs_out.Normal = normal;
     vs_out.Color = vec3(color);
     vec3 offset = calcWaves(position); 
     gl_Position = projection * view * model * vec4(offset, 1.0) ;
+    vs_out.FragPos = vec3(view*model*vec4(offset,1.0));
 }

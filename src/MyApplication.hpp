@@ -23,13 +23,14 @@ class MyApplication : public Application {
   void toggleNormalDisplay() override;
   void toggleSimulation() override;
   void toggleWireframe() override;
+  void toggleMesh() override;
 
  private:
   // I don't think we use application level shaders
   // shader
-  Shader vertexShader;
-  Shader fragmentShader;
-  ShaderProgram shaderProgram;
+  // Shader vertexShader;
+  // Shader fragmentShader;
+  // ShaderProgram shaderProgram;
 
 
 

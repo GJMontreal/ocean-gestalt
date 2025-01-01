@@ -33,10 +33,20 @@ Ocean::Ocean(int meshSize,
   waves.push_back(new Wave(4,17,vec2(0.4,1)));
   waves.push_back(new Wave(0.1f,2,vec2(.5,1)));
   
-  setShaderUniforms(waves, getShaderProgram(0));
+  // setShaderUniforms(waves, getShaderProgram(0));
 }
-void Ocean::beginDrawing(ShaderProgram& program, Uniforms& uniforms){
-   program.setUniform("time",uniforms.time);
+
+Ocean::Ocean(int meshSize, std::shared_ptr<Configuration> configuration): 
+Model(meshSize,configuration){
+  // setup the shaders wave uniforms
+  setShaderUniforms(configuration->waves,configuration->meshShader);
+  setShaderUniforms(configuration->waves,configuration->wireframeShader);
+  setShaderUniforms(configuration->waves,configuration->normalShader);
+}
+
+//If this is all that's happening here, we can probably move it
+void Ocean::beginDrawing(std::shared_ptr<ShaderProgram> program, Uniforms& uniforms){
+   program->setUniform("time",uniforms.time);
 }
 
 void Ocean::draw(Uniforms& uniforms) {
@@ -180,11 +190,11 @@ vec3 Ocean::numericalDerivativeNormal(vec3 lastPosition,
   return normal;  // flip the normal because of our winding order
 }
 
-void Ocean::setShaderUniforms(const std::vector<Wave*>& waves,
-                              ShaderProgram* program) {
+void Ocean::setShaderUniforms(const vector<shared_ptr<Wave>>& waves,
+                       shared_ptr<ShaderProgram> program) const{
   program->activate();
   int i = 0;
-  for (const Wave* wave : waves) {
+  for( const shared_ptr<Wave> wave: waves){
     std::string uniformName = string_format("waves[%i].amplitude", i);
 
     program->setUniform(uniformName, wave->amplitude);

@@ -63,6 +63,7 @@ public:
       Pitch = pitch;
       updateCameraVectors();
       std::cout << "creating camera" << std::endl;
+      std::cout << "HUH" << std::endl;
     }
     // constructor with scalar values
     Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
