@@ -43,13 +43,14 @@ vec3 waveOffset(float time, vec3 aPosition, WAVE wave){
     float k =  2.0f * PI / wave.wavelength;
     vec2 D = normalize(wave.direction.xy);  // normalized direction
     vec2 K = D * k;              
-    float w = speedScale * k; // where does 2 come from?
+    float w = speedScale * k;
     float wT = w * time;        
     float KPwT = dot(K, vec2(aPosition)) - wT;
     float S0 = sin(KPwT);
     float C0 = cos(KPwT);
-    float z = wave.amplitude * C0;
-    vec2 xy = aPosition.xy - D * wave.steepness * wave.amplitude * S0;
+    // float z = wave.amplitude * C0 - (wave.amplitude / 2.0 ); // 0 is our mean height
+     float z = wave.amplitude * C0;
+    vec2 xy = aPosition.xy - D * wave.steepness * wave.amplitude * S0; //are we sure about this?
     return vec3(xy,z);
 }
 
@@ -68,16 +69,17 @@ vec3 numericalDerivativeNormal(vec3 lastPosition,
 }
 
 PARTICLE calcWaves(vec3 aPosition){
-  float scale = 1;
   vec3 offset = aPosition;
   vec3 normal = vec3(0.0,0.0,0.0);
   for(int i=0; i < waves.length(); i++){
     vec3 newOffset = waveOffset(time, aPosition, waves[i] );
-    offset += newOffset * scale;
-    normal = normal - numericalDerivativeNormal(newOffset,aPosition,waves[i],time,.1);
+    offset += newOffset;
+    normal = normal + numericalDerivativeNormal(newOffset,aPosition,waves[i],time,.001);
   }
+  // vec3 _ = normalMatrix * vec3(1.0);
   PARTICLE particle;
-  particle.normal = normal * normalMatrix;
+  particle.normal = normalMatrix * normal;
+  // particle.normal = normal;
   particle.position = offset;
   return particle;
 }
@@ -85,8 +87,9 @@ PARTICLE calcWaves(vec3 aPosition){
 void main(void)
 {
     vs_out.Color = vec3(color);
-    PARTICLE particle = calcWaves(position); 
+    PARTICLE particle = calcWaves(position);       
     gl_Position = projection * view * model * vec4(particle.position, 1.0) ;
+    // gl_Position = projection * view * model * vec4(position.x,particle.position.y,particle.position.z, 1.0) ;
     vs_out.FragPos = vec3(view*model*vec4(particle.position,1.0));
     vs_out.Normal = particle.normal;
 }

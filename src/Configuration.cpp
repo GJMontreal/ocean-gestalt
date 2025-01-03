@@ -65,7 +65,7 @@ void Configuration::loadShaders(const string& fileName){
   auto program = std::make_shared<ShaderProgram>(ShaderProgram({vertexShader,fragmentShader}));
   meshShader = std::move(program);
 
-  vertexShader = Shader(SHADER_DIR "/simple.vert", GL_VERTEX_SHADER);
+  vertexShader = Shader(SHADER_DIR "/gerstner.vert", GL_VERTEX_SHADER);
   fragmentShader = Shader(SHADER_DIR "/simple.frag", GL_FRAGMENT_SHADER);
   program = std::make_shared<ShaderProgram>(ShaderProgram({vertexShader,fragmentShader}));
   wireframeShader = std::move(program);

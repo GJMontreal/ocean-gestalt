@@ -245,9 +245,9 @@ void Application::processInput(GLFWwindow* window) {
     camera->ProcessKeyboard(Camera_Movement::LEFT, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     camera->ProcessKeyboard(Camera_Movement::RIGHT, deltaTime);
-  if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
     camera->ProcessKeyboard(Camera_Movement::UP, deltaTime);
-  if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
     camera->ProcessKeyboard(Camera_Movement::DOWN, deltaTime);
 
   // These are problematic because they might get called many times
@@ -271,13 +271,13 @@ void Application::processInput(GLFWwindow* window) {
     keyPressState[GLFW_KEY_N] = GLFW_RELEASE;
   }
 
-  if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-    if(keyPressState[GLFW_KEY_R] == GLFW_RELEASE){
+  if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+    if(keyPressState[GLFW_KEY_P] == GLFW_RELEASE){
       toggleSimulation();
-      keyPressState[GLFW_KEY_R] = GLFW_PRESS;
+      keyPressState[GLFW_KEY_P] = GLFW_PRESS;
     }
   }else{
-    keyPressState[GLFW_KEY_R] = GLFW_RELEASE;
+    keyPressState[GLFW_KEY_P] = GLFW_RELEASE;
   }
 
   if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {

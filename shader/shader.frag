@@ -31,9 +31,6 @@ void main(void)
 
     // specular
     vec3 viewDir = normalize(viewPos - fs_in.FragPos);
-    // vec3 reflectDir = reflect(-lightDir, normal); // this is unused?
-    // float spec = pow(max(dot(normal, reflectDir), 0.0), 32.0);
-    
     vec3 halfwayDir = normalize(lightDir + viewDir);  
     float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
     

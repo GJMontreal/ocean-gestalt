@@ -1,7 +1,7 @@
 {
     "waves": [
         {
-            "amplitude": 2.5,
+            "amplitude": 2,
             "direction": {
                 "x": 0,
                 "y": 1
@@ -10,12 +10,12 @@
             "steepness": 0.9
         },
         {
-            "amplitude": 0,
+            "amplitude":0,
             "direction": {
-                "x": 0.4,
-                "y": 1
+                "x": 1,
+                "y": 0
             },
-            "wavelength": 70,
+            "wavelength": 10,
             "steepness": 0.9
         },
         {
@@ -35,17 +35,17 @@
             "z": 0
         },
         "position": {
-            "x": -16,
-            "y": 10,
-            "z": 19
+            "x": -23,
+            "y": 26,
+            "z": 28
         },
         "yaw": -425,
-        "pitch": -20,
+        "pitch": -37,
         "zoom": 45
     },
     "light": {
-        "x": 0,
-        "y": 10,
-        "z": 0
+        "x": -20,
+        "y": 40,
+        "z": 20
     }
 }

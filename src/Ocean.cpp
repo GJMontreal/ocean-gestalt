@@ -11,6 +11,8 @@
 #include <string>
 #include <stdexcept>
 
+#include <iostream>
+
 template<typename ... Args>
 std::string string_format( const std::string& format, Args ... args )
 {
@@ -50,15 +52,19 @@ void Ocean::beginDrawing(std::shared_ptr<ShaderProgram> program, Uniforms& unifo
 }
 
 void Ocean::draw(Uniforms& uniforms) {
+
+  // we want to limit how often we draw ie. there's no point in having an excessively high framerate
+
   // calculate new positions for our particles
   auto time = float(glfwGetTime());
-  uniforms.time = time;
+  auto interval = time - lastTime;
+  lastTime = time;
+
   if (isRunning()) {
-    // auto time = float(glfwGetTime());
-    // uniforms.time = time;
+    elapsedTime += interval;
     // moveParticles(time);
   }
- 
+  uniforms.time = elapsedTime;
   Model::draw(uniforms);
 }
 

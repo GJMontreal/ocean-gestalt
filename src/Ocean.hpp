@@ -27,6 +27,8 @@ class Ocean : public Model {
  private:
   // We'll only use this stuff if we're using the cpu to calculate our vertices
   std::vector<VertexType> particles;
+  float elapsedTime = 0;
+  float lastTime;
   void initParticles();
   void resetParticles();
   void moveParticles(float time);
