@@ -55,6 +55,8 @@ class Application {
   int getHeight();
   float getWindowRatio();
   bool windowDimensionChanged();
+
+  // I don't think this is used
   std::shared_ptr<Camera> getCamera();
 
  private:
@@ -75,8 +77,7 @@ class Application {
   int height;
   bool dimensionChanged;
   void detectWindowDimensionChange();
-  void processInput(GLFWwindow *window);
-  void dumpCameraMatrices();
+
   // Simulation:
   bool running = false;
 
@@ -88,6 +89,7 @@ class Application {
   std::shared_ptr<Camera> camera;
 
   virtual void loop();
+  virtual void processInput(GLFWwindow *window, float deltaTime);
   virtual void toggleNormalDisplay();
   virtual void toggleSimulation();
   virtual void toggleWireframe();

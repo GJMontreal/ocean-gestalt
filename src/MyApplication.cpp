@@ -5,6 +5,7 @@
 #include "Uniforms.hpp"
 #include "asset.hpp"
 #include "glError.hpp"
+#include "Debug.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -17,12 +18,19 @@
 
 #include <nlohmann/json.hpp>
 
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args) {
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
 MyApplication::MyApplication()
     : Application()
 {
   auto config = std::make_shared<Configuration>(CONFIGURATION_DIR "/config.json");
   this->camera = config->camera;
   models.push_back(new Ocean(20,config));
+  // waveUI = new WaveUI(config->waves);
+  waveUI = make_unique<WaveUI>(config->waves);
   glEnable(GL_BLEND);
   glBlendFunc(GL_ONE, GL_ONE);  // Not certain what our blend mode should be?
 
@@ -96,4 +104,90 @@ void MyApplication::toggleMesh() {
   for (Model* model : models) {
     model->toggleDrawMesh();
   }
+}
+
+void MyApplication::processInput(GLFWwindow* window, float deltaTime) {
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    glfwSetWindowShouldClose(window, true);
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    camera->ProcessKeyboard(Camera_Movement::FORWARD, deltaTime);
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    camera->ProcessKeyboard(Camera_Movement::BACKWARD, deltaTime);
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    camera->ProcessKeyboard(Camera_Movement::LEFT, deltaTime);
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    camera->ProcessKeyboard(Camera_Movement::RIGHT, deltaTime);
+  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    camera->ProcessKeyboard(Camera_Movement::UP, deltaTime);
+  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+    camera->ProcessKeyboard(Camera_Movement::DOWN, deltaTime);
+
+  // manipulate wave properties
+  // wave selection
+  for(int i = 0; i < 10; i++ ){
+    int key = GLFW_KEY_0 + i;
+      if (glfwGetKey(window, key) == GLFW_PRESS){
+        if (keyPressState[(char)key] == GLFW_RELEASE) {
+        std::cout << "wave " << i << " selected" << std::endl;
+        waveUI->selectWave(i);
+        keyPressState[(char)key] = GLFW_PRESS;
+      } } else{
+        keyPressState[(char)key] = GLFW_RELEASE;
+      }
+  } 
+  // These are problematic because they might get called many times
+  // for each; save the state and only call the function when it changes
+  // to release
+  if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
+    if (keyPressState[GLFW_KEY_C] == GLFW_RELEASE) {
+      dumpCameraMatrices();
+      keyPressState[GLFW_KEY_C] = GLFW_PRESS;
+    }
+  } else {
+    keyPressState[GLFW_KEY_C] = GLFW_RELEASE;
+  }
+  
+  if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) {
+    if (keyPressState[GLFW_KEY_N] == GLFW_RELEASE) {
+      toggleNormalDisplay();
+      keyPressState[GLFW_KEY_N] = GLFW_PRESS;
+    }
+  } else {
+    keyPressState[GLFW_KEY_N] = GLFW_RELEASE;
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+    if(keyPressState[GLFW_KEY_P] == GLFW_RELEASE){
+      toggleSimulation();
+      keyPressState[GLFW_KEY_P] = GLFW_PRESS;
+    }
+  }else{
+    keyPressState[GLFW_KEY_P] = GLFW_RELEASE;
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+    if(keyPressState[GLFW_KEY_L] == GLFW_RELEASE){
+      toggleWireframe();
+      keyPressState[GLFW_KEY_L] = GLFW_PRESS;
+    }
+  }else{
+    keyPressState[GLFW_KEY_L] = GLFW_RELEASE;
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
+    if(keyPressState[GLFW_KEY_M] == GLFW_RELEASE){
+      toggleMesh();
+      keyPressState[GLFW_KEY_M] = GLFW_PRESS;
+    }
+  }else{
+    keyPressState[GLFW_KEY_M] = GLFW_RELEASE;
+  }
+}
+
+void MyApplication::dumpCameraMatrices(){
+  dumpVector("Front", camera->Front);
+  dumpVector("Position", camera->Position);
+  dumpVector("Up", camera->Up);
+  std::cout << "Yaw " << camera->Yaw << std::endl;
+  std::cout << "Pitch " << camera->Pitch << std::endl;
 }

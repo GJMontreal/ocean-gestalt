@@ -12,7 +12,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <stdexcept>
-#include "Debug.hpp"
+
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -137,7 +137,7 @@ void Application::run() {
     // detech window related changes
     detectWindowDimensionChange();
 
-    processInput(window);
+    processInput(window, deltaTime);
     // execute the frame code
     loop();
 
@@ -234,69 +234,7 @@ void Application::mouseCallback(GLFWwindow* window,
 // ---------------------------------------------------------------------------------------------------------
 // process all input: query GLFW whether relevant keys are pressed/released this
 // frame and react accordingly
-void Application::processInput(GLFWwindow* window) {
-  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    glfwSetWindowShouldClose(window, true);
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    camera->ProcessKeyboard(Camera_Movement::FORWARD, deltaTime);
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    camera->ProcessKeyboard(Camera_Movement::BACKWARD, deltaTime);
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    camera->ProcessKeyboard(Camera_Movement::LEFT, deltaTime);
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    camera->ProcessKeyboard(Camera_Movement::RIGHT, deltaTime);
-  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-    camera->ProcessKeyboard(Camera_Movement::UP, deltaTime);
-  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-    camera->ProcessKeyboard(Camera_Movement::DOWN, deltaTime);
-
-  // These are problematic because they might get called many times
-  // for each; save the state and only call the function when it changes
-  // to release
-  if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
-    if (keyPressState[GLFW_KEY_C] == GLFW_RELEASE) {
-      dumpCameraMatrices();
-      keyPressState[GLFW_KEY_C] = GLFW_PRESS;
-    }
-  } else {
-    keyPressState[GLFW_KEY_C] = GLFW_RELEASE;
-  }
-  
-  if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) {
-    if (keyPressState[GLFW_KEY_N] == GLFW_RELEASE) {
-      toggleNormalDisplay();
-      keyPressState[GLFW_KEY_N] = GLFW_PRESS;
-    }
-  } else {
-    keyPressState[GLFW_KEY_N] = GLFW_RELEASE;
-  }
-
-  if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
-    if(keyPressState[GLFW_KEY_P] == GLFW_RELEASE){
-      toggleSimulation();
-      keyPressState[GLFW_KEY_P] = GLFW_PRESS;
-    }
-  }else{
-    keyPressState[GLFW_KEY_P] = GLFW_RELEASE;
-  }
-
-  if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
-    if(keyPressState[GLFW_KEY_L] == GLFW_RELEASE){
-      toggleWireframe();
-      keyPressState[GLFW_KEY_L] = GLFW_PRESS;
-    }
-  }else{
-    keyPressState[GLFW_KEY_L] = GLFW_RELEASE;
-  }
-
-  if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
-    if(keyPressState[GLFW_KEY_M] == GLFW_RELEASE){
-      toggleMesh();
-      keyPressState[GLFW_KEY_M] = GLFW_PRESS;
-    }
-  }else{
-    keyPressState[GLFW_KEY_M] = GLFW_RELEASE;
-  }
+void Application::processInput(GLFWwindow *window, float deltaTime){
 }
 
 void Application::toggleNormalDisplay(){
@@ -311,12 +249,3 @@ void Application::toggleWireframe (){
 void Application::toggleMesh(){
 
 }
-
-void Application::dumpCameraMatrices(){
-  dumpVector("Front", camera->Front);
-  dumpVector("Position", camera->Position);
-  dumpVector("Up", camera->Up);
-  std::cout << "Yaw " << camera->Yaw << std::endl;
-  std::cout << "Pitch " << camera->Pitch << std::endl;
-}
-

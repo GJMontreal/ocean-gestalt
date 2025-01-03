@@ -12,7 +12,11 @@
 #include "Application.hpp"
 #include "Shader.hpp"
 #include "Model.hpp"
+#include "WaveUI.hpp"
+
 #include <map>
+
+using namespace std;
 
 class MyApplication : public Application {
  public:
@@ -20,27 +24,23 @@ class MyApplication : public Application {
  
  protected:
   void loop() override;
+  void processInput(GLFWwindow *window, float deltaTime) override;
   void toggleNormalDisplay() override;
   void toggleSimulation() override;
   void toggleWireframe() override;
   void toggleMesh() override;
 
  private:
-  // I don't think we use application level shaders
-  // shader
-  // Shader vertexShader;
-  // Shader fragmentShader;
-  // ShaderProgram shaderProgram;
-
-
-
   // shader matrix uniform
   glm::mat4 projection = glm::mat4(1.0);
   glm::mat4 view = glm::mat4(1.0);
   GLuint uboMatrices;
 
-  std::vector<Model*> models;
-  std::map<std::string, ShaderProgram*> shaderPrograms;
+  unique_ptr<WaveUI> waveUI;
+  vector<Model*> models;
+  map<string, ShaderProgram*> shaderPrograms;
+
+  void dumpCameraMatrices();
 };
 
 #endif  // OPENGL_CMAKE_SKELETON_MYAPPLICATION
