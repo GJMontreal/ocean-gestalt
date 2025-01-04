@@ -21,7 +21,7 @@ struct WAVE{
   float steepness;
 };
 
-uniform WAVE waves[3];  // increase this to 10?
+uniform WAVE waves[6];  
 
 struct PARTICLE{
   vec3 position;
@@ -76,10 +76,8 @@ PARTICLE calcWaves(vec3 aPosition){
     offset += newOffset;
     normal = normal + numericalDerivativeNormal(newOffset,aPosition,waves[i],time,.001);
   }
-  // vec3 _ = normalMatrix * vec3(1.0);
   PARTICLE particle;
   particle.normal = normalMatrix * normal;
-  // particle.normal = normal;
   particle.position = offset;
   return particle;
 }
@@ -89,7 +87,6 @@ void main(void)
     vs_out.Color = vec3(color);
     PARTICLE particle = calcWaves(position);       
     gl_Position = projection * view * model * vec4(particle.position, 1.0) ;
-    // gl_Position = projection * view * model * vec4(position.x,particle.position.y,particle.position.z, 1.0) ;
-    vs_out.FragPos = vec3(view*model*vec4(particle.position,1.0));
+     vs_out.FragPos = vec3(view*model*vec4(particle.position,1.0));
     vs_out.Normal = particle.normal;
 }

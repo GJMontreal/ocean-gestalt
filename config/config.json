@@ -1,21 +1,39 @@
 {
     "waves": [
         {
-            "amplitude": 2,
+            "amplitude": 6,
             "heading": 0,
-            "wavelength": 10,
+            "wavelength": 12,
             "steepness": 0.9
         },
         {
-            "amplitude":0,
+            "amplitude": 0,
             "heading": 90,
             "wavelength": 10,
             "steepness": 0.9
         },
         {
             "amplitude": 0,
-            "heading":0,
-            "wavelength": 60,
+            "heading": 0,
+            "wavelength": 1,
+            "steepness": 0.9
+        },
+        {
+            "amplitude": 0,
+            "heading": 0,
+            "wavelength": 1,
+            "steepness": 0.9
+        },
+        {
+            "amplitude": 0,
+            "heading": 0,
+            "wavelength": 1,
+            "steepness": 0.9
+        },
+        {
+            "amplitude": 0,
+            "heading": 0,
+            "wavelength": 1,
             "steepness": 0.9
         }
     ],
@@ -35,8 +53,8 @@
         "zoom": 45
     },
     "light": {
-        "x": -20,
-        "y": 40,
-        "z": 20
+        "x": -10,
+        "y": 45,
+        "z": -20
     }
 }

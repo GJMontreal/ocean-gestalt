@@ -27,5 +27,10 @@ class WaveUI: public InputProcessor {
   Updatable* updatable;
 
   map<int, int> keyPressState;
+
+  private:
+  bool adjustDirection(GLFWwindow* window, float deltaTime);
+  bool adjustAmplitude(GLFWwindow* window, float deltaTime);
+  bool adjustWavelength(GLFWwindow* window, float deltaTime);
 };
 #endif
