@@ -10,6 +10,7 @@
 #define OPENGL_CMAKE_SKELETON_APPLICATION_HPP
 
 #include "Camera.hpp"
+#include "InputProcessor.hpp"
 #include <string>
 #include <map>
 #include <memory>
@@ -26,7 +27,7 @@ struct GLFWwindow;
 ///   * getWindowRatio()
 ///   * windowDimensionChanged()
 /// * let the user define the "loop" function.
-class Application {
+class Application: public InputProcessor {
  public:
   Application();
   virtual ~Application() = default;
@@ -89,13 +90,12 @@ class Application {
   std::shared_ptr<Camera> camera;
 
   virtual void loop();
-  virtual void processInput(GLFWwindow *window, float deltaTime);
+  void processInput(GLFWwindow *window, float deltaTime) override;
   virtual void toggleNormalDisplay();
   virtual void toggleSimulation();
   virtual void toggleWireframe();
   virtual void toggleMesh();
 
-  std::map<char, int> keyPressState;
 };
 
 #endif /* end of include guard: OPENGL_CMAKE_SKELETON_APPLICATION_HPP */

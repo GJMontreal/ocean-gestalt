@@ -1,6 +1,7 @@
 #ifndef OCEAN_HPP
 #define OCEAN_HPP
 
+#include <IOKit/hid/IOHIDUsageTables.h>
 #include "Model.hpp"
 #include "Configuration.hpp"
 #include "Wave.hpp"
@@ -24,8 +25,10 @@ class Ocean : public Model {
   void setupWireframeShader();
   void setupMeshShader();
 
+  void updateShaderUniforms() override;
  private:
   // We'll only use this stuff if we're using the cpu to calculate our vertices
+  std::shared_ptr<Configuration> configuration;
   std::vector<VertexType> particles;
   float elapsedTime = 0;
   float lastTime;
@@ -44,7 +47,7 @@ class Ocean : public Model {
   std::vector<Wave*> waves; //this is moving to the configuration
 
   void setShaderUniforms(const vector<shared_ptr<Wave>>& waves,
-                         shared_ptr<ShaderProgram> program)const;
+                         shared_ptr<ShaderProgram> program)const override;
 };
 
 #endif

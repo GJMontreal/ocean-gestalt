@@ -1,13 +1,13 @@
 #include "jsonloader.hpp"
 // This could all live in a header...maybe?
 // Wave
-void to_json(json& j, const Wave& wave) {
+void to_json(json& j, const WaveSerialized& wave) {
   // j = json{{"name", p.name}, {"address", p.address}, {"age", p.age}};
 }
 
-void from_json(const json& j, Wave& wave) {
+void from_json(const json& j, WaveSerialized& wave) {
   j.at("amplitude").get_to(wave.amplitude);
-  j.at("direction").get_to(wave.direction);
+  j.at("heading").get_to(wave.heading);
   j.at("wavelength").get_to(wave.wavelength);
   j.at("steepness").get_to(wave.steepness);
 }

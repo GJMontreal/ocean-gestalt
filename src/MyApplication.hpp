@@ -10,15 +10,19 @@
 #define OPENGL_CMAKE_SKELETON_MYAPPLICATION
 
 #include "Application.hpp"
+#include "InputProcessor.hpp"
 #include "Shader.hpp"
 #include "Model.hpp"
 #include "WaveUI.hpp"
 
 #include <map>
 
-using namespace std;
+using std::unique_ptr;
+using std::map;
+using std::string;
+using std::vector;
 
-class MyApplication : public Application {
+class MyApplication : public Application, public Updatable {
  public:
   MyApplication();
  
@@ -30,6 +34,7 @@ class MyApplication : public Application {
   void toggleWireframe() override;
   void toggleMesh() override;
 
+  void update() override;
  private:
   // shader matrix uniform
   glm::mat4 projection = glm::mat4(1.0);

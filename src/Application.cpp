@@ -138,6 +138,7 @@ void Application::run() {
     detectWindowDimensionChange();
 
     processInput(window, deltaTime);
+
     // execute the frame code
     loop();
 
@@ -249,3 +250,4 @@ void Application::toggleWireframe (){
 void Application::toggleMesh(){
 
 }
+

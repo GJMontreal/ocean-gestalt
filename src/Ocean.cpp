@@ -31,16 +31,24 @@ Ocean::Ocean(int meshSize,
   initParticles();
   resetParticles();
 
-  waves.push_back(new Wave(2, 10, vec2(0, 1),2));
-  waves.push_back(new Wave(4,17,vec2(0.4,1)));
-  waves.push_back(new Wave(0.1f,2,vec2(.5,1)));
+  // waves.push_back(new Wave(2, 10, vec2(0, 1),2));
+  // waves.push_back(new Wave(4,17,vec2(0.4,1)));
+  // waves.push_back(new Wave(0.1f,2,vec2(.5,1)));
   
   // setShaderUniforms(waves, getShaderProgram(0));
 }
 
-Ocean::Ocean(int meshSize, std::shared_ptr<Configuration> configuration): 
-Model(meshSize,configuration){
+Ocean::Ocean(int meshSize, std::shared_ptr<Configuration> aConfiguration): 
+Model(meshSize, aConfiguration){
+  configuration = aConfiguration;
+  updateShaderUniforms();
   // setup the shaders wave uniforms
+  // setShaderUniforms(configuration->waves,configuration->meshShader);
+  // setShaderUniforms(configuration->waves,configuration->wireframeShader);
+  // setShaderUniforms(configuration->waves,configuration->normalShader);
+}
+
+void Ocean::updateShaderUniforms(){
   setShaderUniforms(configuration->waves,configuration->meshShader);
   setShaderUniforms(configuration->waves,configuration->wireframeShader);
   setShaderUniforms(configuration->waves,configuration->normalShader);

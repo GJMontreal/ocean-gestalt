@@ -25,8 +25,9 @@ int Configuration::loadWaves(const string& fileName){
   if(0==retval){
     for( const auto& element: data.at("waves"))
       {
-        auto wave = std::make_shared<Wave>();
-        element.get_to(*(wave.get()));
+        WaveSerialized serialized;
+        element.get_to(serialized);
+        auto wave = std::make_shared<Wave>(serialized);
         waves.push_back(std::move(wave));
       }
   }

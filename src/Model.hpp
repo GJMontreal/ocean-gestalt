@@ -32,6 +32,10 @@ class Model {
 
   Mesh* getMesh(int index);
 
+  virtual void updateShaderUniforms() = 0;
+  virtual void setShaderUniforms(const vector<shared_ptr<Wave>>& waves,
+                         shared_ptr<ShaderProgram> program)const = 0;
+
 // these could all be public, simplifying things
  private:
   std::shared_ptr<Configuration> configuration;

@@ -9,8 +9,8 @@
 using json = nlohmann::json;
 
 // Wave
-void to_json(json& j, const Wave& wave); // I don't think we need this
-void from_json(const json& j, Wave& wave);
+void to_json(json& j, const WaveSerialized& wave); // I don't think we need this
+void from_json(const json& j, WaveSerialized& wave);
 
 // Camera
 void from_json(const json& j, Camera& camera);

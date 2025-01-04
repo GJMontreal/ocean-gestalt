@@ -18,6 +18,9 @@
 
 #include <nlohmann/json.hpp>
 
+using std::cout;
+using std::endl;
+
 template<typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args&&... args) {
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
@@ -30,7 +33,7 @@ MyApplication::MyApplication()
   this->camera = config->camera;
   models.push_back(new Ocean(20,config));
   // waveUI = new WaveUI(config->waves);
-  waveUI = make_unique<WaveUI>(config->waves);
+  waveUI = make_unique<WaveUI>(config->waves,(Updatable*)(this));
   glEnable(GL_BLEND);
   glBlendFunc(GL_ONE, GL_ONE);  // Not certain what our blend mode should be?
 
@@ -122,19 +125,7 @@ void MyApplication::processInput(GLFWwindow* window, float deltaTime) {
   if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
     camera->ProcessKeyboard(Camera_Movement::DOWN, deltaTime);
 
-  // manipulate wave properties
-  // wave selection
-  for(int i = 0; i < 10; i++ ){
-    int key = GLFW_KEY_0 + i;
-      if (glfwGetKey(window, key) == GLFW_PRESS){
-        if (keyPressState[(char)key] == GLFW_RELEASE) {
-        std::cout << "wave " << i << " selected" << std::endl;
-        waveUI->selectWave(i);
-        keyPressState[(char)key] = GLFW_PRESS;
-      } } else{
-        keyPressState[(char)key] = GLFW_RELEASE;
-      }
-  } 
+  waveUI->processInput(window, deltaTime);
   // These are problematic because they might get called many times
   // for each; save the state and only call the function when it changes
   // to release
@@ -190,4 +181,10 @@ void MyApplication::dumpCameraMatrices(){
   dumpVector("Up", camera->Up);
   std::cout << "Yaw " << camera->Yaw << std::endl;
   std::cout << "Pitch " << camera->Pitch << std::endl;
+}
+
+void MyApplication::update(){
+  for (Model* model : models) {
+    model->updateShaderUniforms();
+  }
 }

@@ -2,28 +2,19 @@
     "waves": [
         {
             "amplitude": 2,
-            "direction": {
-                "x": 0,
-                "y": 1
-            },
+            "heading": 0,
             "wavelength": 10,
             "steepness": 0.9
         },
         {
             "amplitude":0,
-            "direction": {
-                "x": 1,
-                "y": 0
-            },
+            "heading": 90,
             "wavelength": 10,
             "steepness": 0.9
         },
         {
             "amplitude": 0,
-            "direction": {
-                "x": 0.6,
-                "y": 0.5
-            },
+            "heading":0,
             "wavelength": 60,
             "steepness": 0.9
         }
