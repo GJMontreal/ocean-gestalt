@@ -18,7 +18,7 @@ class InputProcessor{
 class Updatable{
   public:
   virtual ~Updatable() = default;
-  virtual void update() = 0;
+  bool wavesNeedUpdate = true;
 };
 
 #endif

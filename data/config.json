@@ -1,0 +1,60 @@
+{
+    "waves": [
+        {
+            "amplitude": 6,
+            "heading": 0,
+            "wavelength": 12,
+            "steepness": 0.9
+        },
+        {
+            "amplitude": 0,
+            "heading": 90,
+            "wavelength": 10,
+            "steepness": 0.9
+        },
+        {
+            "amplitude": 0,
+            "heading": 0,
+            "wavelength": 1,
+            "steepness": 0.9
+        },
+        {
+            "amplitude": 0,
+            "heading": 0,
+            "wavelength": 1,
+            "steepness": 0.9
+        },
+        {
+            "amplitude": 0,
+            "heading": 0,
+            "wavelength": 1,
+            "steepness": 0.9
+        },
+        {
+            "amplitude": 0,
+            "heading": 0,
+            "wavelength": 1,
+            "steepness": 0.9
+        }
+    ],
+    "camera": {
+        "up": {
+            "x": 0,
+            "y": 1,
+            "z": 0
+        },
+        "position": {
+            "x": -23,
+            "y": 26,
+            "z": 28
+        },
+        "yaw": -425,
+        "pitch": -37,
+        "zoom": 45
+    },
+    "light": {
+        "x": -10,
+        "y": 45,
+        "z": -20
+    }
+}

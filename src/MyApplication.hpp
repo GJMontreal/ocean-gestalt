@@ -23,7 +23,7 @@ using std::map;
 using std::string;
 using std::vector;
 
-class MyApplication : public Application, public Updatable {
+class MyApplication : public Application, public Updatable{
  public:
   MyApplication();
  
@@ -35,7 +35,6 @@ class MyApplication : public Application, public Updatable {
   void toggleWireframe() override;
   void toggleMesh() override;
 
-  void update() override;
  private:
   // shader matrix uniform
   glm::mat4 projection = glm::mat4(1.0);
@@ -46,7 +45,7 @@ class MyApplication : public Application, public Updatable {
   unique_ptr<WaveUI> waveUI;
   vector<Model*> models;
   map<string, ShaderProgram*> shaderPrograms;
-
+  void updateWaves();
   void dumpCameraMatrices();
 };
 

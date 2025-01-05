@@ -69,6 +69,7 @@ void Mesh::drawNormals()const{
 }
 
 // The mesh is symmetrical in x and y
+// This could be broken up a little
 void Mesh::generateMesh(int aSize){
   // Mesh will have vertex and normal for the moment
   std::vector<VertexType> vertices;

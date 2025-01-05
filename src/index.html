@@ -22,7 +22,24 @@
     </script>
 
     <script async src="ocean-gestalt.js"></script>
-
+    <input/>
+    <button id="dispatchButton">Pause </button>
+    <script>
+      function simulateKeyEvent(eventType, keyCode, code, key, target) {
+  var props = { keyCode, charCode: keyCode, view: window, bubbles: true, cancelable: true };
+  if (code) props['code'] = code;
+  if (key) props['key'] = key;
+  var event = new KeyboardEvent(eventType, props);
+  if (!target) target = document;
+  return target.dispatchEvent(event);
+}
+ 
+dispatchButton.addEventListener('click', () => {
+          console.log("sending keypress");
+          simulateKeyEvent('keydown',80,80,'p');
+          simulateKeyEvent('keyup',80,80,'p');
+      });
+    </script>
     <style>
       body {
         background-color: black;

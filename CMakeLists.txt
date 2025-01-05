@@ -27,10 +27,14 @@ set_property(TARGET ocean-gestalt PROPERTY CXX_STANDARD 11)
 # target_compile_options(ocean-gestalt PRIVATE -Wall)
 add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
 
+
 if (EMSCRIPTEN)
   target_link_libraries(ocean-gestalt PUBLIC "-s USE_GLFW=3")
   target_link_libraries(ocean-gestalt PUBLIC "-s USE_WEBGL2=1")
   target_link_libraries(ocean-gestalt PUBLIC "-s WASM=1")
+
+  target_compile_options(ocean-gestalt PRIVATE -fexceptions )
+  target_link_options(ocean-gestalt PRIVATE -fexceptions)
 
 
   # Copy the index.html file.
@@ -38,14 +42,22 @@ if (EMSCRIPTEN)
     configure_file(src/${file} ${file})
   endforeach(file)
 
-  foreach(file "shader/webgl/shader.frag" "shader/webgl/shader.vert")
+  foreach(file 
+   "data/shader/webgl/shader.frag"
+   "data/shader/webgl/simple.frag" 
+   "data/shader/webgl/gerstner.vert"
+   "data/config.json"
+  )
+  
     configure_file(${file} ${file})
   endforeach(file)
 
-  # Allow the directories /shader and /data to be fetched by the web browser.
+  # Allow the directories /shader and /config to be fetched by the web browser.
   set_property(TARGET ocean-gestalt APPEND_STRING PROPERTY LINK_FLAGS
-    "--preload-file ${CMAKE_CURRENT_BINARY_DIR}/shader/@/shader/")
-  
+    "--preload-file ${CMAKE_CURRENT_BINARY_DIR}/data/@/data/"
+  )
+
+
 else() # Not Web
 
   add_definitions(-DGLEW_STATIC)

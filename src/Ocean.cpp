@@ -24,34 +24,19 @@ std::string string_format( const std::string& format, Args ... args )
     return std::string( buf.get(), buf.get() + size - 1 ); // We don't want the '\0' inside
 }
 
-Ocean::Ocean(int meshSize,
-             std::vector<ShaderProgram> shaderPrograms,
-             std::shared_ptr<Camera> camera)
-    : Model(meshSize, shaderPrograms, camera) {
-  initParticles();
-  resetParticles();
-
-  // waves.push_back(new Wave(2, 10, vec2(0, 1),2));
-  // waves.push_back(new Wave(4,17,vec2(0.4,1)));
-  // waves.push_back(new Wave(0.1f,2,vec2(.5,1)));
-  
-  // setShaderUniforms(waves, getShaderProgram(0));
-}
 
 Ocean::Ocean(int meshSize, std::shared_ptr<Configuration> aConfiguration): 
 Model(meshSize, aConfiguration){
   configuration = aConfiguration;
-  updateShaderUniforms();
-  // setup the shaders wave uniforms
-  // setShaderUniforms(configuration->waves,configuration->meshShader);
-  // setShaderUniforms(configuration->waves,configuration->wireframeShader);
-  // setShaderUniforms(configuration->waves,configuration->normalShader);
+  std::cout << "Constructing ocean" << std::endl;
 }
 
 void Ocean::updateShaderUniforms(){
-  setShaderUniforms(configuration->waves,configuration->meshShader);
-  setShaderUniforms(configuration->waves,configuration->wireframeShader);
-  setShaderUniforms(configuration->waves,configuration->normalShader);
+  setWaveUniforms(configuration->waves,configuration->meshShader);
+  setWaveUniforms(configuration->waves,configuration->wireframeShader);
+  #ifndef __EMSCRIPTEN__
+  setWaveUniforms(configuration->waves,configuration->normalShader);
+  #endif
 }
 
 //If this is all that's happening here, we can probably move it
@@ -70,7 +55,6 @@ void Ocean::draw(Uniforms& uniforms) {
 
   if (isRunning()) {
     elapsedTime += interval;
-    // moveParticles(time);
   }
   uniforms.time = elapsedTime;
   Model::draw(uniforms);
@@ -204,7 +188,7 @@ vec3 Ocean::numericalDerivativeNormal(vec3 lastPosition,
   return normal;  // flip the normal because of our winding order
 }
 
-void Ocean::setShaderUniforms(const vector<shared_ptr<Wave>>& waves,
+void Ocean::setWaveUniforms(const vector<shared_ptr<Wave>>& waves,
                        shared_ptr<ShaderProgram> program) const{
   program->activate();
   int i = 0;

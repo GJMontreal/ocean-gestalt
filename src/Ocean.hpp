@@ -1,7 +1,7 @@
 #ifndef OCEAN_HPP
 #define OCEAN_HPP
 
-#include <IOKit/hid/IOHIDUsageTables.h>
+// #include <IOKit/hid/IOHIDUsageTables.h> // where did this come from
 #include "Model.hpp"
 #include "Configuration.hpp"
 #include "Wave.hpp"
@@ -13,9 +13,6 @@ using vec3 = glm::vec3;
 
 class Ocean : public Model {
  public:
-  Ocean(int meshSize,
-        std::vector<ShaderProgram> shaderPrograms,
-        std::shared_ptr<Camera> camera);
   Ocean(int meshSize, std::shared_ptr<Configuration> configuration);
 
   ~Ocean() override = default;
@@ -30,8 +27,8 @@ class Ocean : public Model {
   // We'll only use this stuff if we're using the cpu to calculate our vertices
   std::shared_ptr<Configuration> configuration;
   std::vector<VertexType> particles;
-  float elapsedTime = 0;
-  float lastTime;
+  float elapsedTime=0;
+  double lastTime;
   void initParticles();
   void resetParticles();
   void moveParticles(float time);
@@ -46,7 +43,7 @@ class Ocean : public Model {
 
   std::vector<Wave*> waves; //this is moving to the configuration
 
-  void setShaderUniforms(const vector<shared_ptr<Wave>>& waves,
+  void setWaveUniforms(const vector<shared_ptr<Wave>>& waves,
                          shared_ptr<ShaderProgram> program)const override;
 };
 

@@ -71,11 +71,14 @@ void Configuration::loadShaders(const string& fileName){
   program = std::make_shared<ShaderProgram>(ShaderProgram({vertexShader,fragmentShader}));
   wireframeShader = std::move(program);
 
+// WEBGL doesn't support geometry shaders
+#ifndef __EMSCRIPTEN__
   Shader geometryShader(SHADER_DIR "/gerstner_normal.gs", GL_GEOMETRY_SHADER);
   vertexShader = Shader(SHADER_DIR "/gerstner.vert", GL_VERTEX_SHADER);
   fragmentShader = Shader(SHADER_DIR "/simple.frag", GL_FRAGMENT_SHADER);
   program = std::make_shared<ShaderProgram>(ShaderProgram({vertexShader,fragmentShader,geometryShader}));
   normalShader = std::move(program);
+#endif
 }
 
 int Configuration::loadLight(const string& fileName){

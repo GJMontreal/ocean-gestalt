@@ -21,6 +21,8 @@
 using std::cout;
 using std::endl;
 
+
+// TODO: move this template elsewhere
 template<typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args&&... args) {
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
@@ -30,10 +32,11 @@ MyApplication::MyApplication()
     : Application()
 {
   auto config = std::make_shared<Configuration>(CONFIGURATION_DIR "/config.json");
-  this->camera = config->camera;
+  this->camera = config->camera;  // TODO: we don't need this additional pointer since we have the configuration
   configuration = config;
   models.push_back(new Ocean(20,config));
   // waveUI = new WaveUI(config->waves);
+ 
   waveUI = make_unique<WaveUI>(config->waves,(Updatable*)(this));
   glEnable(GL_BLEND);
   glBlendFunc(GL_ONE, GL_ONE);  // Not certain what our blend mode should be?
@@ -53,15 +56,19 @@ MyApplication::MyApplication()
 }
 
 void MyApplication::loop() {
+  if(wavesNeedUpdate){
+    wavesNeedUpdate = false;
+    updateWaves();
+  }
   // exit on window close button pressed
   if (glfwWindowShouldClose(getWindow()))
     exit();
 
   projection = glm::perspective(glm::radians(getCamera()->Zoom),
-                                getWindowRatio(), 0.1f, 100.f);
+                                getWindowRatio(), 0.1f, 150.f);
 
-  auto camera = getCamera();
   view = camera->GetViewMatrix();
+  
   Uniforms uniforms{.projection = projection, .view = view};
 #ifndef __EMSCRIPTEN__
   // Set common shader uniforms
@@ -194,7 +201,7 @@ void MyApplication::dumpCameraMatrices(){
   std::cout << "Pitch " << camera->Pitch << std::endl;
 }
 
-void MyApplication::update(){
+void MyApplication::updateWaves(){
   for (Model* model : models) {
     model->updateShaderUniforms();
   }

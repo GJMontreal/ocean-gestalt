@@ -7,6 +7,8 @@ static const float SPEED = 0.25f;  // TODO: change this name
 static const float RADIAL_VELOCITY = 10.0f;
 static const float MAX_AMPLITUDE = 5.0f;
 static const float MAX_HEADING = 359.9f;
+static const float LONGITUDINAL_VELOCITY = 2.0f;
+static const float VERTICAL_VELOCITY = 0.5;
 
 WaveUI::WaveUI(const vector<shared_ptr<Wave>>& aWaves, Updatable* anUpdatable) {
   waves = aWaves;
@@ -46,7 +48,7 @@ void WaveUI::processInput(GLFWwindow* window, float deltaTime) {
   updateUniforms = updateUniforms || adjustWavelength(window, deltaTime);
 
   if(updateUniforms){
-    updatable->update();
+    updatable->wavesNeedUpdate = true;
   }
 }
 bool WaveUI::adjustAmplitude(GLFWwindow* window, float deltaTime) {
@@ -97,13 +99,13 @@ bool WaveUI::adjustDirection(GLFWwindow* window, float deltaTime) {
 bool WaveUI::adjustWavelength(GLFWwindow* window, float deltaTime) {
   bool updateUniforms = false;
   if (glfwGetKey(window, GLFW_KEY_APOSTROPHE) == GLFW_PRESS) {
-    float wavelength = selectedWave->wavelength + SPEED * deltaTime;
+    float wavelength = selectedWave->wavelength + LONGITUDINAL_VELOCITY * deltaTime;
     selectedWave->wavelength = wavelength;
     updateUniforms = true;
   }
 
   if (glfwGetKey(window, GLFW_KEY_SEMICOLON) == GLFW_PRESS) {
-    float wavelength = selectedWave->wavelength - SPEED * deltaTime;
+    float wavelength = selectedWave->wavelength - LONGITUDINAL_VELOCITY * deltaTime;
     selectedWave->wavelength = wavelength;
     updateUniforms = true;
   }

@@ -13,7 +13,6 @@
 
 class Model {
  public:
-  Model(int meshSize, const std::vector<ShaderProgram>& shaderPrograms, std::shared_ptr<Camera> camera);
   Model(int meshSize, std::shared_ptr<Configuration> configuration);
 
   virtual ~Model() = default;
@@ -33,7 +32,7 @@ class Model {
   Mesh* getMesh(int index);
 
   virtual void updateShaderUniforms() = 0;
-  virtual void setShaderUniforms(const vector<shared_ptr<Wave>>& waves,
+  virtual void setWaveUniforms(const vector<shared_ptr<Wave>>& waves,
                          shared_ptr<ShaderProgram> program)const = 0;
 
 // these could all be public, simplifying things

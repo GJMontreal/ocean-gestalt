@@ -1,3 +1,22 @@
+<html>
+    <canvas id="canvas" oncontextmenu="event.preventDefault()">
+    </canvas>
+
+    <script>
+      var canvas = document.getElementById('canvas');
+
+      window.Module = {
+        preRun: [],
+        postRun: [],
+        canvas: canvas,
+        print: console.log,
+        printErr: console.error,
+      };
+    </script>
+
+    <script async src="ocean-gestalt.js"></script>
+</html>
+
 OpenGL CMake Skeleton [![Build Status](https://travis-ci.org/ArthurSonzogni/OpenGL_CMake_Skeleton.svg?branch=master)](https://travis-ci.org/ArthurSonzogni/OpenGL_CMake_Skeleton)
 =======================
 
