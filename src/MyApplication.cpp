@@ -31,6 +31,7 @@ MyApplication::MyApplication()
 {
   auto config = std::make_shared<Configuration>(CONFIGURATION_DIR "/config.json");
   this->camera = config->camera;
+  configuration = config;
   models.push_back(new Ocean(20,config));
   // waveUI = new WaveUI(config->waves);
   waveUI = make_unique<WaveUI>(config->waves,(Updatable*)(this));
@@ -172,6 +173,16 @@ void MyApplication::processInput(GLFWwindow* window, float deltaTime) {
     }
   }else{
     keyPressState[GLFW_KEY_M] = GLFW_RELEASE;
+  }
+
+// could this be written as a template?
+  if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
+    if(keyPressState[GLFW_KEY_Z] == GLFW_RELEASE){
+      configuration->save(CONFIGURATION_DIR "/output.json");
+      keyPressState[GLFW_KEY_Z] = GLFW_PRESS;
+    }
+  }else{
+    keyPressState[GLFW_KEY_Z] = GLFW_RELEASE;
   }
 }
 

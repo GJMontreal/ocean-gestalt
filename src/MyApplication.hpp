@@ -10,6 +10,7 @@
 #define OPENGL_CMAKE_SKELETON_MYAPPLICATION
 
 #include "Application.hpp"
+#include "Configuration.hpp"
 #include "InputProcessor.hpp"
 #include "Shader.hpp"
 #include "Model.hpp"
@@ -40,6 +41,7 @@ class MyApplication : public Application, public Updatable {
   glm::mat4 projection = glm::mat4(1.0);
   glm::mat4 view = glm::mat4(1.0);
   GLuint uboMatrices;
+  shared_ptr<Configuration> configuration;
 
   unique_ptr<WaveUI> waveUI;
   vector<Model*> models;

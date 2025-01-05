@@ -28,6 +28,8 @@ class Configuration {
   
   vec3 lightPosition;
 
+  void save(const string& fileName);
+
   private:
   int loadJSON(const string& fileName, json& data)const;
   int loadWaves(const string& fileName);

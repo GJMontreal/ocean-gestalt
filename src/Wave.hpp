@@ -4,9 +4,11 @@
 #include <glm/glm.hpp>
 
 using vec2 = glm::vec2;
+class Wave;
 class WaveSerialized {
  public:
   WaveSerialized() = default;
+  explicit WaveSerialized(const Wave& wave);
   float heading = 0.0f;  // degrees
   float wavelength = 0.0f;
   float steepness = 1.0f;
@@ -16,7 +18,7 @@ class WaveSerialized {
 
 class Wave {
  public:
-  explicit Wave(WaveSerialized& serialized);
+  explicit Wave(const WaveSerialized& serialized);
   Wave() = default;
   Wave(float amplitude, float wavelength, float heading, float steepness);
   vec2 direction = vec2(0.0f, 0.0f);

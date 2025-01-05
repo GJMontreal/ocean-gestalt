@@ -1,6 +1,6 @@
 #include "Configuration.hpp"
 #include "Camera.hpp"
-#include "jsonloader.hpp"  //rename
+#include "Serialization.hpp"
 #include "asset.hpp"
 
 #include <memory.h>
@@ -86,4 +86,17 @@ int Configuration::loadLight(const string& fileName){
       j.get_to(lightPosition);
   }
   return retval;
+}
+
+void Configuration::save(const string& fileName){
+  ofstream file(fileName);
+  if(file){
+    std::cout << "Writing configuration " << std::endl;
+    json data = *this;
+    file << std::setw(4) << data << std::endl;
+    file.close();
+  } else {
+    throw std::invalid_argument(string("The file ") + fileName +
+                                " doesn't exist");
+  }
 }

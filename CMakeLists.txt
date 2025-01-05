@@ -19,7 +19,7 @@ add_executable(ocean-gestalt
   src/Ocean.cpp
   src/Debug.cpp
   src/Configuration.cpp
-  src/jsonloader.cpp
+  src/Serialization.cpp
   src/Camera.cpp
   src/WaveUI.cpp
 )

@@ -1,9 +1,17 @@
 #include <Wave.hpp>
-Wave::Wave(WaveSerialized& serialized) {
+
+WaveSerialized::WaveSerialized(const Wave& wave){
+  amplitude = wave.amplitude;
+  wavelength = wave.wavelength;
+  heading = wave.heading;
+  steepness = wave.steepness;
+}
+
+Wave::Wave(const WaveSerialized& serialized) {
   amplitude = serialized.amplitude;
   wavelength = serialized.wavelength;
   heading = serialized.heading;
-  float radians = glm::radians(heading);//TODO: rename this and the direction vector
+  float radians = glm::radians(heading);
   direction.y = sin(radians);
   direction.x = cos(radians); 
   steepness = serialized.steepness;
