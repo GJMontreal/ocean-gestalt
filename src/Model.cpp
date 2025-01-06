@@ -8,7 +8,7 @@
 #include <iostream>
 
 Model::Model(int meshSize, std::shared_ptr<Configuration> configuration)
-    : transform(1.0), meshes({Mesh(meshSize)}) {
+    : transform(1.0), meshes({Mesh(meshSize,configuration->meshColor)}) {
   this->configuration = configuration;
   transform =
       glm::rotate(transform, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -33,7 +33,6 @@ void Model::draw(Uniforms& uniforms) {
     }
 
   #ifndef __EMSCRIPTEN__
-// TO DO: implement diagnostic/normal geometry shader 
     if(drawNormals){
       configuration->normalShader->activate();
       configuration->normalShader->setUniform("time",uniforms.time);
@@ -47,6 +46,7 @@ void Model::draw(Uniforms& uniforms) {
   if(drawMesh){
       configuration->meshShader->activate();
       configuration->meshShader->setUniform("time",uniforms.time);
+
       // these next three don't need to be set each pass
       configuration->meshShader->setUniform("model", transform);
       configuration->meshShader->setUniform("normalMatrix",normalMatrix);

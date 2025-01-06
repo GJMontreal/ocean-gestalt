@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Ocean Gestalt</title>
+    <title>Here we are, again</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no">
   </head>
@@ -19,26 +19,6 @@
         print: console.log,
         printErr: console.error,
       };
-    </script>
-
-    <script async src="ocean-gestalt.js"></script>
-    <input/>
-    <button id="dispatchButton">Pause </button>
-    <script>
-      function simulateKeyEvent(eventType, keyCode, code, key, target) {
-  var props = { keyCode, charCode: keyCode, view: window, bubbles: true, cancelable: true };
-  if (code) props['code'] = code;
-  if (key) props['key'] = key;
-  var event = new KeyboardEvent(eventType, props);
-  if (!target) target = document;
-  return target.dispatchEvent(event);
-}
- 
-dispatchButton.addEventListener('click', () => {
-          console.log("sending keypress");
-          simulateKeyEvent('keydown',80,80,'p');
-          simulateKeyEvent('keyup',80,80,'p');
-      });
     </script>
     <style>
       body {

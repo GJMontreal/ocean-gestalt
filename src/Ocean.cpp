@@ -35,7 +35,7 @@ void Ocean::updateShaderUniforms(){
   setWaveUniforms(configuration->waves,configuration->meshShader);
   setWaveUniforms(configuration->waves,configuration->wireframeShader); 
   configuration->wireframeShader->setUniform("lineColor",configuration->wireframeColor);
-  // we should set an additonal uniform for the wireframe and normal shaders representing their colors
+  
   #ifndef __EMSCRIPTEN__
   setWaveUniforms(configuration->waves,configuration->normalShader);
   configuration->wireframeShader->setUniform("lineColor",configuration->normalColor);
@@ -52,7 +52,7 @@ void Ocean::draw(Uniforms& uniforms) {
   lastTime = time;
 
   if (isRunning()) {
-    elapsedTime += interval;
+    elapsedTime += (float)interval;
   }
   uniforms.time = elapsedTime;
   Model::draw(uniforms);
