@@ -1,6 +1,8 @@
 #ifndef __CAMERA_HPP
 #define __CAMERA_HPP
 
+#include "Moveable.hpp"
+
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
@@ -11,16 +13,7 @@ const float SPEED       =  5.0f;
 const float SENSITIVITY =  0.1f;
 const float ZOOM        =  45.0f;
 
-enum class Camera_Movement {
-    FORWARD,
-    BACKWARD,
-    LEFT,
-    RIGHT,
-    UP,
-    DOWN
-};
-
-class Camera{
+class Camera: public Moveable{
 public:
   //updating these directly might not properly recalculate camera Vectors
   // camera Attributes
@@ -36,7 +29,7 @@ public:
     float Yaw;
     float Pitch;
     // camera options
-    float MovementSpeed;
+    // float MovementSpeed;
     float MouseSensitivity;
     float Zoom;
 
@@ -44,12 +37,14 @@ public:
            glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
            float yaw = YAW,
            float pitch = PITCH);
+        
+  ~Camera() = default;
 
-//TO DO: make capitalization consistent
+// TODO:  make capitalization consistent
     void updateCameraVectors();
     void ProcessMouseScroll(float yoffset);
     void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
-    void ProcessKeyboard(Camera_Movement direction, float deltaTime);
+    void ProcessKeyboard(Movement direction, float deltaTime) override;
     glm::mat4 GetViewMatrix() const;
 };
 

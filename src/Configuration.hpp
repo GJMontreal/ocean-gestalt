@@ -3,39 +3,51 @@
 
 #include "Wave.hpp"
 #include "Camera.hpp"
+#include "Light.hpp"
 #include "Shader.hpp"
 
 #include <memory.h>
 #include <nlohmann/json.hpp>
 #include <string>
 
-using json = nlohmann::json;
-using vec3 = glm::vec3;
+using nlohmann::json;
+using glm::vec3;
+using glm::vec4;
+using std::shared_ptr;
+using std::vector;
+using std::string;
 
-using namespace std;
 
 class Configuration {
  public:
-  explicit Configuration(const std::string& fileName);
+  explicit Configuration(const string& fileName);
 
   vector<shared_ptr<Wave>> waves;
 
   shared_ptr<Camera> camera;
   
+  shared_ptr<Light> light;
+
   shared_ptr<ShaderProgram> meshShader;  
   shared_ptr<ShaderProgram> wireframeShader;
   shared_ptr<ShaderProgram> normalShader;
   
-  vec3 lightPosition;
+  int meshSize;
+
+  vec4 meshColor;
+  vec4 wireframeColor;
+  vec4 normalColor;
 
   void save(const string& fileName);
 
   private:
-  int loadJSON(const string& fileName, json& data)const;
-  int loadWaves(const string& fileName);
-  int loadCamera(const string& fileName);
+  void loadJSON(const string& fileName, json& data)const;
+  void loadWaves(const string& fileName);
+  void loadCamera(const string& fileName);
   void loadShaders(const string& fileName);
-  int loadLight(const string& fileName);
+  void loadLight(const string& fileName);
+  void loadShaderColors(const string& fileName);
+  void loadMeshSize(const string& fileName);
 };
 
 #endif

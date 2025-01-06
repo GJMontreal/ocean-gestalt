@@ -18,7 +18,6 @@ class Model {
   virtual ~Model() = default;
 
   virtual void draw(Uniforms& uniforms);
-  virtual void beginDrawing(std::shared_ptr<ShaderProgram> program,  Uniforms& uniforms);
   
   void toggleDrawWireframe();
   void toggleDrawMesh();

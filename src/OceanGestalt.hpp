@@ -1,13 +1,14 @@
 /**
- * MyApplication.hpp skeleton
+ * OceanGestalt.hpp skeleton
  * Contributors:
+ *      * Geoffrey Jones
  *      * Arthur Sonzogni
  * Licence:
  *      * MIT
  */
 
-#ifndef OPENGL_CMAKE_SKELETON_MYAPPLICATION
-#define OPENGL_CMAKE_SKELETON_MYAPPLICATION
+#ifndef __OCEAN_GESTALT_HPP
+#define __OCEAN_GESTALT_HPP
 
 #include "Application.hpp"
 #include "Configuration.hpp"
@@ -15,6 +16,7 @@
 #include "Shader.hpp"
 #include "Model.hpp"
 #include "WaveUI.hpp"
+#include "Moveable.hpp"
 
 #include <map>
 
@@ -23,9 +25,11 @@ using std::map;
 using std::string;
 using std::vector;
 
-class MyApplication : public Application, public Updatable{
+using glm::mat4;
+
+class OceanGestalt : public Application, public Updatable{
  public:
-  MyApplication();
+  OceanGestalt();
  
  protected:
   void loop() override;
@@ -37,16 +41,23 @@ class MyApplication : public Application, public Updatable{
 
  private:
   // shader matrix uniform
-  glm::mat4 projection = glm::mat4(1.0);
-  glm::mat4 view = glm::mat4(1.0);
-  GLuint uboMatrices;
-  shared_ptr<Configuration> configuration;
+  glm::mat4 projection = mat4(1.0);
+  glm::mat4 view = mat4(1.0);
 
+  GLuint uboMatrices;
+
+  shared_ptr<Configuration> configuration;
+  shared_ptr<Moveable> moveable;
   unique_ptr<WaveUI> waveUI;
   vector<Model*> models;
-  map<string, ShaderProgram*> shaderPrograms;
-  void updateWaves();
-  void dumpCameraMatrices();
+
+  // I think this next is unused
+  // map<string, ShaderProgram*> shaderPrograms;
+
+  void initUniformBuffers();
+  void setUniformBuffers(mat4& projection, mat4& view) const;
+  
+  void updateWaves() const;
 };
 
-#endif  // OPENGL_CMAKE_SKELETON_MYAPPLICATION
+#endif

@@ -15,6 +15,7 @@ layout(std140) uniform Matrices
 // Just to keep our uniforms consistent between shaders
 uniform vec3 lightPos;
 uniform vec3 viewPos;
+uniform vec4 lineColor;
 
 // output
 out vec4 FragColor;
@@ -23,5 +24,6 @@ void main(void)
 {    vec3 _ = lightPos; // To keep our uniforms consistent between shaders
     _ = viewPos;
 
-    FragColor = vec4(.25,.25,.25,1.0);
+    // FragColor = vec4(.25,.25,.25,1.0);
+    FragColor = lineColor;
 }

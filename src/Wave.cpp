@@ -13,6 +13,7 @@ WaveSerialized::WaveSerialized(const Wave& wave){
 }
 
 Wave::Wave(const WaveSerialized& serialized) {
+  std::cout << "constructing wave from serialized" << std::endl;
   amplitude = serialized.amplitude;
   wavelength = serialized.wavelength;
   heading = serialized.heading;
@@ -22,6 +23,11 @@ Wave::Wave(const WaveSerialized& serialized) {
   steepness = serialized.steepness;
 }
 
+Wave::Wave(){
+  std::cout << "constructing default wave" <<std::endl;
+}
+
+// I don't think this is used
 Wave::Wave(float anAmplitude, float aWavelength, float aHeading, float aSteepness){
   amplitude = anAmplitude;
   wavelength = aWavelength;

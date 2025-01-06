@@ -15,10 +15,6 @@ Model::Model(int meshSize, std::shared_ptr<Configuration> configuration)
   calculateNormalMatrix(transform, normalMatrix);
 }
 
-void Model::beginDrawing(std::shared_ptr<ShaderProgram> program, Uniforms& uniforms){
-
-}
-
 // specify different shaders for mesh, wireframe, and normals
 void Model::draw(Uniforms& uniforms) {
   for(Mesh mesh: meshes){
@@ -54,7 +50,7 @@ void Model::draw(Uniforms& uniforms) {
       // these next three don't need to be set each pass
       configuration->meshShader->setUniform("model", transform);
       configuration->meshShader->setUniform("normalMatrix",normalMatrix);
-      configuration->meshShader->setUniform("lightPos", configuration->lightPosition);
+      configuration->meshShader->setUniform("lightPos", configuration->light->position);
       configuration->meshShader->setUniform("viewPos",configuration->camera->Position);
       
        #ifdef __EMSCRIPTEN__

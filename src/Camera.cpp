@@ -6,9 +6,10 @@
 
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
     : Front(glm::vec3(0.0f, 0.0f, -1.0f)),
-      MovementSpeed(SPEED),
+      
       MouseSensitivity(SENSITIVITY),
       Zoom(ZOOM) {
+  movementSpeed = SPEED;
   Position = position;
   WorldUp = up;
   Yaw = yaw;
@@ -25,19 +26,19 @@ glm::mat4 Camera::GetViewMatrix() const {
 // processes input received from any keyboard-like input system. Accepts input
 // parameter in the form of camera defined ENUM (to abstract it from windowing
 // systems)
-void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime) {
-  float velocity = MovementSpeed * deltaTime;
-  if (direction == Camera_Movement::FORWARD)
+void Camera::ProcessKeyboard(Movement direction, float deltaTime) {
+  float velocity = movementSpeed * deltaTime;
+  if (direction == Movement::FORWARD)
     Position += DollyFront * velocity;
-  if (direction == Camera_Movement::BACKWARD)
+  if (direction == Movement::BACKWARD)
     Position -= DollyFront * velocity;
-  if (direction == Camera_Movement::LEFT)
+  if (direction == Movement::LEFT)
     Position -= DollyRight * velocity;
-  if (direction == Camera_Movement::RIGHT)
+  if (direction == Movement::RIGHT)
     Position += DollyRight * velocity;
-  if (direction == Camera_Movement::UP)
+  if (direction == Movement::UP)
     Position += WorldUp * velocity;
-  if (direction == Camera_Movement::DOWN)
+  if (direction == Movement::DOWN)
     Position -= WorldUp * velocity;
 }
 

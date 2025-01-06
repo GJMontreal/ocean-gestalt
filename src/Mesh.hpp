@@ -13,7 +13,7 @@ struct NormalVertices{
 };
 class Mesh {
  public:
-  Mesh(int size, glm::vec4 aColor = glm::vec4({.01f, .15f, .210f, 0.0f}));
+  Mesh(int size, glm::vec4 aColor = glm::vec4({.01f, .15f, .210f, 0.0f})); // this colour should come from the configuration
   ~Mesh() = default;
 
   int getSize()const;

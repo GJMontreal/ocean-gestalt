@@ -7,9 +7,10 @@
 #include <fstream>
 #include <iostream>
 
-using json = nlohmann::json;
-using namespace std;
-
+using nlohmann::json;
+using std::cout;
+using std::endl;
+using std::make_shared;
 
 
 Configuration::Configuration(const string& fileName){
@@ -17,46 +18,43 @@ Configuration::Configuration(const string& fileName){
   loadCamera(fileName);
   loadShaders(fileName);
   loadLight(fileName);
+  loadShaderColors(fileName);
+  loadMeshSize(fileName);
 }
 
-int Configuration::loadWaves(const string& fileName){
+void Configuration::loadWaves(const string& fileName){
   json data;
-  int retval = loadJSON(fileName, data);
-  if(0==retval){
-    for( const auto& element: data.at("waves"))
-      {
-        WaveSerialized serialized;
-        element.get_to(serialized);
-        auto wave = std::make_shared<Wave>(serialized);
-        waves.push_back(std::move(wave));
-      }
-  }
-  return retval;
+  loadJSON(fileName, data);
+
+  for( const auto& element: data.at("waves"))
+    {
+      WaveSerialized serialized;
+      element.get_to(serialized);
+      auto wave = make_shared<Wave>(serialized);
+      waves.push_back(std::move(wave));
+    }
 }
 
-int Configuration::loadCamera(const string& fileName){
+void Configuration::loadCamera(const string& fileName){
   json data;
-  int retval = loadJSON(fileName, data);
-  if(0==retval){
-   auto aCamera = std::make_shared<Camera>();
-      json j =  data.at("camera");
-      j.get_to(*(aCamera.get()));
-      camera = std::move(aCamera);
-  }
-  return retval;
+  loadJSON(fileName, data);
+  
+  auto aCamera = make_shared<Camera>();
+  auto j =  data.at("camera");
+  j.get_to(*(aCamera.get()));
+  camera = std::move(aCamera);
 }
 
-int Configuration::loadJSON(const string& fileName, json& data) const{
-  int retval = 0;
-  ifstream file(fileName);
+
+void Configuration::loadJSON(const string& fileName, json& data) const{
+  std::ifstream file(fileName);
   if (file) {
     data = json::parse(file);
   } else {
+    //If we want to catch this in the browser, pass fexceptions at compile and link time
     throw std::invalid_argument(string("The file ") + fileName +
                                 " doesn't exist");
-    retval = -1;
   }
-  return retval;
 }
 
 void Configuration::loadShaders(const string& fileName){
@@ -81,22 +79,43 @@ void Configuration::loadShaders(const string& fileName){
 #endif
 }
 
-int Configuration::loadLight(const string& fileName){
+void Configuration::loadLight(const string& fileName){
   json data;
-  int retval = loadJSON(fileName, data);
-  if(0==retval){
-      json j =  data.at("light");
-      j.get_to(lightPosition);
-  }
-  return retval;
+  loadJSON(fileName, data);
+  vec3 lightPosition; 
+  auto j =  data.at("light");
+  j.get_to(lightPosition);
+  light = make_shared<Light>(lightPosition);
+}
+
+void Configuration::loadShaderColors(const string& fileName){
+  json data;
+  loadJSON(fileName, data);
+  
+  auto j = data.at("normal_color");
+  j.get_to(normalColor);
+
+  j = data.at("mesh_color");
+  j.get_to(meshColor);
+
+  j = data.at("wireframe_color");
+  j.get_to(wireframeColor);
+}
+
+void Configuration::loadMeshSize(const string& fileName){
+  json data;
+  loadJSON(fileName, data);
+
+  auto j = data.at("mesh_size");
+  j.get_to(meshSize);
 }
 
 void Configuration::save(const string& fileName){
-  ofstream file(fileName);
+  std::ofstream file(fileName);
   if(file){
-    std::cout << "Writing configuration " << std::endl;
+    cout << "Writing configuration " << endl;
     json data = *this;
-    file << std::setw(4) << data << std::endl;
+    file << std::setw(4) << data << endl;
     file.close();
   } else {
     throw std::invalid_argument(string("The file ") + fileName +

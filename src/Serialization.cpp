@@ -3,10 +3,9 @@
 
 // Configuration
 void to_json(json& j, const Configuration& configuration) {
-  j = json{{"camera",
-            *(configuration.camera.get())},
-            {"waves", configuration.waves},
-            {"light",configuration.lightPosition}};
+  j = json{{"camera", *(configuration.camera.get())},
+           {"waves", configuration.waves},
+           {"light", configuration.light->position}};
 }
 
 void to_json(json& j, shared_ptr<Wave> p) {
@@ -67,7 +66,17 @@ void from_json(const json& j, vec3& v) {
 }
 
 void to_json(json& j, const vec3& v) {
-  j = json{{"x", v.x}, {"y", v.y},{"z",v.z}};
+  j = json{{"x", v.x}, {"y", v.y}, {"z", v.z}};
 }
 
+void from_json(const json& j, vec4& v) {
+  j.at("r").get_to(v.r);
+  j.at("g").get_to(v.g);
+  j.at("b").get_to(v.b);
+  j.at("a").get_to(v.a);
+}
+
+void to_json(json& j, const vec4& v) {
+  j = json{{"r", v.r}, {"g", v.g}, {"b", v.b}, {"a", v.a}};
+}
 }  // namespace glm

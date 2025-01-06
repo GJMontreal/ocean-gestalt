@@ -26,7 +26,13 @@ void to_json(json& j, const Camera& camera);
 namespace glm {
 void to_json(json& j, const vec2& v);
 void from_json(const json& j, vec2& v);
+
 void from_json(const json& j, vec3& v);
+void to_json(json& j, const vec3& v);
+
+void from_json(const json& j, vec4& v);
+void to_json(json& j, const vec4& v);
+
 }  // namespace glm
 
 

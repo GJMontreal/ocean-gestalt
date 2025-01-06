@@ -13,11 +13,10 @@ using vec3 = glm::vec3;
 
 class Ocean : public Model {
  public:
-  Ocean(int meshSize, std::shared_ptr<Configuration> configuration);
+  Ocean(std::shared_ptr<Configuration> configuration);
 
   ~Ocean() override = default;
   void draw(Uniforms& uniforms) override;
-  void beginDrawing(std::shared_ptr<ShaderProgram> program, Uniforms& uniforms) override;
 
   void setupWireframeShader();
   void setupMeshShader();
