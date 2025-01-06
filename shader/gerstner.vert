@@ -38,7 +38,6 @@ out VS_OUT {
 const float PI = 3.14159265358979323;
 const float speedScale = 3.0;
 
-//Why is it moving with the camera
 vec3 waveOffset(float time, vec3 aPosition, WAVE wave){
     float k =  2.0f * PI / wave.wavelength;
     vec2 D = normalize(wave.direction.xy);  // normalized direction
@@ -48,9 +47,8 @@ vec3 waveOffset(float time, vec3 aPosition, WAVE wave){
     float KPwT = dot(K, vec2(aPosition)) - wT;
     float S0 = sin(KPwT);
     float C0 = cos(KPwT);
-    // float z = wave.amplitude * C0 - (wave.amplitude / 2.0 ); // 0 is our mean height
      float z = wave.amplitude * C0;
-    vec2 xy = aPosition.xy - D * wave.steepness * wave.amplitude * S0; //are we sure about this?
+    vec2 xy = aPosition.xy - D * wave.steepness * S0 * wave.amplitude; //are we sure about this?
     return vec3(xy,z);
 }
 
@@ -76,6 +74,7 @@ PARTICLE calcWaves(vec3 aPosition){
     offset += newOffset;
     normal = normal + numericalDerivativeNormal(newOffset,aPosition,waves[i],time,.001);
   }
+  offset = offset / waves.length();
   PARTICLE particle;
   particle.normal = normalMatrix * normal;
   particle.position = offset;

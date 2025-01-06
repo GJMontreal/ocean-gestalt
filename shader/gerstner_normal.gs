@@ -13,7 +13,7 @@ out VS_OUT {
     vec3 Color;
 } fs_in;
 
-const float MAGNITUDE = 2;
+const float MAGNITUDE = .1;
 
 layout(std140) uniform Matrices
 {
@@ -23,7 +23,7 @@ layout(std140) uniform Matrices
 
 void GenerateLine(int index)
 {
-    gl_Position = projection * vec4(gs_in[index].FragPos,1);
+    gl_Position = projection * vec4(gs_in[index].FragPos,1);   
     EmitVertex();
     gl_Position = projection * (vec4(gs_in[index].FragPos,1) + vec4(gs_in[index].Normal,1)*MAGNITUDE);
     EmitVertex();
