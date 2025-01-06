@@ -23,9 +23,9 @@ layout(std140) uniform Matrices
 
 void GenerateLine(int index)
 {
-    gl_Position = projection * vec4(gs_in[index].FragPos,1);   
+    gl_Position = projection * view * vec4(gs_in[index].FragPos,1);   
     EmitVertex();
-    gl_Position = projection * (vec4(gs_in[index].FragPos,1) + vec4(gs_in[index].Normal,1)*MAGNITUDE);
+    gl_Position = projection * ( view * (vec4(gs_in[index].FragPos,1)) + vec4(gs_in[index].Normal,1)* MAGNITUDE);
     EmitVertex();
     EndPrimitive();
 }
