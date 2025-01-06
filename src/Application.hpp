@@ -1,6 +1,7 @@
 /**
  * Application.cpp
  * Contributors:
+ *      * Geoffrey Jones
  *      * Arthur Sonzogni (author)
  * Licence:
  *      * MIT
@@ -11,10 +12,13 @@
 
 #include "Camera.hpp"
 #include "InputProcessor.hpp"
-#include <string>
-#include <map>
-#include <memory>
+#include "Light.hpp"
+
 #include <GLFW/glfw3.h>
+
+#include <string>
+#include <memory>
+
 
 struct GLFWwindow;
 
@@ -57,8 +61,8 @@ class Application: public InputProcessor {
   float getWindowRatio();
   bool windowDimensionChanged();
 
-  // I don't think this is used
   std::shared_ptr<Camera> getCamera();
+  std::shared_ptr<Light> getLight();
 
  private:
   enum State { stateReady, stateRun, stateExit };
@@ -88,6 +92,7 @@ class Application: public InputProcessor {
   std::string title;
 
   std::shared_ptr<Camera> camera;
+  std::shared_ptr<Light> light;
 
   virtual void loop();
   void processInput(GLFWwindow *window, float deltaTime) override;

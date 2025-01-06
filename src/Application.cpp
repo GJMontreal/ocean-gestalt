@@ -1,6 +1,7 @@
 /**
  * Application.hpp
  * Contributors:
+ *      Geoffrey Jones
  *      * Arthur Sonzogni (author)
  * Licence:
  *      * MIT
@@ -95,9 +96,6 @@ Application::Application()
   glEnable(GL_CULL_FACE);
   // vsync
   // glfwSwapInterval(false);
-  // camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f));// replace with configuration.camera
-  // camera = Camera(glm::vec3{15,3.8,15},glm::vec3{-.002,1,-.02},-138,-1.3);
-
 
   // bind the callbacks
   glfwSetWindowUserPointer(window, this);
@@ -193,6 +191,10 @@ std::shared_ptr<Camera> Application::getCamera() {
   return camera;
 }
 
+std::shared_ptr<Light> Application::getLight() {
+  return light;
+}
+
 void Application::scrollCallback(GLFWwindow* window,
                                  double xoffset,
                                  double yoffset) {
@@ -213,6 +215,8 @@ void Application::mouseCallback(GLFWwindow* window,
 
   Application* app = (Application*)glfwGetWindowUserPointer(window);
   auto camera = app->getCamera();
+  auto light = app->getLight();
+
   float xpos = static_cast<float>(xposIn);
   float ypos = static_cast<float>(yposIn);
 
@@ -230,12 +234,15 @@ void Application::mouseCallback(GLFWwindow* window,
   lastY = ypos;
 
   camera->ProcessMouseMovement(xoffset, yoffset);
+  light->forward = camera->DollyFront;
+  // light->up = camera->WorldUp;
+  light->right = camera->DollyRight;
 }
 
 // ---------------------------------------------------------------------------------------------------------
 // process all input: query GLFW whether relevant keys are pressed/released this
 // frame and react accordingly
-void Application::processInput(GLFWwindow *window, float deltaTime){
+void Application::processInput(GLFWwindow*, float){
 }
 
 void Application::toggleNormalDisplay(){

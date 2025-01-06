@@ -86,6 +86,6 @@ void main(void)
     vs_out.Color = vec3(color);
     PARTICLE particle = calcWaves(position);       
     gl_Position = projection * view * model * vec4(particle.position, 1.0) ;
-     vs_out.FragPos = vec3(view*model*vec4(particle.position,1.0));
+    vs_out.FragPos = vec3(model*vec4(particle.position,1.0));
     vs_out.Normal = particle.normal;
 }

@@ -34,6 +34,8 @@ OceanGestalt::OceanGestalt()
   auto config = std::make_shared<Configuration>(CONFIGURATION_DIR "/config.json");
   this->camera = config->camera; 
   this->moveable = this->camera;
+  this->light = config->light;
+  
   configuration = config;
   models.push_back(new Ocean(config));
  
@@ -146,13 +148,13 @@ void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
     moveable->ProcessKeyboard(Movement::DOWN, deltaTime);
 
   waveUI->processInput(window, deltaTime);
+
   // These are problematic because they might get called many times
   // for each; save the state and only call the function when it changes
   // to release
   // Toggle between moving the camera and light
   if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
     if (keyPressState[GLFW_KEY_C] == GLFW_RELEASE) {
-      //can we compare pointers
       if(moveable == configuration->camera){
         moveable = configuration->light;
       }else {

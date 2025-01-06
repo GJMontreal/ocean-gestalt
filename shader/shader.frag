@@ -22,7 +22,7 @@ void main(void)
 {       
     vec3 color = fs_in.Color;
     // ambient
-    vec3 ambient = 0.0125 * color;
+    vec3 ambient = 0.125 * color;
     // diffuse
     vec3 lightDir = normalize(lightPos - fs_in.FragPos);
     vec3 normal = normalize(fs_in.Normal);
