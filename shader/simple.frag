@@ -23,5 +23,5 @@ void main(void)
 {    vec3 _ = lightPos; // To keep our uniforms consistent between shaders
     _ = viewPos;
 
-    FragColor = vec4(.5,.5,.5,1.0);
+    FragColor = vec4(.25,.25,.25,1.0);
 }

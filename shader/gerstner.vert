@@ -21,7 +21,7 @@ struct WAVE{
   float steepness;
 };
 
-uniform WAVE waves[6];  
+uniform WAVE waves[10];  
 
 struct PARTICLE{
   vec3 position;

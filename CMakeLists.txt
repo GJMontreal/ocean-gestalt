@@ -22,6 +22,7 @@ add_executable(ocean-gestalt
   src/Serialization.cpp
   src/Camera.cpp
   src/WaveUI.cpp
+  src/WaveGenerator.cpp
 )
 set_property(TARGET ocean-gestalt PROPERTY CXX_STANDARD 11)
 # target_compile_options(ocean-gestalt PRIVATE -Wall)

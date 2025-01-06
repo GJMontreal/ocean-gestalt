@@ -6,6 +6,7 @@
 #include "asset.hpp"
 #include "glError.hpp"
 #include "Debug.hpp"
+#include "WaveGenerator.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -14,7 +15,6 @@
 #include "glm/gtc/type_ptr.hpp"
 
 #include <iostream>
-#include <vector>
 
 #include <nlohmann/json.hpp>
 
@@ -65,7 +65,7 @@ void MyApplication::loop() {
     exit();
 
   projection = glm::perspective(glm::radians(getCamera()->Zoom),
-                                getWindowRatio(), 0.1f, 150.f);
+                                getWindowRatio(), 0.1f, 250.f);
 
   view = camera->GetViewMatrix();
   
@@ -190,6 +190,16 @@ void MyApplication::processInput(GLFWwindow* window, float deltaTime) {
     }
   }else{
     keyPressState[GLFW_KEY_Z] = GLFW_RELEASE;
+  }
+
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+    if(keyPressState[GLFW_KEY_R] == GLFW_RELEASE){
+      WaveGenerator(configuration->waves);
+      wavesNeedUpdate = true;
+      keyPressState[GLFW_KEY_R] = GLFW_PRESS;
+    }
+  }else{
+    keyPressState[GLFW_KEY_R] = GLFW_RELEASE;
   }
 }
 

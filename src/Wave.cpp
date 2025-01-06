@@ -1,5 +1,10 @@
 #include <Wave.hpp>
 
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
 WaveSerialized::WaveSerialized(const Wave& wave){
   amplitude = wave.amplitude;
   wavelength = wave.wavelength;
@@ -25,6 +30,10 @@ Wave::Wave(float anAmplitude, float aWavelength, float aHeading, float aSteepnes
   direction.y = sin(radians);
   direction.x = cos(radians);
   steepness = aSteepness;
+}
+
+Wave::~Wave(){
+  cout << "deleting wave" << endl;
 }
 
 float Wave::getVelocity() const {

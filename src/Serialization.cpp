@@ -5,7 +5,8 @@
 void to_json(json& j, const Configuration& configuration) {
   j = json{{"camera",
             *(configuration.camera.get())},
-            {"waves", configuration.waves}};
+            {"waves", configuration.waves},
+            {"light",configuration.lightPosition}};
 }
 
 void to_json(json& j, shared_ptr<Wave> p) {

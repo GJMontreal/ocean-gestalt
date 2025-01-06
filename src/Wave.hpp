@@ -19,8 +19,9 @@ class WaveSerialized {
 class Wave {
  public:
   explicit Wave(const WaveSerialized& serialized);
-  Wave() = default;
+  Wave() = default; // do we still need these additional constructors?
   Wave(float amplitude, float wavelength, float heading, float steepness);
+  ~Wave();
   vec2 direction = vec2(0.0f, 0.0f);
   float heading = 0.0f;
   float wavelength = 0.0f;
