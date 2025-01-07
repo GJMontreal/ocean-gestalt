@@ -51,7 +51,7 @@ void Model::draw(Uniforms& uniforms) {
       configuration->meshShader->setUniform("model", transform);
       configuration->meshShader->setUniform("normalMatrix",normalMatrix);
       configuration->meshShader->setUniform("lightPos", configuration->light->position);
-      configuration->meshShader->setUniform("viewPos",configuration->camera->Position);
+      configuration->meshShader->setUniform("viewPos",configuration->camera->position);
       
        #ifdef __EMSCRIPTEN__
       configuration->meshShader->setUniform("projection", uniforms.projection);

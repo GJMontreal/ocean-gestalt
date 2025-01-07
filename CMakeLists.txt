@@ -5,10 +5,7 @@ project (ocean-gestalt)
 # The main executable
 add_executable(ocean-gestalt
   src/Application.cpp
-  # src/Application.cpp
   src/OceanGestalt.cpp
-  # src/MyApplication.cpp
-  # src/glError.hpp
   src/glError.cpp
   src/main.cpp
   src/Shader.hpp
@@ -17,14 +14,15 @@ add_executable(ocean-gestalt
   src/Mesh.cpp
   src/Model.cpp
   src/Ocean.cpp
-  src/Debug.cpp
   src/Configuration.cpp
   src/Serialization.cpp
   src/Camera.cpp
   src/WaveUI.cpp
   src/WaveGenerator.cpp
   src/Light.cpp
+  src/Moveable.cpp
 )
+
 set_property(TARGET ocean-gestalt PROPERTY CXX_STANDARD 11)
 # target_compile_options(ocean-gestalt PRIVATE -Wall)
 add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)

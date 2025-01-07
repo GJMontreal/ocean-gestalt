@@ -33,8 +33,8 @@ void to_json(json& j, const WaveSerialized& wave) {
 
 // Camera
 void from_json(const json& j, Camera& camera) {
-  j.at("position").get_to(camera.Position);
-  j.at("up").get_to(camera.WorldUp);
+  j.at("position").get_to(camera.position);
+  j.at("up").get_to(camera.moveUp);
   j.at("yaw").get_to(camera.Yaw);
   j.at("pitch").get_to(camera.Pitch);
   j.at("zoom").get_to(camera.Zoom);
@@ -42,8 +42,8 @@ void from_json(const json& j, Camera& camera) {
 }
 
 void to_json(json& j, const Camera& camera) {
-  j = json{{"position", camera.Position},
-           {"up", camera.WorldUp},
+  j = json{{"position", camera.position},
+           {"up", camera.moveUp},
            {"yaw", camera.Yaw},
            {"pitch", camera.Pitch},
            {"zoom", camera.Zoom}};

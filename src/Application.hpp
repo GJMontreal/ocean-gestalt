@@ -56,10 +56,10 @@ class Application: public InputProcessor {
   static void mouseCallback(GLFWwindow* window, double xposIn, double yposIn);
   // Application informations
   //
-  int getWidth();
-  int getHeight();
-  float getWindowRatio();
-  bool windowDimensionChanged();
+  int getWidth() const;
+  int getHeight() const;
+  float getWindowRatio() const;
+  bool windowDimensionChanged() const;
 
   std::shared_ptr<Camera> getCamera();
   std::shared_ptr<Light> getLight();

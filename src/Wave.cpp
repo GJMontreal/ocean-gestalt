@@ -1,9 +1,4 @@
-#include <Wave.hpp>
-
-#include <iostream>
-
-using std::cout;
-using std::endl;
+#include "Wave.hpp"
 
 WaveSerialized::WaveSerialized(const Wave& wave){
   amplitude = wave.amplitude;
@@ -13,7 +8,6 @@ WaveSerialized::WaveSerialized(const Wave& wave){
 }
 
 Wave::Wave(const WaveSerialized& serialized) {
-  std::cout << "constructing wave from serialized" << std::endl;
   amplitude = serialized.amplitude;
   wavelength = serialized.wavelength;
   heading = serialized.heading;
@@ -23,9 +17,6 @@ Wave::Wave(const WaveSerialized& serialized) {
   steepness = serialized.steepness;
 }
 
-Wave::Wave(){
-  std::cout << "constructing default wave" <<std::endl;
-}
 
 // I don't think this is used
 Wave::Wave(float anAmplitude, float aWavelength, float aHeading, float aSteepness){
@@ -36,10 +27,6 @@ Wave::Wave(float anAmplitude, float aWavelength, float aHeading, float aSteepnes
   direction.y = sin(radians);
   direction.x = cos(radians);
   steepness = aSteepness;
-}
-
-Wave::~Wave(){
-  cout << "deleting wave" << endl;
 }
 
 float Wave::getVelocity() const {

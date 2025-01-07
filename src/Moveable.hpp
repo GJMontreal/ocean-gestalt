@@ -16,12 +16,14 @@ enum class Movement {
 
 class Moveable{
   public:
-    virtual void ProcessKeyboard(Movement direction, float deltaTime) = 0;
+    void ProcessKeyboard(Movement direction, float deltaTime);
     float movementSpeed = 5.0f;
 
-    vec3 forward{0.0,0.0,-1.0};
-    vec3 up{0.0,1.0,0.0};
-    vec3 right{1.0,0.0,0.0};
+    vec3 position;
+    
+    vec3 moveForward{0.0,0.0,-1.0};
+    vec3 moveUp{0.0,1.0,0.0};
+    vec3 moveRight{1.0,0.0,0.0};
 
   protected:
     virtual ~Moveable() = default;

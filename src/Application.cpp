@@ -94,8 +94,9 @@ Application::Application()
   glDepthFunc(GL_LESS);  // depth-testing interprets a smaller value as "closer"
 
   glEnable(GL_CULL_FACE);
+  glCullFace(GL_FRONT_FACE);
   // vsync
-  // glfwSwapInterval(false);
+  glfwSwapInterval(1);
 
   // bind the callbacks
   glfwSetWindowUserPointer(window, this);
@@ -125,14 +126,14 @@ void Application::run() {
   // Make the window's context current
   glfwMakeContextCurrent(window);
 
-  time = glfwGetTime();
+  time = (float)glfwGetTime();
   registered_loop = [&]() {
     // compute new time and delta time
-    float t = glfwGetTime();
+    auto t = (float)glfwGetTime();
     deltaTime = t - time;
     time = t;
 
-    // detech window related changes
+    // detect window related changes
     detectWindowDimensionChange();
 
     processInput(window, deltaTime);
@@ -157,7 +158,8 @@ void Application::run() {
 }
 
 void Application::detectWindowDimensionChange() {
-  int w, h;
+  int w;
+  int h;
   glfwGetWindowSize(getWindow(), &w, &h);
   dimensionChanged = (w != width || h != height);
   if (dimensionChanged) {
@@ -171,19 +173,19 @@ void Application::loop() {
   cout << "[INFO] : loop" << endl;
 }
 
-int Application::getWidth() {
+int Application::getWidth() const {
   return width;
 }
 
-int Application::getHeight() {
+int Application::getHeight() const{
   return height;
 }
 
-float Application::getWindowRatio() {
+float Application::getWindowRatio() const{
   return float(width) / float(height);
 }
 
-bool Application::windowDimensionChanged() {
+bool Application::windowDimensionChanged() const{
   return dimensionChanged;
 }
 
@@ -196,7 +198,7 @@ std::shared_ptr<Light> Application::getLight() {
 }
 
 void Application::scrollCallback(GLFWwindow* window,
-                                 double xoffset,
+                                 double,
                                  double yoffset) {
   auto app = (Application*)glfwGetWindowUserPointer(window);
   auto camera = app->getCamera();
@@ -213,12 +215,12 @@ void Application::mouseCallback(GLFWwindow* window,
     return;
   }
 
-  Application* app = (Application*)glfwGetWindowUserPointer(window);
+  auto app = (Application*)glfwGetWindowUserPointer(window);
   auto camera = app->getCamera();
   auto light = app->getLight();
 
-  float xpos = static_cast<float>(xposIn);
-  float ypos = static_cast<float>(yposIn);
+  auto xpos = static_cast<float>(xposIn);
+  auto ypos = static_cast<float>(yposIn);
 
   if (firstMouse) {
     lastX = xpos;
@@ -234,9 +236,8 @@ void Application::mouseCallback(GLFWwindow* window,
   lastY = ypos;
 
   camera->ProcessMouseMovement(xoffset, yoffset);
-  light->forward = camera->DollyFront;
-  // light->up = camera->WorldUp;
-  light->right = camera->DollyRight;
+  light->moveForward = camera->moveForward;
+  light->moveRight = camera->moveRight;
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -255,6 +256,5 @@ void Application::toggleWireframe (){
 }
 
 void Application::toggleMesh(){
-
 }
 

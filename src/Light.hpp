@@ -11,8 +11,8 @@ using glm::vec3;
 class Light: public Moveable{
   public:
     explicit Light(vec3 aPosition);
-    void ProcessKeyboard(Movement direction, float deltaTime) override;
-    vec3 position;
+    // void ProcessKeyboard(Movement direction, float deltaTime) override;
+    // vec3 position;
 };
 
 #endif
