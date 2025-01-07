@@ -30,8 +30,9 @@ std::unique_ptr<T> make_unique(Args&&... args) {
 OceanGestalt::OceanGestalt()
     : Application()
 {
-  // TODO: pass in config file as optional command line argument
-  auto config = std::make_shared<Configuration>(CONFIGURATION_DIR "/config.json");
+  // TODO: pass in file names as optional command line arguments
+  auto config = std::make_shared<Configuration>(CONFIGURATION_DIR "environment.json",
+  CONFIGURATION_DIR "shader.json",CONFIGURATION_DIR "generator.json");
   this->camera = config->camera; 
   this->moveable = this->camera;
   this->light = config->light;
@@ -131,7 +132,7 @@ void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
   
-
+  // TODO:
   // moveable->processInput(window, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
     moveable->ProcessKeyboard(Movement::FORWARD, deltaTime);
@@ -214,7 +215,9 @@ void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
 
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
     if(keyPressState[GLFW_KEY_R] == GLFW_RELEASE){
-      WaveGenerator(configuration->waves);
+      WaveGenerator(configuration->waves, configuration->stdDeviation,
+                    configuration->medianWavelength,
+                    configuration->medianAmplitude);
       wavesNeedUpdate = true;
       keyPressState[GLFW_KEY_R] = GLFW_PRESS;
     }

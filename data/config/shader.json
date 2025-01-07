@@ -1,0 +1,33 @@
+{
+    "normal_shader": {
+        "vertex": "gerstner.vert",
+        "geometry": "gerstner_normal.gs",
+        "fragment": "simple.frag",
+        "color": {
+            "r": 0,
+            "g": 1,
+            "b": 0.5,
+            "a": 1
+        }
+    },
+    "wireframe_shader": {
+        "vertex": "gerstner.vert",
+        "fragment": "simple.frag",
+        "color": {
+            "r": 0,
+            "g": 0.5,
+            "b": 0.5,
+            "a": 1
+        }
+    },
+    "mesh_shader": {
+        "vertex": "gerstner.vert",
+        "fragment": "shader.frag",
+        "color": {
+            "r": 0.1,
+            "g": 0.1,
+            "b": 0.5,
+            "a": 1
+        }
+    }
+}

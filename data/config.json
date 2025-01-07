@@ -1,60 +1,102 @@
-{
-    "waves": [
-        {
-            "amplitude": 6,
-            "heading": 0,
-            "wavelength": 12,
-            "steepness": 0.9
-        },
-        {
-            "amplitude": 0,
-            "heading": 90,
-            "wavelength": 10,
-            "steepness": 0.9
-        },
-        {
-            "amplitude": 0,
-            "heading": 0,
-            "wavelength": 1,
-            "steepness": 0.9
-        },
-        {
-            "amplitude": 0,
-            "heading": 0,
-            "wavelength": 1,
-            "steepness": 0.9
-        },
-        {
-            "amplitude": 0,
-            "heading": 0,
-            "wavelength": 1,
-            "steepness": 0.9
-        },
-        {
-            "amplitude": 0,
-            "heading": 0,
-            "wavelength": 1,
-            "steepness": 0.9
-        }
-    ],
+{"mesh_size":30,
     "camera": {
+        "pitch": -14.79998779296875,
+        "position": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
         "up": {
             "x": 0,
             "y": 1,
             "z": 0
         },
-        "position": {
-            "x": -23,
-            "y": 26,
-            "z": 28
-        },
-        "yaw": -425,
-        "pitch": -37,
+        "yaw": -37,
         "zoom": 45
     },
     "light": {
-        "x": -10,
-        "y": 45,
-        "z": -20
+        "x": 0,
+        "y": 10,
+        "z": -10
+    },
+    "waves": [
+        {
+            "amplitude": 6,
+            "heading": 0,
+            "steepness": 0.8999999761581421,
+            "wavelength": 12
+        },
+        {
+            "amplitude": 0,
+            "heading": 127.70712280273438,
+            "steepness": 0.8999999761581421,
+            "wavelength": 10
+        },
+        {
+            "amplitude": 0,
+            "heading": 56.25946044921875,
+            "steepness": 0.8999999761581421,
+            "wavelength": 3.6940078735351562
+        },
+        {
+            "amplitude": 0,
+            "heading": 0,
+            "steepness": 0.8999999761581421,
+            "wavelength": 1
+        },
+        {
+            "amplitude": 0,
+            "heading": 31.165542602539062,
+            "steepness": 0.8999999761581421,
+            "wavelength": 12.931991577148438
+        },
+        {
+            "amplitude": 0,
+            "heading": 0,
+            "steepness": 0.8999999761581421,
+            "wavelength": 1
+        },
+        {
+            "amplitude": 0,
+            "heading": 0,
+            "steepness": 0.8999999761581421,
+            "wavelength": 1
+        },
+        {
+            "amplitude": 0,
+            "heading": 0,
+            "steepness": 0.8999999761581421,
+            "wavelength": 1
+        },
+        {
+            "amplitude": 0,
+            "heading": 0,
+            "steepness": 0.8999999761581421,
+            "wavelength": 1
+        },
+        {
+            "amplitude": 0,
+            "heading": 0,
+            "steepness": 0.8999999761581421,
+            "wavelength": 1
+        }
+    ],
+    "wireframe_color": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+    },
+    "mesh_color": {
+        "r": 0.1,
+        "g": 0.1,
+        "b": 0.5,
+        "a": 1.0
+    },
+    "normal_color": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 0.5,
+        "a": 1.0
     }
 }

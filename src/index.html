@@ -4,6 +4,7 @@
     <title>Here we are, again</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   </head>
   <body>
     <canvas id="canvas" oncontextmenu="event.preventDefault()">
@@ -20,6 +21,17 @@
         printErr: console.error,
       };
     </script>
+    <script async src="ocean-gestalt.js"></script>
+    <div class="output"></div>
+    <script language="javascript">
+        var realConsoleLog = console.log;
+        console.log = function () {
+            var message = [].join.call(arguments, " ");
+            $(".output").text(message);
+            realConsoleLog.apply(console, arguments);
+        };
+        console.log("hello there");
+    </script>  
     <style>
       body {
         background-color: black;

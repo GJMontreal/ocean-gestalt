@@ -46,7 +46,9 @@ if (EMSCRIPTEN)
    "data/shader/webgl/shader.frag"
    "data/shader/webgl/simple.frag" 
    "data/shader/webgl/gerstner.vert"
-   "data/config.json"
+   "data/config/environment.json"
+   "data/config/shader.json"
+   "data/config/generator.json"
   )
   
     configure_file(${file} ${file})
@@ -54,7 +56,7 @@ if (EMSCRIPTEN)
 
   # Allow the directories /shader and /config to be fetched by the web browser.
   set_property(TARGET ocean-gestalt APPEND_STRING PROPERTY LINK_FLAGS
-    "--preload-file ${CMAKE_CURRENT_BINARY_DIR}/data/@/data/"
+    "--preload-file ${CMAKE_CURRENT_BINARY_DIR}/data/@/"
   )
 
 

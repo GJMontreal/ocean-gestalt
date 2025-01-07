@@ -12,14 +12,15 @@ using std::cout;
 using std::endl;
 using std::make_shared;
 
+static const auto SHADERS = vector<string>{"mesh_shader","wireframe_shader","normal_shader"};
 
-Configuration::Configuration(const string& fileName){
-  loadWaves(fileName);
-  loadCamera(fileName);
-  loadShaders(fileName);
-  loadLight(fileName);
-  loadShaderColors(fileName);
-  loadMeshSize(fileName);
+Configuration::Configuration(const string& environment, const string& shader, const string &generator){
+  loadWaves(environment);
+  loadCamera(environment);
+  loadLight(environment);
+  loadMeshSize(environment);
+  loadShaders(shader);
+  loadGenerator(generator);
 }
 
 void Configuration::loadWaves(const string& fileName){
@@ -58,25 +59,36 @@ void Configuration::loadJSON(const string& fileName, json& data) const{
 }
 
 void Configuration::loadShaders(const string& fileName){
-  //TODO: pass the filenames for each shader in a json file
-  Shader vertexShader(SHADER_DIR "/gerstner.vert", GL_VERTEX_SHADER);
-  Shader fragmentShader(SHADER_DIR "/shader.frag", GL_FRAGMENT_SHADER);
-  auto program = std::make_shared<ShaderProgram>(ShaderProgram({vertexShader,fragmentShader}));
-  meshShader = std::move(program);
+  json j;
+  loadJSON(fileName, j);
 
-  vertexShader = Shader(SHADER_DIR "/gerstner.vert", GL_VERTEX_SHADER);
-  fragmentShader = Shader(SHADER_DIR "/simple.frag", GL_FRAGMENT_SHADER);
-  program = std::make_shared<ShaderProgram>(ShaderProgram({vertexShader,fragmentShader}));
-  wireframeShader = std::move(program);
+  meshShader = buildShader(j, "mesh_shader", meshColor );
+  wireframeShader = buildShader(j,"wireframe_shader", wireframeColor);
 
-// WEBGL doesn't support geometry shaders
-#ifndef __EMSCRIPTEN__
-  Shader geometryShader(SHADER_DIR "/gerstner_normal.gs", GL_GEOMETRY_SHADER);
-  vertexShader = Shader(SHADER_DIR "/gerstner.vert", GL_VERTEX_SHADER);
-  fragmentShader = Shader(SHADER_DIR "/simple.frag", GL_FRAGMENT_SHADER);
-  program = std::make_shared<ShaderProgram>(ShaderProgram({vertexShader,fragmentShader,geometryShader}));
-  normalShader = std::move(program);
-#endif
+   // WEBGL doesn't support geometry shaders
+  #ifndef __EMSCRIPTEN__
+  normalShader = buildShader(j,"normal_shader",normalColor);
+  #endif
+}
+
+shared_ptr<ShaderProgram> Configuration::buildShader(json& j, const string& name, vec4& color){
+  auto shaderJSON = j.at(name);
+ 
+  Shader vertexShader(SHADER_DIR + (string)shaderJSON.at("vertex"), GL_VERTEX_SHADER);
+  Shader fragmentShader(SHADER_DIR + (string)shaderJSON.at("fragment"), GL_FRAGMENT_SHADER);
+
+  color = shaderJSON.at("color");
+
+  //optional geometry shader where supported
+  auto geometry = shaderJSON["geometry"];
+  shared_ptr<ShaderProgram> program;
+  if(geometry != nullptr){
+    Shader geometryShader(SHADER_DIR + (string)geometry, GL_GEOMETRY_SHADER);
+    program = make_shared<ShaderProgram>(ShaderProgram{vertexShader,fragmentShader, geometryShader});
+  }else{
+    program = make_shared<ShaderProgram>(ShaderProgram{vertexShader, fragmentShader});
+  }
+  return program;
 }
 
 void Configuration::loadLight(const string& fileName){
@@ -88,26 +100,22 @@ void Configuration::loadLight(const string& fileName){
   light = make_shared<Light>(lightPosition);
 }
 
-void Configuration::loadShaderColors(const string& fileName){
-  json data;
-  loadJSON(fileName, data);
-  
-  auto j = data.at("normal_color");
-  j.get_to(normalColor);
-
-  j = data.at("mesh_color");
-  j.get_to(meshColor);
-
-  j = data.at("wireframe_color");
-  j.get_to(wireframeColor);
-}
-
 void Configuration::loadMeshSize(const string& fileName){
   json data;
   loadJSON(fileName, data);
 
   auto j = data.at("mesh_size");
   j.get_to(meshSize);
+}
+
+void Configuration::loadGenerator(const string& fileName){
+  json data;
+  loadJSON(fileName, data);
+
+  medianWavelength = data.at("median_wavelength");
+  medianAmplitude = data.at("median_amplitude");
+  directionalVariance = data.at("directional_variance");
+  stdDeviation = data.at("std_deviation");
 }
 
 void Configuration::save(const string& fileName){

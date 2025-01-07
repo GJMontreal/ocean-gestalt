@@ -20,7 +20,7 @@ using std::string;
 
 class Configuration {
  public:
-  explicit Configuration(const string& fileName);
+  explicit Configuration(const string& environment, const string& shader, const string &generator);
 
   vector<shared_ptr<Wave>> waves;
 
@@ -34,6 +34,11 @@ class Configuration {
   
   int meshSize;
 
+  float medianWavelength;
+  float medianAmplitude;
+  float directionalVariance;
+  float stdDeviation;
+  
   vec4 meshColor;
   vec4 wireframeColor;
   vec4 normalColor;
@@ -46,8 +51,10 @@ class Configuration {
   void loadCamera(const string& fileName);
   void loadShaders(const string& fileName);
   void loadLight(const string& fileName);
-  void loadShaderColors(const string& fileName);
   void loadMeshSize(const string& fileName);
+  void loadGenerator(const string& fileName);
+
+  shared_ptr<ShaderProgram> buildShader(json& j, const string& name, vec4& color);
 };
 
 #endif
