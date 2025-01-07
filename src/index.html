@@ -1,42 +1,50 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Here we are, again</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-  </head>
-  <body>
+
+<head>
+  <style>
+    .grid-container {
+      display: grid;
+      grid-template-columns: 100%;
+      grid-template-rows: 100px;
+      height: 100%;
+      width: 100%;
+      text-align: center;
+    }
+    .canvas-container {
+      margin: auto;
+    }
+  </style>
+  <title>Here we are, again</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+</head>
+
+<body>
+  <div class="grid-container">
+    <div class="canvas-container">
     <canvas id="canvas" oncontextmenu="event.preventDefault()">
     </canvas>
+  </div>
+  </div>
+  <script>
+    var canvas = document.getElementById('canvas');
 
-    <script>
-      var canvas = document.getElementById('canvas');
+    window.Module = {
+      preRun: [],
+      postRun: [],
+      canvas: canvas,
+      print: console.log,
+      printErr: console.error,
+    };
+  </script>
+  <script async src="ocean-gestalt.js"></script>
+  <style>
+    body {
+      background-color: black;
+    }
+  </style>
 
-      window.Module = {
-        preRun: [],
-        postRun: [],
-        canvas: canvas,
-        print: console.log,
-        printErr: console.error,
-      };
-    </script>
-    <script async src="ocean-gestalt.js"></script>
-    <div class="output"></div>
-    <script language="javascript">
-        var realConsoleLog = console.log;
-        console.log = function () {
-            var message = [].join.call(arguments, " ");
-            $(".output").text(message);
-            realConsoleLog.apply(console, arguments);
-        };
-        console.log("hello there");
-    </script>  
-    <style>
-      body {
-        background-color: black;
-      }
-    </style>
+</body>
 
-  </body>
 </html>

@@ -92,12 +92,14 @@ Application::Application()
   // opengl configuration
   glEnable(GL_DEPTH_TEST);  // enable depth-testing
   glDepthFunc(GL_LESS);  // depth-testing interprets a smaller value as "closer"
-#ifndef __EMSCRIPTEN__
+
   glEnable(GL_CULL_FACE);
+
+#ifndef __EMSCRIPTEN__
   glCullFace(GL_FRONT_FACE);
-#endif
   // vsync
   glfwSwapInterval(1);
+#endif
 
   // bind the callbacks
   glfwSetWindowUserPointer(window, this);
