@@ -209,9 +209,11 @@ void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
       wavesNeedUpdate = true;
   });
 
+#ifndef __EMSCRIPTEN__
   executeIfPressed(window, GLFW_KEY_F, [this, window](){
     toggleFullscreen(window);
   });
+#endif
 }
 
 void OceanGestalt::toggleFullscreen(GLFWwindow* window){
