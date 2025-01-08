@@ -18,7 +18,7 @@ Configuration::Configuration(const string& environment, const string& shader, co
   loadWaves(environment);
   loadCamera(environment);
   loadLight(environment);
-  loadMeshSize(environment);
+  loadMesh(environment);
   loadShaders(shader);
   loadGenerator(generator);
 }
@@ -100,12 +100,13 @@ void Configuration::loadLight(const string& fileName){
   light = make_shared<Light>(lightPosition);
 }
 
-void Configuration::loadMeshSize(const string& fileName){
+void Configuration::loadMesh(const string& fileName){
   json data;
   loadJSON(fileName, data);
 
-  auto j = data.at("mesh_size");
-  j.get_to(meshSize);
+  meshSize = data.at("mesh_size");
+  meshDimension = data.at("mesh_dimension");
+  // TODO: make json mesh:{"spacing":1,"size":20}
 }
 
 void Configuration::loadGenerator(const string& fileName){
@@ -124,6 +125,7 @@ void Configuration::save(const string& fileName){
     cout << "Writing configuration " << endl;
     json data = *this;
     file << std::setw(4) << data << endl;
+    cout << std::setw(4) << data << endl; // so we can dump this in the web console
     file.close();
   } else {
     throw std::invalid_argument(string("The file ") + fileName +

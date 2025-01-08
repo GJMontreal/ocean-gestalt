@@ -13,7 +13,7 @@
 
 class Model {
  public:
-  Model(int meshSize, std::shared_ptr<Configuration> configuration);
+  Model(int meshSize, float meshSpacing, std::shared_ptr<Configuration> configuration);
 
   virtual ~Model() = default;
 

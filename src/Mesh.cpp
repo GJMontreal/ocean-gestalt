@@ -10,11 +10,12 @@
 
 using namespace  glm;
 
-Mesh::Mesh(int meshSize, glm::vec4 aColor)
+Mesh::Mesh(int aDimension, float meshSize, glm::vec4 aColor)
 {
   color = aColor;
   size = meshSize;
-  generateMesh(size);
+  dimension = aDimension;
+  generateMesh(dimension, size);
 }
 
 int Mesh::getSize()const{
@@ -30,9 +31,10 @@ std::vector<GLuint> Mesh::getTriangularIndices()const{
 }
 
 void Mesh::drawWireframe()const{
+  auto xy = (int)((float)dimension/size);
   glBindVertexArray(wireframeVao);
   glDrawElements(GL_LINES,         // mode
-                 size * (size + 1) * 4 ,  // number of lines * number of directions * number of vertices
+                 xy * (xy + 1) * 4 ,  // number of lines * number of directions * number of vertices
                  GL_UNSIGNED_INT,  // type
                  nullptr              // element array buffer offset
   );
@@ -42,24 +44,25 @@ void Mesh::drawWireframe()const{
   glBindVertexArray(0);
 }
 
-void Mesh::draw()const {
-    glBindVertexArray(vao);
+void Mesh::draw() const {
+  auto xy = (int)((float)dimension / size);
+  glBindVertexArray(vao);
+  glDrawElements(GL_TRIANGLES,     // mode
+                 xy * xy * 2 * 3,  // count
+                 GL_UNSIGNED_INT,  // type
+                 nullptr           // element array buffer offset
+  );
 
-    glDrawElements(GL_TRIANGLES,         // mode
-                   size * size * 2 * 3,  // count
-                   GL_UNSIGNED_INT,      // type
-                   nullptr                  // element array buffer offset
-    );
+  glCheckError(__FILE__, __LINE__);
 
-    glCheckError(__FILE__, __LINE__);
-
-    glBindVertexArray(0);
+  glBindVertexArray(0);
 }
 
 void Mesh::drawNormals()const{
+  auto xy = (int)((float)dimension / size);
   glBindVertexArray(wireframeVao);
   glDrawElements(GL_LINES,         // mode
-                 size * (size + 1) * 4 ,  // number of lines * number of directions * number of vertices
+                 xy * (xy + 1) * 4 ,  // number of lines * number of directions * number of vertices
                  GL_UNSIGNED_INT,  // type
                  nullptr              // element array buffer offset
   );
@@ -70,19 +73,20 @@ void Mesh::drawNormals()const{
 
 // The mesh is symmetrical in x and y
 // This could be broken up a little
-void Mesh::generateMesh(int aSize){
+void Mesh::generateMesh(int aDimension, float aSize){
   // Mesh will have vertex and normal for the moment
   std::vector<VertexType> vertices;
-
-  for (int y = 0; y <= aSize; ++y)
-    for (int x = 0; x <= aSize; ++x) {
-      float xx = (float)x - (float)aSize / 2.0f;
-      float yy = (float)y - (float)aSize / 2.0f;
+  auto xyVertices = (int)((float)aDimension / aSize);
+//will this only work for even multiples of aSize - (maybe it should be something like subdivisions instead)
+  for (int y = 0; y <= xyVertices; ++y)
+    for (int x = 0; x <= xyVertices; ++x) {
+      float xx = (float)x * aSize - ((float)aDimension / 2.0f);
+      float yy = (float)y * aSize - ((float)aDimension / 2.0f);
       vertices.push_back(generateVertex({xx, yy}, color));
     }
 
   // generate indices for a triangular mesh
-  triangularMeshIndices = generateTriangularIndices(size);
+  triangularMeshIndices = generateTriangularIndices(xyVertices);
   // creation of the vertex array buffer----------------------------------------
   std::cout << "vertices=" << vertices.size() << std::endl;
   std::cout << "index=" << triangularMeshIndices.size() << std::endl;
@@ -119,7 +123,7 @@ void Mesh::generateMesh(int aSize){
   glBindVertexArray(0);
   glCheckError(__FILE__, __LINE__);
 
-  std::vector<GLuint> wireframeIndices = generateWireframeIndices(size);
+  std::vector<GLuint> wireframeIndices = generateWireframeIndices(xyVertices);
   
   //repeat to generate buffers for wireframe
   glGenBuffers(1, &wireframeIbo);

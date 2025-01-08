@@ -32,7 +32,8 @@ class Configuration {
   shared_ptr<ShaderProgram> wireframeShader;
   shared_ptr<ShaderProgram> normalShader;
   
-  int meshSize;
+  int meshDimension;
+  float meshSize;  // maybe we should rename this to spacing since it's a bit confusing
 
   float medianWavelength;
   float medianAmplitude;
@@ -51,7 +52,7 @@ class Configuration {
   void loadCamera(const string& fileName);
   void loadShaders(const string& fileName);
   void loadLight(const string& fileName);
-  void loadMeshSize(const string& fileName);
+  void loadMesh(const string& fileName);
   void loadGenerator(const string& fileName);
 
   shared_ptr<ShaderProgram> buildShader(json& j, const string& name, vec4& color);

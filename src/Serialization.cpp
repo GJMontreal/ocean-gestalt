@@ -3,7 +3,8 @@
 
 // Configuration
 void to_json(json& j, const Configuration& configuration) {
-  j = json{{"camera", *(configuration.camera.get())},
+  j = json{{"mesh",configuration.meshSize},
+           {"camera", *(configuration.camera.get())},
            {"waves", configuration.waves},
            {"light", configuration.light->position}};
 }

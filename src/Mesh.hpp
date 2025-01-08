@@ -13,9 +13,11 @@ struct NormalVertices{
 };
 class Mesh {
  public:
-  Mesh(int size, glm::vec4 aColor = glm::vec4({.01f, .15f, .210f, 0.0f})); // this colour should come from the configuration
+  Mesh(int dimension, float size, glm::vec4 aColor = glm::vec4({.01f, .15f, .210f, 0.0f})); // this colour should come from the configuration
   ~Mesh() = default;
 
+
+  // TODO: unused remove!
   int getSize()const;
   
   // So that we can specify different shaders for each
@@ -37,8 +39,10 @@ class Mesh {
   NormalVertices generateNormalVertices(const std::vector<VertexType>& vertices)const;
 
  private:
-  int size;
+  float size;
+  int dimension; // x and y are symmetrical 
   glm::vec4 color;
+
   // Our vertices are shared between the triangular mesh and line strips
   GLuint vao;
   GLuint vbo;
@@ -54,7 +58,7 @@ class Mesh {
 
   std::vector<GLuint> triangularMeshIndices;
 
-  void generateMesh(int size);
+  void generateMesh(int dimension, float size);
   VertexType generateVertex(const glm::vec2 position, const glm::vec4& color)const;
 
   std::vector<GLuint> generateTriangularIndices(

@@ -7,8 +7,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
-Model::Model(int meshSize, std::shared_ptr<Configuration> configuration)
-    : transform(1.0), meshes({Mesh(meshSize,configuration->meshColor)}) {
+Model::Model(int meshSize,float meshSpacing, std::shared_ptr<Configuration> configuration)
+    : transform(1.0), meshes({Mesh(meshSize,meshSpacing,configuration->meshColor)}) {
   this->configuration = configuration;
   transform =
       glm::rotate(transform, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
