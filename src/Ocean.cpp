@@ -26,7 +26,7 @@ std::string string_format( const std::string& format, Args ... args )
 
 
 Ocean::Ocean(std::shared_ptr<Configuration> aConfiguration): 
-Model(aConfiguration->meshDimension, aConfiguration->meshSize, aConfiguration){
+Model(aConfiguration){
   configuration = aConfiguration;
   std::cout << "Constructing ocean" << std::endl;
 }

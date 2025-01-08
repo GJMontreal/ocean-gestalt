@@ -3,10 +3,11 @@
 
 // Configuration
 void to_json(json& j, const Configuration& configuration) {
-  j = json{{"mesh",configuration.meshSize},
-           {"camera", *(configuration.camera.get())},
+  j = {   {"camera", *(configuration.camera.get())},
            {"waves", configuration.waves},
            {"light", configuration.light->position}};
+
+  j["mesh"] = {{"size",configuration.meshSize},{"subdivisions",configuration.meshSubdivisions}};
 }
 
 void to_json(json& j, shared_ptr<Wave> p) {

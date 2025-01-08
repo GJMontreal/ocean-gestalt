@@ -32,9 +32,9 @@ class Configuration {
   shared_ptr<ShaderProgram> wireframeShader;
   shared_ptr<ShaderProgram> normalShader;
   
-  int meshDimension;
-  float meshSize;  // maybe we should rename this to spacing since it's a bit confusing
-
+  int meshSize;
+  int meshSubdivisions;
+  
   float medianWavelength;
   float medianAmplitude;
   float directionalVariance;

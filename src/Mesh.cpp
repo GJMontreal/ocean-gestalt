@@ -10,16 +10,12 @@
 
 using namespace  glm;
 
-Mesh::Mesh(int aDimension, float meshSize, glm::vec4 aColor)
+Mesh::Mesh(int meshSize, int meshSubdivisions, glm::vec4 aColor)
 {
   color = aColor;
   size = meshSize;
-  dimension = aDimension;
-  generateMesh(dimension, size);
-}
-
-int Mesh::getSize()const{
-  return size;
+  subdivisions = meshSubdivisions;
+  generateMesh(size, subdivisions);
 }
 
 GLuint Mesh::getVbo()const{
@@ -31,7 +27,7 @@ std::vector<GLuint> Mesh::getTriangularIndices()const{
 }
 
 void Mesh::drawWireframe()const{
-  auto xy = (int)((float)dimension/size);
+  auto xy = size * subdivisions;
   glBindVertexArray(wireframeVao);
   glDrawElements(GL_LINES,         // mode
                  xy * (xy + 1) * 4 ,  // number of lines * number of directions * number of vertices
@@ -45,7 +41,7 @@ void Mesh::drawWireframe()const{
 }
 
 void Mesh::draw() const {
-  auto xy = (int)((float)dimension / size);
+  auto xy = size * subdivisions;
   glBindVertexArray(vao);
   glDrawElements(GL_TRIANGLES,     // mode
                  xy * xy * 2 * 3,  // count
@@ -59,7 +55,7 @@ void Mesh::draw() const {
 }
 
 void Mesh::drawNormals()const{
-  auto xy = (int)((float)dimension / size);
+  auto xy = size * subdivisions;
   glBindVertexArray(wireframeVao);
   glDrawElements(GL_LINES,         // mode
                  xy * (xy + 1) * 4 ,  // number of lines * number of directions * number of vertices
@@ -73,15 +69,16 @@ void Mesh::drawNormals()const{
 
 // The mesh is symmetrical in x and y
 // This could be broken up a little
-void Mesh::generateMesh(int aDimension, float aSize){
+void Mesh::generateMesh(int meshSize, int meshSubdivisions){
   // Mesh will have vertex and normal for the moment
   std::vector<VertexType> vertices;
-  auto xyVertices = (int)((float)aDimension / aSize);
+  auto xyVertices = meshSize * meshSubdivisions;
+  float subdivisionSize = 1.0f / (float)meshSubdivisions;
 //will this only work for even multiples of aSize - (maybe it should be something like subdivisions instead)
   for (int y = 0; y <= xyVertices; ++y)
     for (int x = 0; x <= xyVertices; ++x) {
-      float xx = (float)x * aSize - ((float)aDimension / 2.0f);
-      float yy = (float)y * aSize - ((float)aDimension / 2.0f);
+      float xx = (float)x * subdivisionSize - ((float)meshSize / 2.0f);
+      float yy = (float)y * subdivisionSize - ((float)meshSize / 2.0f);
       vertices.push_back(generateVertex({xx, yy}, color));
     }
 

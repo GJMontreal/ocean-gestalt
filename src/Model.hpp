@@ -13,7 +13,7 @@
 
 class Model {
  public:
-  Model(int meshSize, float meshSpacing, std::shared_ptr<Configuration> configuration);
+  Model(std::shared_ptr<Configuration> configuration);
 
   virtual ~Model() = default;
 
@@ -47,7 +47,7 @@ class Model {
   bool drawWireframe = true;
   bool drawNormals = false;
   
-  bool drawMesh = true;
+  bool drawMesh = false;  //it would be nice to specify these in our configuration
   bool drawTriangles = true;
   bool drawLines = true;
 

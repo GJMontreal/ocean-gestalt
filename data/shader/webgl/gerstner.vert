@@ -66,7 +66,7 @@ PARTICLE calcWaves(vec3 aPosition){
   for(int i=0; i < waves.length(); i++){
     vec3 newOffset = waveOffset(time, aPosition, waves[i] );
     offset += newOffset;
-    normal = normal + numericalDerivativeNormal(newOffset,aPosition,waves[i],time,.001);
+    normal = normal + numericalDerivativeNormal(newOffset,aPosition,waves[i],time,2);
   }
   offset = offset / vec3(waves.length(),waves.length(),waves.length());
   PARTICLE particle;

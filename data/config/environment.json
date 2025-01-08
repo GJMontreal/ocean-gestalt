@@ -1,6 +1,4 @@
-{"mesh":{"size":30,"subdivisions":1},
-  "mesh_size":0.5,
-"mesh_dimension":30,
+{"mesh":{"size":30,"subdivisions":1}, 
 "camera": {
   "pitch": -26.0,
   "position": {

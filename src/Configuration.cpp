@@ -103,10 +103,9 @@ void Configuration::loadLight(const string& fileName){
 void Configuration::loadMesh(const string& fileName){
   json data;
   loadJSON(fileName, data);
-
-  meshSize = data.at("mesh_size");
-  meshDimension = data.at("mesh_dimension");
-  // TODO: make json mesh:{"spacing":1,"size":20}
+  auto mesh = data.at("mesh");
+  meshSize = mesh.at("size");
+  meshSubdivisions = mesh.at("subdivisions");
 }
 
 void Configuration::loadGenerator(const string& fileName){
