@@ -21,6 +21,7 @@ add_executable(ocean-gestalt
   src/WaveGenerator.cpp
   src/Light.cpp
   src/Moveable.cpp
+  src/KeyExecutable.cpp
 )
 
 set_property(TARGET ocean-gestalt PROPERTY CXX_STANDARD 11)

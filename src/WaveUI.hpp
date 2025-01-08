@@ -4,6 +4,7 @@
 #include "Wave.hpp"
 
 #include "InputProcessor.hpp"
+#include "KeyExecutable.hpp"
 
 #include <memory>
 #include <vector>
@@ -11,9 +12,8 @@
 using std::shared_ptr;
 using std::weak_ptr;
 using std::vector;
-using std::map;
 
-class WaveUI: public InputProcessor {
+class WaveUI: public InputProcessor, public KeyExecutable {
   public:
   explicit WaveUI(const vector<shared_ptr<Wave>>& waves, Updatable* updatable);
 
@@ -25,8 +25,6 @@ class WaveUI: public InputProcessor {
   shared_ptr<Wave> selectedWave;
   
   Updatable* updatable;
-
-  map<int, int> keyPressState;
 
   private:
   bool adjustDirection(GLFWwindow* window, float deltaTime);

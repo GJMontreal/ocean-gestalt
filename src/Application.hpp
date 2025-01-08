@@ -96,11 +96,6 @@ class Application: public InputProcessor {
 
   virtual void loop();
   void processInput(GLFWwindow *window, float deltaTime) override;
-  virtual void toggleNormalDisplay();
-  virtual void toggleSimulation();
-  virtual void toggleWireframe();
-  virtual void toggleMesh();
-
 };
 
 #endif /* end of include guard: OPENGL_CMAKE_SKELETON_APPLICATION_HPP */

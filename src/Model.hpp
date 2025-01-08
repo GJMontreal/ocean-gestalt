@@ -22,11 +22,11 @@ class Model {
   void toggleDrawWireframe();
   void toggleDrawMesh();
   void toggleDrawNormals();
+  void toggleDrawTriangles();
+  void toggleDrawLines();
   void toggleRunning();
 
   bool isRunning()const;
-  bool shouldDrawNormals()const;
-  bool shouldDrawWireframe()const;
 
   Mesh* getMesh(int index);
 

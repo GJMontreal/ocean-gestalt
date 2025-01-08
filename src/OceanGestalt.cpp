@@ -128,6 +128,20 @@ void OceanGestalt::toggleMesh() {
   }
 }
 
+void OceanGestalt::toggleDrawTriangles() {
+  std::cout << "Toggle triangles" << std::endl;
+  for (Model* model : models) {
+    model->toggleDrawTriangles();
+  }
+}
+
+void OceanGestalt::toggleDrawLines() {
+  std::cout << "Toggle lines" << std::endl;
+  for (Model* model : models) {
+    model->toggleDrawLines();
+  }
+}
+
 void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
@@ -150,80 +164,67 @@ void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
 
   waveUI->processInput(window, deltaTime);
 
-  // These are problematic because they might get called many times
-  // for each; save the state and only call the function when it changes
-  // to release
-  // Toggle between moving the camera and light
-  if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
-    if (keyPressState[GLFW_KEY_C] == GLFW_RELEASE) {
-      if(moveable == configuration->camera){
-        moveable = configuration->light;
-      }else {
-        moveable = configuration->camera;
-      }
-      keyPressState[GLFW_KEY_C] = GLFW_PRESS;
+  executeIfPressed(window, GLFW_KEY_C, [this]() {
+    if (moveable == configuration->camera) {
+      moveable = configuration->light;
+      cout << "Activating light" << endl;
+    } else {
+      moveable = configuration->camera;
+      cout << "Activating camera" << endl;
     }
-  } else {
-    keyPressState[GLFW_KEY_C] = GLFW_RELEASE;
-  }
-  
-  if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) {
-    if (keyPressState[GLFW_KEY_N] == GLFW_RELEASE) {
-      toggleNormalDisplay();
-      keyPressState[GLFW_KEY_N] = GLFW_PRESS;
-    }
-  } else {
-    keyPressState[GLFW_KEY_N] = GLFW_RELEASE;
-  }
+  });
 
-  if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
-    if(keyPressState[GLFW_KEY_P] == GLFW_RELEASE){
-      toggleSimulation();
-      keyPressState[GLFW_KEY_P] = GLFW_PRESS;
-    }
-  }else{
-    keyPressState[GLFW_KEY_P] = GLFW_RELEASE;
-  }
+  executeIfPressed(window, GLFW_KEY_N, [this](){
+    toggleNormalDisplay();
+  });
 
-  if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
-    if(keyPressState[GLFW_KEY_L] == GLFW_RELEASE){
-      toggleWireframe();
-      keyPressState[GLFW_KEY_L] = GLFW_PRESS;
-    }
-  }else{
-    keyPressState[GLFW_KEY_L] = GLFW_RELEASE;
-  }
+  executeIfPressed(window, GLFW_KEY_P, [this](){
+    toggleSimulation();
+  });
 
-  if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
-    if(keyPressState[GLFW_KEY_M] == GLFW_RELEASE){
-      toggleMesh();
-      keyPressState[GLFW_KEY_M] = GLFW_PRESS;
-    }
-  }else{
-    keyPressState[GLFW_KEY_M] = GLFW_RELEASE;
-  }
+  executeIfPressed(window, GLFW_KEY_M, [this](){
+    toggleMesh();
+  });
 
-// could this be written as a template?
-  if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
-    if(keyPressState[GLFW_KEY_Z] == GLFW_RELEASE){
-      configuration->save(CONFIGURATION_DIR "/output.json");
-      keyPressState[GLFW_KEY_Z] = GLFW_PRESS;
-    }
-  }else{
-    keyPressState[GLFW_KEY_Z] = GLFW_RELEASE;
-  }
+  executeIfPressed(window, GLFW_KEY_J, [this](){
+    toggleDrawTriangles();
+  });
+    
+  executeIfPressed(window, GLFW_KEY_K, [this](){
+    toggleDrawLines();
+  });
 
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-    if(keyPressState[GLFW_KEY_R] == GLFW_RELEASE){
-      WaveGenerator(configuration->waves, configuration->stdDeviation,
+  executeIfPressed(window, GLFW_KEY_L, [this](){
+    toggleWireframe();
+  });
+
+  executeIfPressed(window, GLFW_KEY_O, [this]() {
+    configuration->save(CONFIGURATION_DIR "/output.json");
+  });
+
+  executeIfPressed(window, GLFW_KEY_R, [this](){
+    WaveGenerator(configuration->waves, configuration->stdDeviation,
                     configuration->medianWavelength,
                     configuration->medianAmplitude);
       wavesNeedUpdate = true;
-      keyPressState[GLFW_KEY_R] = GLFW_PRESS;
-    }
+  });
+
+  executeIfPressed(window, GLFW_KEY_F, [this, window](){
+    toggleFullscreen(window);
+  });
+}
+
+void OceanGestalt::toggleFullscreen(GLFWwindow* window){
+  GLFWmonitor* monitor = glfwGetWindowMonitor(window);
+  if(monitor == nullptr){
+    //save position and size
+    glfwGetWindowPos(window, &windowXPos, &windowYPos);
+    glfwGetWindowSize(window,&windowWidth, &windowHeight);
+    monitor = glfwGetPrimaryMonitor();
   }else{
-    keyPressState[GLFW_KEY_R] = GLFW_RELEASE;
+    monitor = nullptr;
   }
+  glfwSetWindowMonitor(window, monitor, windowXPos, windowYPos, windowWidth, windowHeight, GLFW_DONT_CARE );
 }
 
 void OceanGestalt::updateWaves() const{

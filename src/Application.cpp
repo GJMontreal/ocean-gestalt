@@ -248,16 +248,3 @@ void Application::mouseCallback(GLFWwindow* window,
 // frame and react accordingly
 void Application::processInput(GLFWwindow*, float){
 }
-
-void Application::toggleNormalDisplay(){
-}
-
-void Application::toggleSimulation(){
-}
-
-void Application::toggleWireframe (){
-}
-
-void Application::toggleMesh(){
-}
-

@@ -59,10 +59,12 @@ void Model::draw(Uniforms& uniforms) {
       
       #endif
       glCheckError(__FILE__, __LINE__);
-
-      mesh.draw(); 
-      mesh.drawWireframe();   
-    
+      if(drawTriangles){
+        mesh.draw(); 
+      }
+      if(drawLines){
+        mesh.drawWireframe();   
+      }    
       configuration->meshShader->deactivate();
     }
   }
@@ -88,17 +90,18 @@ void Model::toggleRunning(){
   running = !running;
 }
 
+void Model::toggleDrawLines(){
+  drawLines = !drawLines;
+}
+
+void Model::toggleDrawTriangles(){
+  drawTriangles = !drawTriangles;
+}
+
 bool Model::isRunning()const{
   return running;
 }
 
-bool Model::shouldDrawNormals()const{
-  return drawNormals;
-}
-
-bool Model::shouldDrawWireframe()const{
-  return drawWireframe;
-}
 void Model::calculateNormalMatrix(const glm::mat4& modelTransform, glm::mat3& aNormalMatrix){
   aNormalMatrix = glm::transpose(glm::inverse(modelTransform));
 }

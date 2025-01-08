@@ -97,7 +97,7 @@ void Mesh::generateMesh(int meshSize, int meshSubdivisions){
   glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(VertexType),
                vertices.data(), GL_STATIC_DRAW);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+  glCheckError(__FILE__, __LINE__);
   // ibo
   glGenBuffers(1, &ibo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);

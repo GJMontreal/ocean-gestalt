@@ -21,25 +21,17 @@ void WaveUI::selectWave(int index) {
   if (index >= 0 && index < waves.size()) {
     selectedWave = waves[index];
   } else {
-    // maybe we should throw an exception
     std::cout << "index " << index << " out of range" << std::endl;
   }
 }
 
 void WaveUI::processInput(GLFWwindow* window, float deltaTime) {
-  // manipulate wave properties
-  // wave selection
   for (int i = 0; i < 10; i++) {
     int key = GLFW_KEY_0 + i;
-    if (glfwGetKey(window, key) == GLFW_PRESS) {
-      if (keyPressState[key] == GLFW_RELEASE) {
+    executeIfPressed(window, key, [this,i](){
         std::cout << "wave " << i << " selected" << std::endl;
         selectWave(i);
-        keyPressState[key] = GLFW_PRESS;
-      }
-    } else {
-      keyPressState[key] = GLFW_RELEASE;
-    }
+    });
   }
 
   bool updateUniforms = false;

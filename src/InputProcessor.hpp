@@ -3,16 +3,10 @@
 
 #include <GLFW/glfw3.h>
 
-#include <map>
-
-using std::map;
-
 class InputProcessor{
   public:
     virtual ~InputProcessor() = default;
     virtual void processInput(GLFWwindow *window, float deltaTime) = 0;
-
-    map<int, int> keyPressState;
 };
 
 class Updatable{
