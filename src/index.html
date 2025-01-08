@@ -18,15 +18,32 @@
   <title>Here we are, again</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, user-scalable=no">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </head>
 
 <body>
+  <div class="output"></div>
   <div class="grid-container">
     <div class="canvas-container">
-    <canvas id="canvas" oncontextmenu="event.preventDefault()">
+    <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="1">
     </canvas>
+    <div id="output" style="color:white"></div>
   </div>
   </div>
+
+  <script>
+    var realLog = console.log;
+    console.log = function () {
+      var message = [].join.call(arguments," ");
+      var output = document.getElementById("output"); 
+      output.innerText = message;
+      //clear the text after a given time
+      setTimeout(()=> { output.innerText = "";}, 2000);
+     
+      realLog.apply(console, arguments);
+    };
+  </script>
+
   <script>
     var canvas = document.getElementById('canvas');
 
@@ -39,6 +56,7 @@
     };
   </script>
   <script async src="ocean-gestalt.js"></script>
+  
   <style>
     body {
       background-color: black;
