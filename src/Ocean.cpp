@@ -2,6 +2,7 @@
 #include "Mesh.hpp"
 #include "Shader.hpp"
 #include "Vertex.hpp"
+#include "random.hpp"
 
 #include <GLFW/glfw3.h>
 #include <cmath>
@@ -12,6 +13,8 @@
 #include <stdexcept>
 
 #include <iostream>
+
+using Random = effolkronium::random_static;
 
 template<typename ... Args>
 std::string string_format( const std::string& format, Args ... args )
@@ -28,6 +31,7 @@ std::string string_format( const std::string& format, Args ... args )
 Ocean::Ocean(std::shared_ptr<Configuration> aConfiguration): 
 Model(aConfiguration){
   configuration = aConfiguration;
+  glfwSetTime(Random::get<float>(0.f, 500));
   std::cout << "Constructing ocean" << std::endl;
 }
 
