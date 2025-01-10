@@ -21,11 +21,8 @@ class Ocean : public Model {
 
   void updateShaderUniforms() override;
  private:
-  std::shared_ptr<Configuration> configuration;
-  std::vector<VertexType> particles;
   float elapsedTime=0;
   double lastTime;
-
   std::vector<Wave*> waves; //this is moving to the configuration
 
   void setWaveUniforms(const vector<shared_ptr<Wave>>& waves,

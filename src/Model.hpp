@@ -11,12 +11,16 @@
 
 #include <memory>
 
+using std::shared_ptr;
+
 class Model {
  public:
-  Model(std::shared_ptr<Configuration> configuration);
+  explicit Model(shared_ptr<Configuration> configuration);
 
   virtual ~Model() = default;
 
+  std::shared_ptr<Configuration> configuration;
+  
   virtual void draw(Uniforms& uniforms);
   
   void toggleDrawWireframe();
@@ -36,7 +40,7 @@ class Model {
 
 // these could all be public, simplifying things
  private:
-  std::shared_ptr<Configuration> configuration;
+  
   glm::mat4 transform = glm::mat4(1.0);
   glm::mat3 normalMatrix = glm::mat3(1.0);
   
@@ -52,6 +56,7 @@ class Model {
   bool drawLines = true;
 
   bool running = true;
+
 };
 
 #endif
