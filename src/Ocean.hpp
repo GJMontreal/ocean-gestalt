@@ -33,13 +33,6 @@ class Ocean : public Model {
   void moveParticles(float time);
   vec3 gerstnerWave(float time, vec2 position, const Wave* wave) const;
 
-  vec3 numericalDerivativeNormal(vec3 lastPosition,
-                                 vec2 position,
-                                 Wave* wave,
-                                 float time,
-                                 float offset = 0.01f);
-  // end CPU routines
-
   std::vector<Wave*> waves; //this is moving to the configuration
 
   void setWaveUniforms(const vector<shared_ptr<Wave>>& waves,
