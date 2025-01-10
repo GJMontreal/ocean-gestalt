@@ -1,114 +1,118 @@
 <!DOCTYPE html>
-
 <html>
-
 <head>
-  
   <title>Here we are, again</title>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </head>
-
 <body>
   <div class="grid-container">
     <div class="canvas-container">
-  
-      <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="1">
-  
+      <canvas id="canvas" oncontextmenu="event.preventDefault()">
       </canvas>
-      <div id="unselectable">
-        <div id="overlay">
-          <div id="control_grid">
-            <div class="button_container">
+      <div id="overlay">
+        <div id="control_grid">
+          <div class="button_container">
             <div id="left_button_grid">
-              <div></div><button id="move_forward" class="overlay_button">W</button>
+              <div></div><button id="move_forward" class="overlay_button_large">&uarr;<br>W</button>
               <div></div>
-              <button id="move_left" class="overlay_button">A</button>
-              <div></div><button id="move_right" class="overlay_button">D</button>
+              <button id="move_left" class="overlay_button_large">&larr;<br>A</button>
+              <div></div><button id="move_right" class="overlay_button_large">&rarr;<br>D</button>
               <div></div>
-              <button id="move_back" class="overlay_button">S</button>what about
+              <button id="move_back" class="overlay_button_large">&darr;<br>S</button>
             </div>
           </div>
-            <div class="button_container">huh where is this going
-            </div>
-            <div>
-              <div class="button_container">
-                <div id="right_button_grid">
-                  <button id="move_up" class="overlay_button">space</button>
-                  <div></div>
-                  <div></div>
-                  <button id="move_down" class="overlay_button">shift</button>
-                </div>
+          <div class="button_container">
+          </div>
+          <div>
+            <div class="button_container">
+              <div id="right_button_grid">
+                <button id="move_up" class="overlay_button_large">&uArr;<br>space</button>
+                <div></div>
+                <div></div>
+                <button id="move_down" class="overlay_button_large">&dArr;<br>shift</button>
               </div>
             </div>
-            </div>
-        <div id="output" style="color:white"></div>
+          </div>
+
+        </div>
+        <div id="bottom_container">
+          <button id="toggle_mesh" class="overlay_button_small">M</button>
+          <button id="generate_waves" class="overlay_button_small">R</button>
+          <a id="github_button" href="https://github.com/GJMontreal/ocean-gestalt"></a>
+        </div>
+        <div id="output"></div>
       </div>
-    </div>
-  <script src="keypress.js"></script>
-  <script async src="ocean-gestalt.js"></script>
+ddddasfasdfsadf
+      <script src="keypress.js"></script>
+      <script async src="ocean-gestalt.js"></script>
 
 
 </body>
 <script>
 
-  
+
 </script>
 <script type='text/javascript'>
-  function addListeners(id,key,code){
+  function addListeners(id, key, code) {
     var element = document.getElementById(id);
-    var downFunc = function(){simulateKeyDown(key.toUpperCase().charCodeAt(0))};
-    var upFunc = function(){simulateKeyUp(key.toUpperCase().charCodeAt(0))};
+    var downFunc = function () { simulateKeyDown(key.toUpperCase().charCodeAt(0)) };
+    var upFunc = function () { simulateKeyUp(key.toUpperCase().charCodeAt(0)) };
     element.addEventListener("touchstart", downFunc);
     element.addEventListener("mousedown", downFunc);
     element.addEventListener("touchend", upFunc);
     element.addEventListener("mouseup", upFunc);
   }
 
-  addListeners("move_left",'a','KeyA');
-  addListeners("move_right",'d','KeyD');
-  addListeners("move_forward",'w','KeyW');
-  addListeners("move_back",'s','KeyS');
-  addListeners("move_up"," ",'KeySpace');
-  addListeners("move_down",String.fromCharCode(16));
+  addListeners("move_left", 'a', 'KeyA');
+  addListeners("move_right", 'd', 'KeyD');
+  addListeners("move_forward", 'w', 'KeyW');
+  addListeners("move_back", 's', 'KeyS');
+  addListeners("move_up", " ", 'KeySpace');
+  addListeners("move_down", String.fromCharCode(16));
+  addListeners("toggle_mesh", 'm');
+  addListeners("generate_waves", 'r');
+
   var ticker = null;
 
-  var f = function(){
-    overlay.style.display = "block";   
-    if(ticker){
+  var f = function () {
+    overlay.style.display = "block";
+    if (ticker) {
       window.clearTimeout(ticker);
       ticker = null;
     }
   };
-  document.addEventListener("mousedown",f);
-  document.addEventListener("touchstart",f);
+  document.addEventListener("mousedown", f);
+  document.addEventListener("touchstart", f);
 
-  f = function(){
-    ticker = setTimeout(()=> { overlay.style.display = "none";}, 5000);
+  f = function () {
+    ticker = setTimeout(() => { overlay.style.display = "none"; }, 5000);
   };
-  document.addEventListener("mouseup",f);
-  document.addEventListener("touchend",f);
+  document.addEventListener("mouseup", f);
+  document.addEventListener("touchend", f);
 
 </script>
+
 <script type='text/javascript'>
   // connect to canvas
   var Module = {
-    print: (function() {
+    print: (function () {
       var element = document.getElementById('output');
-      return function(text) {
+      return function (text) {
         element.innerHTML = text;
         // element.innerHTML += text.replace('\n', '<br>', 'g') + '<br>';
       };
     })(),
     canvas: document.getElementById('canvas')
   };
-  </script>
+</script>
+
 <style>
-      body {
-      background-color: black;
-    }
+  body {
+    background-color: black;
+  }
+
   .grid-container {
     display: grid;
     grid-template-columns: 100%;
@@ -116,65 +120,95 @@
     height: 100%;
     width: 100%;
     text-align: center;
-    user-select:none ;
+    user-select: none;
+    -webkit-user-select: none;
   }
+
   .canvas-container {
     margin: auto;
   }
+
   #overlay {
-position: fixed; /* Sit on top of the page content */
-display: block; /* Hidden by default */
-width: 100%; /* Full width (cover the whole page) */
-height: 90%; /* Full height (cover the whole page) */
-top:10%;
-left: 0;
-right: 0;
-bottom: 0;
-background-color: rgba(0,0,0,0); /* Black background with opacity */
-z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
-cursor: pointer; /* Add a pointer on hover */
-pointer-events: none;
-user-select:none ;
-}
-.overlay_button{
-background-color: rgba(0,0,0,0.5);
-/*position: absolute;*/
-top: 50%;
-left: 50%;
-font-size: 20px;
-/*transform: translate(-50%,-50%);  /* It would be good if we could make this relative to the canvas */
-/*-ms-transform: translate(-50%,-50%);*/
-color: white;
-width: 100px;
-height: 100px;
-pointer-events: auto;
-user-select: none;
-}
-#control_grid{
-  display: grid;
-  grid-template-columns: auto auto auto;
-  /* grid-template-columns: repeat(3, minmax(0, 1fr)); */
-  border-style: solid;
-  border-color: green;
-}
-#left_button_grid{
-  display: grid;
-  grid-template-columns: 100px 100px 100px;
-  border-width: 1;
-  border-color: white;
-}
-#unselectable{
-  user-select: none;
-  -webkit-user-select: none;
-}
-.button_container{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-color: white;
-  border-width: 1;
-  border-style: solid;
-  height: 100%;
-}
+    position: fixed;
+    /* Sit on top of the page content */
+    display: none;
+    /* Hidden by default */
+    
+    width: 100%;
+    bottom: 10px;
+    background-color: rgba(0, 0, 0, 0);
+    /* Black background with opacity */
+    z-index: 2;
+    /* Specify a stack order in case you're using a different order for other elements */
+    cursor: pointer;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .overlay_button_large,
+  .overlay_button_small,
+  #github_button {
+    background-color: rgba(0, 0, 0, 0.5);
+    top: 50%;
+    left: 50%;
+    color: white;
+    pointer-events: auto;
+    user-select: none;
+    padding: 0;
+  }
+
+  .overlay_button_large {
+    font-size: 15px;
+    width: 60px;
+    height: 60px;
+    margin: 5px;
+  }
+
+  .overlay_button_small,
+  #github_button {
+    font-size: 10px;
+    width: 50px;
+    height: 50px;
+    padding: 10px;
+    margin: 10px;
+  }
+
+  #control_grid {
+    display: grid;
+    grid-template-columns: auto auto auto;
+  }
+
+  #left_button_grid {
+    display: grid;
+    grid-template-columns: auto auto auto;
+  }
+
+  #bottom_container {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+  }
+
+  .button_container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+
+  #github_button {
+    background: url(./github-mark-white.png) no-repeat;
+    background-size: 40px 40px;
+    background-position: center;
+  }
+
+  #output{ 
+    display: none;
+    color:white;
+    }
+  .icon{
+    font-size: 20px;
+  }
 </style>
+
 </html>

@@ -39,7 +39,11 @@ if (EMSCRIPTEN)
 
 
   # Copy the index.html file.
-  foreach(file "index.html" "run_webassembly.py" "keypress.js")
+  foreach(file 
+   "index.html" 
+   "run_webassembly.py" 
+   "keypress.js"
+   )
     configure_file(src/${file} ${file})
   endforeach(file)
 
@@ -53,6 +57,13 @@ if (EMSCRIPTEN)
   )
   
     configure_file(${file} ${file})
+  endforeach(file)
+
+
+  foreach(file
+    "github-mark-white.png"
+  )
+  configure_file(${file} ${file} COPYONLY)
   endforeach(file)
 
   # Allow the directories /shader and /config to be fetched by the web browser.
