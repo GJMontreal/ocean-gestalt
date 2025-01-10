@@ -25,7 +25,6 @@ add_executable(ocean-gestalt
 )
 
 set_property(TARGET ocean-gestalt PROPERTY CXX_STANDARD 11)
-# target_compile_options(ocean-gestalt PRIVATE -Wall)
 add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
 
 
@@ -59,14 +58,13 @@ if (EMSCRIPTEN)
     configure_file(${file} ${file})
   endforeach(file)
 
-
   foreach(file
     "github-mark-white.png"
   )
   configure_file(${file} ${file} COPYONLY)
   endforeach(file)
 
-  # Allow the directories /shader and /config to be fetched by the web browser.
+  # Allow the /data directory to be fetched by the web browser.
   set_property(TARGET ocean-gestalt APPEND_STRING PROPERTY LINK_FLAGS
     "--preload-file ${CMAKE_CURRENT_BINARY_DIR}/data/@/"
   )
