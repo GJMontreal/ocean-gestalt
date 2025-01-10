@@ -39,7 +39,7 @@ if (EMSCRIPTEN)
 
 
   # Copy the index.html file.
-  foreach(file "index.html" "run_webassembly.py")
+  foreach(file "index.html" "run_webassembly.py" "keypress.js")
     configure_file(src/${file} ${file})
   endforeach(file)
 
