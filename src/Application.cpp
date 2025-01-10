@@ -96,7 +96,6 @@ Application::Application()
   glEnable(GL_CULL_FACE);
 
 #ifndef __EMSCRIPTEN__
-  glCullFace(GL_FRONT_FACE);
   // vsync
   glfwSwapInterval(1);
 #endif
