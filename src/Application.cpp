@@ -23,9 +23,9 @@
 
 using namespace std;
 
-static bool firstMouse = true;
-static float lastX;
-static float lastY;
+bool Application::firstMouse = true;
+float Application::lastX;
+float Application::lastY;
 
 std::function<void()> registered_loop;
 void loop_iteration() {
@@ -104,7 +104,8 @@ Application::Application()
   // bind the callbacks
   glfwSetWindowUserPointer(window, this);
   glfwSetScrollCallback(window, Application::scrollCallback);
-  glfwSetCursorPosCallback(window, Application::mouseCallback);
+  glfwSetCursorPosCallback(window, Application::cursorCallback);
+  glfwSetMouseButtonCallback(window, Application::mouseCallback);
 }
 
 GLFWwindow* Application::getWindow() const {
@@ -208,13 +209,13 @@ void Application::scrollCallback(GLFWwindow* window,
   camera->ProcessMouseScroll(static_cast<float>(yoffset));
 }
 
-void Application::mouseCallback(GLFWwindow* window,
+void Application::cursorCallback(GLFWwindow* window,
                                 double xposIn,
                                 double yposIn) {
   // Ignore if the mouse button is not pressed
   int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);  
+
   if(state == GLFW_RELEASE){
-    firstMouse = true;
     return;
   }
 
@@ -224,11 +225,11 @@ void Application::mouseCallback(GLFWwindow* window,
 
   auto xpos = static_cast<float>(xposIn);
   auto ypos = static_cast<float>(yposIn);
-
-  if (firstMouse) {
+  
+  if (Application::firstMouse) {
     lastX = xpos;
     lastY = ypos;
-    firstMouse = false;
+    Application::firstMouse = false;
   }
 
   float xoffset = xpos - lastX;
@@ -243,8 +244,16 @@ void Application::mouseCallback(GLFWwindow* window,
   light->moveRight = camera->moveRight;
 }
 
+// Reset the starting position on a mouse or touch up
+void Application::mouseCallback(GLFWwindow *window, int, int state, int){
+  if(state == 0){
+    Application::firstMouse = true;
+  }
+}
 // ---------------------------------------------------------------------------------------------------------
 // process all input: query GLFW whether relevant keys are pressed/released this
 // frame and react accordingly
 void Application::processInput(GLFWwindow*, float){
 }
+
+

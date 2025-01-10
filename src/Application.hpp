@@ -53,7 +53,8 @@ class Application: public InputProcessor {
 
   // GLFW callbacks
   static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
-  static void mouseCallback(GLFWwindow* window, double xposIn, double yposIn);
+  static void cursorCallback(GLFWwindow* window, double xposIn, double yposIn);
+  static void mouseCallback(GLFWwindow* window,int x, int y, int z);
   // Application informations
   //
   int getWidth() const;
@@ -67,6 +68,10 @@ class Application: public InputProcessor {
  private:
   enum State { stateReady, stateRun, stateExit };
 
+  static bool firstMouse;
+  static float lastX;
+  static float lastY;
+  
   State state;
 
   Application& operator=(const Application&) { return *this; }
