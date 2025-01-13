@@ -30,7 +30,7 @@ add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
 
 if (EMSCRIPTEN)
   target_link_libraries(ocean-gestalt PUBLIC "-s USE_GLFW=3")
-  target_link_libraries(ocean-gestalt PUBLIC "-s USE_WEBGL2=1")
+  target_link_libraries(ocean-gestalt PUBLIC "-s MAX_WEBGL_VERSION=2")
   target_link_libraries(ocean-gestalt PUBLIC "-s WASM=1")
 
   target_compile_options(ocean-gestalt PRIVATE -fexceptions )
@@ -42,6 +42,7 @@ if (EMSCRIPTEN)
    "index.html" 
    "run_webassembly.py" 
    "keypress.js"
+   "manifest.json"
    )
     configure_file(src/${file} ${file})
   endforeach(file)

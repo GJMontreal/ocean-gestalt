@@ -5,6 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="./manifest.json">
 </head>
 <body>
   <div class="grid-container">
@@ -44,9 +45,8 @@
         </div>
         <div id="output"></div>
       </div>
-ddddasfasdfsadf
-      <script src="keypress.js"></script>
-      <script async src="ocean-gestalt.js"></script>
+      <script src="./keypress.js"></script>
+      <script async src="./ocean-gestalt.js"></script>
 
 
 </body>
@@ -101,11 +101,13 @@ ddddasfasdfsadf
       var element = document.getElementById('output');
       return function (text) {
         element.innerHTML = text;
+        console.log(text);
         // element.innerHTML += text.replace('\n', '<br>', 'g') + '<br>';
       };
     })(),
     canvas: document.getElementById('canvas')
   };
+
 </script>
 
 <style>
@@ -133,7 +135,7 @@ ddddasfasdfsadf
     /* Sit on top of the page content */
     display: none;
     /* Hidden by default */
-    
+    left: 0px;
     width: 100%;
     bottom: 10px;
     background-color: rgba(0, 0, 0, 0);
@@ -208,6 +210,16 @@ ddddasfasdfsadf
     }
   .icon{
     font-size: 20px;
+  }
+  #canvas{
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width:90%;
+    height:90%;
+  }
+  html {
+    padding-bottom: 400px; /* so we can scroll and hide the toolbar */
   }
 </style>
 
