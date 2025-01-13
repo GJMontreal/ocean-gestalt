@@ -8,10 +8,7 @@ It's a bit of ocean you can fit in your pocket.
 
 =======================
 
-I am open to any comments and contributions.
-
-
-Now, visit [http://localhost:8000](http://localhost:8000)
+I am open to any comments and contribu
 
 
 I started with the OpenGL CMake Skeleton.
@@ -26,3 +23,6 @@ https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-1-ef
 https://learnopengl.com/About
 
 
+=====================
+A note for android users; I'm not certain this will work on your device. If there's someone who could give me a hand debugging that I'd really appreciate the help
+http://get.webgl.org
