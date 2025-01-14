@@ -105,6 +105,7 @@ Application::Application()
   glfwSetScrollCallback(window, Application::scrollCallback);
   glfwSetCursorPosCallback(window, Application::cursorCallback);
   glfwSetMouseButtonCallback(window, Application::mouseCallback);
+  glfwSetFramebufferSizeCallback(window, Application::framebufferSizeCallback);
 }
 
 GLFWwindow* Application::getWindow() const {
@@ -136,9 +137,6 @@ void Application::run() {
     deltaTime = t - time;
     time = t;
 
-    // detect window related changes
-    detectWindowDimensionChange();
-
     processInput(window, deltaTime);
 
     // execute the frame code
@@ -158,18 +156,6 @@ void Application::run() {
   }
   glfwTerminate();
 #endif
-}
-
-void Application::detectWindowDimensionChange() {
-  int w;
-  int h;
-  glfwGetWindowSize(getWindow(), &w, &h);
-  dimensionChanged = (w != width || h != height);
-  if (dimensionChanged) {
-    width = w;
-    height = h;
-    glViewport(0, 0, width, height);
-  }
 }
 
 void Application::loop() {
@@ -198,6 +184,12 @@ std::shared_ptr<Camera> Application::getCamera() {
 
 std::shared_ptr<Light> Application::getLight() {
   return light;
+}
+
+void Application::framebufferSizeCallback(GLFWwindow* window, int w, int h){
+  glViewport(0, 0, w, h);
+  Application::getInstance().width = w;
+  Application::getInstance().height = h;
 }
 
 void Application::scrollCallback(GLFWwindow* window,

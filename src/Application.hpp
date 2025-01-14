@@ -55,6 +55,7 @@ class Application: public InputProcessor {
   static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
   static void cursorCallback(GLFWwindow* window, double xposIn, double yposIn);
   static void mouseCallback(GLFWwindow* window,int x, int y, int z);
+  static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
   // Application informations
   //
   int getWidth() const;
@@ -86,7 +87,6 @@ class Application: public InputProcessor {
   int width;
   int height;
   bool dimensionChanged;
-  void detectWindowDimensionChange();
 
   // Simulation:
   bool running = false;
