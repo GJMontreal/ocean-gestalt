@@ -8,10 +8,11 @@
   <link rel="manifest" href="./manifest.json">
 </head>
 <body>
-  <div class="grid-container">
+
     <div class="canvas-container">
       <canvas id="canvas" oncontextmenu="event.preventDefault()">
       </canvas>
+
       <div id="overlay">
         <div id="control_grid">
           <div class="button_container">
@@ -23,10 +24,10 @@
               <div></div>
               <button id="move_back" class="overlay_button_large">&darr;<br>S</button>
             </div>
-          </div>
+          </div><!--button_container-->
           <div class="button_container">
-          </div>
-          <div>
+          </div><!-- button container-->
+          
             <div class="button_container">
               <div id="right_button_grid">
                 <button id="move_up" class="overlay_button_large">&uArr;<br>space</button>
@@ -34,26 +35,24 @@
                 <div></div>
                 <button id="move_down" class="overlay_button_large">&dArr;<br>shift</button>
               </div>
-            </div>
-          </div>
-
-        </div>
+            </div><!-- button container -->
+          </div><!--- control grid -->
+          
         <div id="bottom_container">
           <button id="toggle_mesh" class="overlay_button_small">M</button>
           <button id="generate_waves" class="overlay_button_small">R</button>
           <a id="github_button" href="https://github.com/GJMontreal/ocean-gestalt"></a>
         </div>
+      </div><!--- overlay -->
+    </div><!-- <canvas-container> -->
         <div id="output"></div>
-      </div>
-      <script src="./keypress.js"></script>
-      <script async src="./ocean-gestalt.js"></script>
-
+      
+        <script src="./keypress.js"></script>
+        <script async src="./ocean-gestalt.js"></script>
+  
 
 </body>
-<script>
 
-
-</script>
 <script type='text/javascript'>
   function addListeners(id, key, code) {
     var element = document.getElementById(id);
@@ -92,9 +91,6 @@
   document.addEventListener("mouseup", f);
   document.addEventListener("touchend", f);
 
-</script>
-
-<script type='text/javascript'>
   // connect to canvas
   var Module = {
     print: (function () {
@@ -115,33 +111,24 @@
     background-color: black;
   }
 
-  .grid-container {
-    display: grid;
-    grid-template-columns: 100%;
-    grid-template-rows: 100px;
+  .canvas-container {
+    position:relative;
+    margin-top: 5%;
     height: 100%;
     width: 100%;
-    text-align: center;
     user-select: none;
     -webkit-user-select: none;
   }
 
-  .canvas-container {
-    margin: auto;
-  }
-
   #overlay {
-    position: fixed;
-    /* Sit on top of the page content */
+    position: absolute;
     display: none;
     /* Hidden by default */
     left: 0px;
     width: 100%;
-    bottom: 10px;
+    bottom: 0;  
     background-color: rgba(0, 0, 0, 0);
-    /* Black background with opacity */
     z-index: 2;
-    /* Specify a stack order in case you're using a different order for other elements */
     cursor: pointer;
     pointer-events: none;
     user-select: none;
@@ -161,16 +148,16 @@
 
   .overlay_button_large {
     font-size: 15px;
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     margin: 5px;
   }
 
   .overlay_button_small,
   #github_button {
     font-size: 10px;
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     padding: 10px;
     margin: 10px;
   }
@@ -208,18 +195,18 @@
     display: none;
     color:white;
     }
+
   .icon{
     font-size: 20px;
-  }
+    }
+
   #canvas{
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    width:90%;
-    height:90%;
+    position: relative;
+    left: 0;
+    width:100%;
   }
   html {
-    padding-bottom: 400px; /* so we can scroll and hide the toolbar */
+    padding-bottom: 10%; /* so we can scroll and hide the toolbar */
   }
 </style>
 
