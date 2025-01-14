@@ -44,7 +44,7 @@ Application& Application::getInstance() {
 #define GLFW_PLATFORM_EMSCRIPTEN 0x00060006
 
 Application::Application()
-    : state(stateReady), width(600), height(300), title("Here we are, again.") {
+    : state(stateReady), width(1200), height(600), title("Here we are, again.") {
   currentApplication = this;
 
   cout << "[Info] GLFW initialisation" << endl;
