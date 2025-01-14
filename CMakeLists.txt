@@ -61,6 +61,7 @@ if (EMSCRIPTEN)
 
   foreach(file
     "github-mark-white.png"
+    "favicon.ico"
   )
   configure_file(${file} ${file} COPYONLY)
   endforeach(file)
