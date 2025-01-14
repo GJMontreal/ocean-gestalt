@@ -16,13 +16,13 @@
   <meta name="twitter:card" content="summary_large_image">
 
 </head>
-<body>
-
+<body id="landscape-container">
     <div class="canvas-container">
       <canvas id="canvas" oncontextmenu="event.preventDefault()">
       </canvas>
-
+      <div id="title">Here we are, again</div>
       <div id="overlay">
+
         <div id="control_grid">
           <div class="button_container">
             <div id="left_button_grid">
@@ -99,6 +99,9 @@
   };
   document.addEventListener("mouseup", f);
   document.addEventListener("touchend", f);
+
+  // hide the title text after 5s
+  setTimeout(() => { title.style.display = "none"; }, 5000);
 
   // connect to canvas
   var Module = {
@@ -200,23 +203,50 @@
     background-position: center;
   }
 
-  #output{ 
+  #output { 
     display: none;
     color:white;
     }
 
-  .icon{
+  .icon {
     font-size: 20px;
     }
 
-  #canvas{
+  #canvas {
     position: relative;
     left: 0;
     width:100%;
   }
+
   html {
     padding-bottom: 10%; /* so we can scroll and hide the toolbar */
   }
+
+  #title {
+    position: absolute;
+    top:10px;
+    width:100%;
+    color: white;
+    text-align: center;
+    font-family: sans-serif;
+  }
+
+/* From https://fuel-efficient-vehicles.org/pwsdb/?p=330 */
+  #landscape-container { 
+    display:block; 
+  }
+
+@media only screen and (orientation:portrait){ 
+  #landscape-container {
+    height: 100vw;
+    -webkit-transform: translate(0,20%);
+    -webkit-transform: translate(0,20%);
+    -moz-transform: translate(0,20%);
+    -o-transform: translate(0,20%);
+    -ms-transform: translate(0,20%);
+    transform: translate(0,20%);
+  }
+} 
 </style>
 
 </html>
