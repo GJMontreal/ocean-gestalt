@@ -79,7 +79,7 @@ Application::Application()
 
   if (err != GLEW_OK) {
     glfwTerminate();
-    throw std::runtime_error(string("Could initialize GLEW, error = ") +
+    throw std::runtime_error(string("Could initialize GLFW, error = ") +
                              (const char*)glewGetErrorString(err));
   }
 
