@@ -41,13 +41,13 @@ Application& Application::getInstance() {
     throw std::runtime_error("There is no current Application");
 }
 
+#define GLFW_PLATFORM_EMSCRIPTEN 0x00060006
+
 Application::Application()
-    : state(stateReady), width(1280), height(480), title("Application") {
+    : state(stateReady), width(600), height(300), title("Here we are, again.") {
   currentApplication = this;
 
   cout << "[Info] GLFW initialisation" << endl;
-
-  // initialize the GLFW library
   if (!glfwInit()) {
     throw std::runtime_error("Couldn't init GLFW");
   }
@@ -64,7 +64,7 @@ Application::Application()
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #endif
-
+  glfwWindowHint(GLFW_RESIZABLE,GLFW_TRUE);
   // create the window
   window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
   if (!window) {
