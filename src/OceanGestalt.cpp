@@ -222,8 +222,11 @@ void OceanGestalt::toggleFullscreen(GLFWwindow* window){
     //save position and size
     glfwGetWindowPos(window, &windowXPos, &windowYPos);
     glfwGetWindowSize(window,&windowWidth, &windowHeight);
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     monitor = glfwGetPrimaryMonitor();
   }else{
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     monitor = nullptr;
   }
   glfwSetWindowMonitor(window, monitor, windowXPos, windowYPos, windowWidth, windowHeight, GLFW_DONT_CARE );
