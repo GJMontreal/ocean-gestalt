@@ -174,10 +174,6 @@ float Application::getWindowRatio() const{
   return float(width) / float(height);
 }
 
-bool Application::windowDimensionChanged() const{
-  return dimensionChanged;
-}
-
 std::shared_ptr<Camera> Application::getCamera() {
   return camera;
 }

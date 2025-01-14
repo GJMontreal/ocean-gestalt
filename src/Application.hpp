@@ -29,7 +29,6 @@ struct GLFWwindow;
 ///   * getHeight()
 ///   * getFrameDeltaTime()
 ///   * getWindowRatio()
-///   * windowDimensionChanged()
 /// * let the user define the "loop" function.
 class Application: public InputProcessor {
  public:
@@ -61,7 +60,6 @@ class Application: public InputProcessor {
   int getWidth() const;
   int getHeight() const;
   float getWindowRatio() const;
-  bool windowDimensionChanged() const;
 
   std::shared_ptr<Camera> getCamera();
   std::shared_ptr<Light> getLight();
@@ -86,7 +84,6 @@ class Application: public InputProcessor {
   // Dimensions:
   int width;
   int height;
-  bool dimensionChanged;
 
   // Simulation:
   bool running = false;
