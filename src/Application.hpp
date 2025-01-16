@@ -55,6 +55,8 @@ class Application: public InputProcessor {
   static void cursorCallback(GLFWwindow* window, double xposIn, double yposIn);
   static void mouseCallback(GLFWwindow* window,int x, int y, int z);
   static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+  static void errorCallback(int error_code, const char* description);
+
   // Application informations
   //
   int getWidth() const;

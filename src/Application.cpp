@@ -18,6 +18,7 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <emscripten/html5.h>
+#include <GLFW/emscripten_glfw3.h>
 #include <cmath>
 #endif
 
@@ -56,6 +57,7 @@ Application::Application()
 #ifdef __EMSCRIPTEN__
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+  emscripten::glfw3::SetNextWindowCanvasSelector("#canvas");
 #else
   int major = 3;
   int minor = 2;
@@ -71,9 +73,13 @@ Application::Application()
     glfwTerminate();
     throw std::runtime_error("Couldn't create a window");
   }
-
+  
+  #ifdef __EMSCRIPTEN__
+  emscripten::glfw3::MakeCanvasResizable(window, "#canvas-container",nullptr);
+  #endif
+  
   glfwMakeContextCurrent(window);
-
+  glfwSetInputMode(window,GLFW_CURSOR, GLFW_CURSOR_CAPTURED);
   glewExperimental = GL_TRUE;
   GLenum err = glewInit();
 
@@ -106,6 +112,7 @@ Application::Application()
   glfwSetCursorPosCallback(window, Application::cursorCallback);
   glfwSetMouseButtonCallback(window, Application::mouseCallback);
   glfwSetFramebufferSizeCallback(window, Application::framebufferSizeCallback);
+  glfwSetErrorCallback(Application::errorCallback);
 }
 
 GLFWwindow* Application::getWindow() const {
@@ -237,6 +244,11 @@ void Application::mouseCallback(GLFWwindow *window, int, int state, int){
     Application::firstMouse = true;
   }
 }
+
+void Application::errorCallback(int error_code, const char *description){
+  cout << "GLFW error: " << error_code << " " << description << endl;
+}
+
 // ---------------------------------------------------------------------------------------------------------
 // process all input: query GLFW whether relevant keys are pressed/released this
 // frame and react accordingly

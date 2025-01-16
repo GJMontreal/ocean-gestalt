@@ -17,7 +17,7 @@
 
 </head>
 <body id="landscape-container">
-    <div class="canvas-container">
+    <div id="canvas-container">
       <div id="info">You can move the camera around this patch of simulated ocean water.<br>
         The arrows will move forward/back side to side and up/down.<br>
         Dragging pans and tilts the camera. <br>
@@ -74,13 +74,40 @@
 </body>
 
 <script type='text/javascript'>
+
+// from https://stackoverflow.com/questions/1517924/javascript-mapping-touch-events-to-mouse-events
+function touchHandler(event){
+    var touches = event.changedTouches,
+        first = touches[0],
+        type = "";
+    switch(event.type)
+    {
+        case "touchstart": type = "mousedown"; break;
+        case "touchmove":  type = "mousemove"; break;        
+        case "touchend":   type = "mouseup";   break;
+        default:           return;
+    }
+
+    var simulatedEvent = document.createEvent("MouseEvent");
+    simulatedEvent.initMouseEvent(type, true, true, window, 1, 
+                                  first.screenX, first.screenY, 
+                                  first.clientX, first.clientY, false, 
+                                  false, false, false, 0/*left*/, null);
+
+    first.target.dispatchEvent(simulatedEvent);
+  }
+
+  document.addEventListener("touchstart", touchHandler, true);
+  document.addEventListener("touchmove", touchHandler, true);
+  document.addEventListener("touchend", touchHandler, true);
+  document.addEventListener("touchcancel", touchHandler, true);    
+
+
   function addListeners(id, key, code) {
     var element = document.getElementById(id);
     var downFunc = function () { simulateKeyDown(key.toUpperCase().charCodeAt(0)) };
     var upFunc = function () { simulateKeyUp(key.toUpperCase().charCodeAt(0)) };
-    element.addEventListener("touchstart", downFunc);
     element.addEventListener("mousedown", downFunc);
-    element.addEventListener("touchend", upFunc);
     element.addEventListener("mouseup", upFunc);
   }
 
@@ -116,13 +143,11 @@
     }
   };
   document.addEventListener("mousedown", f);
-  document.addEventListener("touchstart", f);
 
   f = function () {
     ticker = setTimeout(() => { overlay.style.display = "none"; }, 5000);
   };
   document.addEventListener("mouseup", f);
-  document.addEventListener("touchend", f);
 
   // hide the title text after 5s
   setTimeout(() => { title.style.display = "none"; }, 5000);
@@ -147,11 +172,11 @@
     background-color: black;
   }
 
-  .canvas-container {
+  #canvas-container {
     position:relative;
     margin-top: 5%;
-    height: 100%;
-    width: 100%;
+    height: 100vh;
+    width: 100vw;
     user-select: none;
     -webkit-user-select: none;
   }
@@ -221,7 +246,6 @@
   #bottom_left {
     float:left;
     justify-content: left;
-    /* left:0; */
     align-items: center;
   }
 
@@ -249,8 +273,6 @@
 
   #canvas {
     position: relative;
-    left: 0;
-    width:100%;
   }
 
   html {
@@ -272,22 +294,6 @@
     font-size:smaller;
   }
 
-/* From https://fuel-efficient-vehicles.org/pwsdb/?p=330 */
-  #landscape-container { 
-    display:block; 
-  }
-
-@media only screen and (orientation:portrait){ 
-  #landscape-container {
-    height: 100vw;
-    -webkit-transform: translate(0,20%);
-    -webkit-transform: translate(0,20%);
-    -moz-transform: translate(0,20%);
-    -o-transform: translate(0,20%);
-    -ms-transform: translate(0,20%);
-    transform: translate(0,20%);
-  }
-} 
 </style>
 
 </html>
