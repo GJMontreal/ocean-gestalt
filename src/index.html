@@ -20,9 +20,9 @@
     <div id="canvas-container">
       <div id="info">You can move the camera around this patch of simulated ocean water.<br>
         The arrows will move forward/back side to side and up/down.<br>
-        Dragging pans and tilts the camera. <br>
+        Drag to pan and tilt the camera. <br>
         It's your perspective that changes, not the world.<br>
-        Tapping the button R will generate a random set of Gerstner waves.<br>
+        Tap R to generate a random set of Gerstner waves.<br>
         It runs on your GPU. 
         </div>
       <canvas id="canvas" oncontextmenu="event.preventDefault()">
@@ -294,6 +294,19 @@ function touchHandler(event){
     display: none;
     font-size:smaller;
   }
+
+/* From https://fuel-efficient-vehicles.org/pwsdb/?p=330 */
+#landscape-container { 
+    display:block; 
+  }
+
+  @media only screen and (orientation:portrait){ 
+  html { padding-bottom: 20%;
+     }
+  #overlay{
+      bottom: 15%;
+     }  
+} 
 
 </style>
 
