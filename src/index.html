@@ -105,8 +105,12 @@ function touchHandler(event){
 
   function addListeners(id, key, code) {
     var element = document.getElementById(id);
-    var downFunc = function () { simulateKeyDown(key.toUpperCase().charCodeAt(0)) };
-    var upFunc = function () { simulateKeyUp(key.toUpperCase().charCodeAt(0)) };
+    var downFunc = function () { 
+      simulateKeyDown(key.toUpperCase().charCodeAt(0),code,key); 
+    };
+    var upFunc = function () { 
+      simulateKeyUp(key.toUpperCase().charCodeAt(0),code,key); 
+    };
     element.addEventListener("mousedown", downFunc);
     element.addEventListener("mouseup", upFunc);
   }
@@ -115,10 +119,10 @@ function touchHandler(event){
   addListeners("move_right", 'd', 'KeyD');
   addListeners("move_forward", 'w', 'KeyW');
   addListeners("move_back", 's', 'KeyS');
-  addListeners("move_up", " ", 'KeySpace');
-  addListeners("move_down", String.fromCharCode(16));
-  addListeners("toggle_mesh", 'm');
-  addListeners("generate_waves", 'r');
+  addListeners("move_up", " ", 'Space');
+  addListeners("move_down", 'Shift','Shift');
+  addListeners("toggle_mesh", 'm','KeyM');
+  addListeners("generate_waves", 'r','KeyR');
 
   
   function toggleInfo(){
