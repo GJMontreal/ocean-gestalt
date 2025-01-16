@@ -24,7 +24,7 @@ add_executable(ocean-gestalt
   src/KeyExecutable.cpp
 )
 
-set_property(TARGET ocean-gestalt PROPERTY CXX_STANDARD 11)
+set_property(TARGET ocean-gestalt PROPERTY CXX_STANDARD 17)
 add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
 
 

@@ -21,16 +21,9 @@ using std::cout;
 using std::endl;
 
 
-// TODO: move this template elsewhere
-template<typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args&&... args) {
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-
 OceanGestalt::OceanGestalt()
     : Application()
 {
-  // TODO: pass in file names as optional command line arguments
   auto config = std::make_shared<Configuration>(CONFIGURATION_DIR "environment.json",
   CONFIGURATION_DIR "shader.json",CONFIGURATION_DIR "generator.json");
   this->camera = config->camera; 
@@ -39,8 +32,9 @@ OceanGestalt::OceanGestalt()
   
   configuration = config;
   models.push_back(new Ocean(config));
- 
-  waveUI = make_unique<WaveUI>(config->waves,(Updatable*)(this));
+  
+  waveUI = unique_ptr<WaveUI>(new WaveUI(config->waves,(Updatable*)this));
+  
   glEnable(GL_BLEND);
   glBlendFunc(GL_ONE, GL_ONE);  // Not certain what our blend mode should be?
 
