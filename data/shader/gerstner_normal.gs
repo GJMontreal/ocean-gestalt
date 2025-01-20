@@ -13,7 +13,7 @@ out VS_OUT {
     vec3 Color;
 } fs_in;
 
-const float MAGNITUDE = .1;
+const float MAGNITUDE = 1.;
 
 layout(std140) uniform Matrices
 {

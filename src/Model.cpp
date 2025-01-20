@@ -22,7 +22,6 @@ void Model::draw(Uniforms& uniforms) {
       configuration->wireframeShader->activate();
       configuration->wireframeShader->setUniform("time",uniforms.time);
       configuration->wireframeShader->setUniform("model", transform);
-      configuration->wireframeShader->setUniform("normalMatrix",normalMatrix);
       #ifdef __EMSCRIPTEN__
       configuration->wireframeShader->setUniform("projection", uniforms.projection);
       configuration->wireframeShader->setUniform("view", uniforms.view);
@@ -37,7 +36,6 @@ void Model::draw(Uniforms& uniforms) {
       configuration->normalShader->activate();
       configuration->normalShader->setUniform("time",uniforms.time);
       configuration->normalShader->setUniform("model", transform);
-      configuration->normalShader->setUniform("normalMatrix",normalMatrix);
       mesh.drawWireframe();
       configuration->normalShader->deactivate();
     }
@@ -49,7 +47,6 @@ void Model::draw(Uniforms& uniforms) {
 
       // these next three don't need to be set each pass
       configuration->meshShader->setUniform("model", transform);
-      configuration->meshShader->setUniform("normalMatrix",normalMatrix);
       configuration->meshShader->setUniform("lightPos", configuration->light->position);
       configuration->meshShader->setUniform("viewPos",configuration->camera->position);
       

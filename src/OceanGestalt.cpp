@@ -36,7 +36,7 @@ OceanGestalt::OceanGestalt()
   waveUI = unique_ptr<WaveUI>(new WaveUI(config->waves,(Updatable*)this));
   
   glEnable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE);  // Not certain what our blend mode should be?
+  // glBlendFunc(GL_ONE, GL_ONE);  // Not certain what our blend mode should be?
 
 // Uniform buffers aren't supported by GLES
 #ifndef __EMSCRIPTEN__

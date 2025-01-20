@@ -14,7 +14,7 @@ I am open to any comments and contributions
 Jerry Tessendorf's paper on simulating ocean water.  
 https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf  
 
-A guide to implementing Gerstner waves and more   
+A guide to implementing Gerstner waves and more 
 https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-1-effective-water-simulation-physical-models  
 
 I started with the OpenGL CMake Skeleton.  
