@@ -15,7 +15,7 @@ using std::vector;
 
 class WaveUI: public InputProcessor, public KeyExecutable {
   public:
-  explicit WaveUI(const vector<shared_ptr<Wave>>& waves, Updatable* updatable);
+  explicit WaveUI(const vector<shared_ptr<Wave>>& waves);
 
   void processInput(GLFWwindow *window, float deltaTime) override;
   
@@ -24,7 +24,7 @@ class WaveUI: public InputProcessor, public KeyExecutable {
   vector<shared_ptr<Wave>> waves;
   shared_ptr<Wave> selectedWave;
   
-  Updatable* updatable;
+  weak_ptr<Updatable> updatable;
 
   private:
   bool adjustDirection(GLFWwindow* window, float deltaTime);

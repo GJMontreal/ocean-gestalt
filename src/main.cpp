@@ -8,11 +8,12 @@
 
 #include  "OceanGestalt.hpp"
 
+#include <memory>
 #include <GLFW/glfw3.h>
 
 #include <memory>
 int main(int argc, const char* argv[]) {
-  auto app = OceanGestalt();
-  app.run();
+  auto app = std::make_shared<OceanGestalt>();
+  app->run();
   return 0;
 }

@@ -32,6 +32,7 @@ class OceanGestalt : public Application, public Updatable, public KeyExecutable{
   OceanGestalt();
  
  protected:
+  void setUIDelegate() override;
   void loop() override;
   void processInput(GLFWwindow *window, float deltaTime) override;
 

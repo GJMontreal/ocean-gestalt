@@ -10,9 +10,8 @@ static const float MAX_HEADING = 359.9f;
 static const float LONGITUDINAL_VELOCITY = 2.0f;
 static const float VERTICAL_VELOCITY = 0.5;
 
-WaveUI::WaveUI(const vector<shared_ptr<Wave>>& aWaves, Updatable* anUpdatable) {
+WaveUI::WaveUI(const vector<shared_ptr<Wave>>& aWaves) {
   waves = aWaves;
-  updatable = anUpdatable;
   selectWave(0);
 }
 
@@ -40,7 +39,10 @@ void WaveUI::processInput(GLFWwindow* window, float deltaTime) {
   updateUniforms = updateUniforms || adjustWavelength(window, deltaTime);
 
   if(updateUniforms){
-    updatable->wavesNeedUpdate = true;
+    shared_ptr<Updatable> spt = updatable.lock();
+    if(spt){
+      spt->wavesNeedUpdate = true;
+    }
   }
 }
 bool WaveUI::adjustAmplitude(GLFWwindow* window, float deltaTime) {

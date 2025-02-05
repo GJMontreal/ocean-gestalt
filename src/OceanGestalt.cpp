@@ -33,7 +33,7 @@ OceanGestalt::OceanGestalt()
   configuration = config;
   models.push_back(new Ocean(config));
   
-  waveUI = unique_ptr<WaveUI>(new WaveUI(config->waves,(Updatable*)this));
+  waveUI = unique_ptr<WaveUI>(new WaveUI(config->waves));
   
   glEnable(GL_BLEND);
   // glBlendFunc(GL_ONE, GL_ONE);  // Not certain what our blend mode should be?
@@ -44,7 +44,11 @@ OceanGestalt::OceanGestalt()
 #endif
 }
 
-void OceanGestalt::loop() {
+void OceanGestalt::setUIDelegate() {
+  waveUI->updatable = weak_from_this();
+}
+
+void OceanGestalt::loop() {  
   if(wavesNeedUpdate){
     wavesNeedUpdate = false;
     updateWaves();

@@ -137,6 +137,7 @@ void Application::run() {
   // Make the window's context current
   glfwMakeContextCurrent(window);
 
+  setUIDelegate();
   time = (float)glfwGetTime();
   registered_loop = [&]() {
     // compute new time and delta time
@@ -167,6 +168,10 @@ void Application::run() {
 
 void Application::loop() {
   cout << "[INFO] : loop" << endl;
+}
+
+void Application::setUIDelegate() {
+  cout << "[INFO] : setUIDelegate" << endl;
 }
 
 int Application::getWidth() const {
