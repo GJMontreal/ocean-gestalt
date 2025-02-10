@@ -117,3 +117,4 @@ build
 .vscode
 .venv
 build*
+__pycache__

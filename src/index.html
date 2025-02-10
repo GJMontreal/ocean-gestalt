@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <base href="https://geoffreyjones.ca/ocean-gestalt/">
   <title>Here we are, again</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -73,34 +72,6 @@
 
 <script type='text/javascript'>
 
-// from https://stackoverflow.com/questions/1517924/javascript-mapping-touch-events-to-mouse-events
-function touchHandler(event){
-    var touches = event.changedTouches,
-        first = touches[0],
-        type = "";
-    switch(event.type)
-    {
-        case "touchstart": type = "mousedown"; break;
-        case "touchmove":  type = "mousemove"; break;        
-        case "touchend":   type = "mouseup";   break;
-        default:           return;
-    }
-
-    var simulatedEvent = document.createEvent("MouseEvent");
-    simulatedEvent.initMouseEvent(type, true, true, window, 1, 
-                                  first.screenX, first.screenY, 
-                                  first.clientX, first.clientY, false, 
-                                  false, false, false, 0/*left*/, null);
-
-    first.target.dispatchEvent(simulatedEvent);
-  }
-
-  document.addEventListener("touchstart", touchHandler, true);
-  document.addEventListener("touchmove", touchHandler, true);
-  document.addEventListener("touchend", touchHandler, true);
-  document.addEventListener("touchcancel", touchHandler, true);    
-
-
   function addListeners(id, key, code) {
     var element = document.getElementById(id);
     var downFunc = function () { 
@@ -110,7 +81,9 @@ function touchHandler(event){
       simulateKeyUp(key.toUpperCase().charCodeAt(0),code,key); 
     };
     element.addEventListener("mousedown", downFunc);
+    element.addEventListener("touchstart", downFunc);
     element.addEventListener("mouseup", upFunc);
+    element.addEventListener("touchend", upFunc);
   }
 
   addListeners("move_left", 'a', 'KeyA');
@@ -140,11 +113,13 @@ function touchHandler(event){
     }
   };
   document.addEventListener("mousedown", f);
+  document.addEventListener("touchstart", f);
 
   f = function () {
     ticker = setTimeout(() => { overlay.style.display = "none"; }, 5000);
   };
   document.addEventListener("mouseup", f);
+  document.addEventListener("touchend", f);
 
   // hide the title text after 5s
   setTimeout(() => { title.style.display = "none"; }, 5000);
