@@ -20,7 +20,8 @@ struct WAVE{
   float steepness;
 };
 
-uniform WAVE waves[10];  
+#define NUM_WAVES 10
+uniform WAVE waves[NUM_WAVES];  
 
 
 const float PI = 3.14159265358979323;
@@ -42,12 +43,12 @@ vec3 waveOffset(float time, vec3 aPosition, WAVE wave){
 
 
 vec3 calcNewPosition(vec3 aPosition){
-  vec3 offset = aPosition;
+  vec3 offset = vec3(0.0);
   for(int i=0; i < waves.length(); i++){
     vec3 newOffset = waveOffset(time, aPosition, waves[i] );
     offset += newOffset;
   }
-  offset = offset / vec3(waves.length());
+  offset = aPosition + offset / vec3(NUM_WAVES);
   return offset;
 }
 

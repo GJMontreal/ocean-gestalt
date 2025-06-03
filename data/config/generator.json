@@ -1,8 +1,6 @@
 {
-  
         "median_wavelength": 30,
-        "median_amplitude": 10,
+        "median_amplitude": 15,
         "std_deviation": 20,
         "directional_variance": 15
-    
 }

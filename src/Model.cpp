@@ -22,6 +22,7 @@ void Model::draw(Uniforms& uniforms) {
       configuration->wireframeShader->activate();
       configuration->wireframeShader->setUniform("time",uniforms.time);
       configuration->wireframeShader->setUniform("model", transform);
+      std::cout << glm::to_string(transform) << std::endl;
       #ifdef __EMSCRIPTEN__
       configuration->wireframeShader->setUniform("projection", uniforms.projection);
       configuration->wireframeShader->setUniform("view", uniforms.view);

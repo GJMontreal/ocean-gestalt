@@ -24,9 +24,9 @@
         "vertex": "gerstner.vert",
         "fragment": "shader.frag",
         "color": {
-            "r": 0.18,
-            "g": 0.24,
-            "b": 0.28,
+            "r": 0.01,
+            "g": 0.05,
+            "b": 0.4,
             "a": 1
         }
     }

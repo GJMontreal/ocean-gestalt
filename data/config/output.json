@@ -1,4 +1,5 @@
-{ "camera": {
+{
+    "camera": {
         "pitch": -10.446091651916504,
         "position": {
             "x": -10.74269962310791,
@@ -19,15 +20,15 @@
         "z": 10.0
     },
     "mesh": {
-        "size": 60,
-        "subdivisions": 2
+        "size": 30,
+        "subdivisions": 1
     },
     "waves": [
         {
-            "amplitude": 0.0,
-            "heading": 180.0,
-            "steepness": 0.5,
-            "wavelength": 4.0
+            "amplitude": 42.32577896118164,
+            "heading": 212.86114501953125,
+            "steepness": 1.0,
+            "wavelength": 42.32577896118164
         },
         {
             "amplitude": 17.67422103881836,
@@ -66,7 +67,7 @@
             "wavelength": 55.096126556396484
         },
         {
-            "amplitude": 0.0,
+            "amplitude": 4.903873443603516,
             "heading": 238.18231201171875,
             "steepness": 1.0,
             "wavelength": 4.903873443603516
@@ -78,10 +79,10 @@
             "wavelength": 59.777008056640625
         },
         {
-            "amplitude": 1.0,
+            "amplitude": 0.2229938507080078,
             "heading": 93.49227905273438,
             "steepness": 1.0,
-            "wavelength": 15.2229938507080078
+            "wavelength": 0.2229938507080078
         }
     ]
 }

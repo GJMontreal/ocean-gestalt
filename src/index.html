@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <base href="https://geoffreyjones.ca/ocean-gestalt/">
+
   <title>Here we are, again</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -137,22 +137,38 @@
     })(),
     canvas: document.getElementById('canvas')
   };
+window.addEventListener('load', function () {
+  setTimeout(function () {
+    console.log("load window");
+    window.scrollTo(0, 100); // scroll by 1px to hide address bar
+  }, 100);
+  });
+
+  function setViewportHeight() {
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+
+window.addEventListener('resize', setViewportHeight);
+window.addEventListener('orientationchange', setViewportHeight);
+setViewportHeight();
 
 </script>
-
 <style>
-  body {
+ body {
     background-color: black;
   }
 
   #canvas-container {
+    display: flex;
+    flex-direction: column;
     position:relative;
-    margin-top: 5%;
-    height: 100vh;
-    width: 100vw;
+    height: calc(var(--vh, 1vh) * 100);
+    width: 100%;
     user-select: none;
     touch-action: none;
     -webkit-user-select: none;
+    overflow: hidden;
   }
 
   #overlay {
@@ -161,7 +177,7 @@
     /* Hidden by default */
     left: 0px;
     width: 100%;
-    bottom: 5%;  
+    bottom: 0;  
     background-color: rgba(0, 0, 0, 0);
     z-index: 2;
     cursor: pointer;
@@ -246,12 +262,21 @@
     }
 
   #canvas {
-    position: relative;
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    position: absolute;
   }
 
-  html {
-    padding-bottom: 10%; /* so we can scroll and hide the toolbar */
-  }
+html, body {
+  margin: 0;
+  padding-bottom:10%;
+  height: 100%;
+  overflow-y: scroll; 
+  background-color: black;
+}
 
   #title, #info {
     position: absolute;
