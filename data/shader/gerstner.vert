@@ -39,6 +39,7 @@ out VS_OUT {
     vec3 Normal;
     vec3 Color;
     vec3 ModelUp;
+    float FoamModulation;
 } vs_out;
 
 const float PI = 3.14159265358979323;
@@ -105,7 +106,7 @@ vec3 waveOffset(float time, vec3 aPosition, WAVE wave) {
 }
 
 
-vec3 calcNewPosition(vec3 aPosition){
+vec3 calcNewPosition(vec3 aPosition, out float modulation){
   vec3 offset = vec3(0.0);
   for(int i=0; i < NUM_WAVES; i++){
     vec3 newOffset = waveOffset(time, aPosition, waves[i] );
@@ -117,7 +118,7 @@ vec3 calcNewPosition(vec3 aPosition){
   float n = fbm(q);
 
   float waveHeight = offset.z - aPosition.z;
-  float modulation = smoothstep(FBM_MODULATION_MIN, FBM_MODULATION_MAX, abs(waveHeight));
+  modulation = smoothstep(FBM_MODULATION_MIN, FBM_MODULATION_MAX, abs(waveHeight));
   
   offset.z += n * FBM_AMPLITUDE * modulation;
 
@@ -127,15 +128,17 @@ vec3 calcNewPosition(vec3 aPosition){
 vec3 calcNormal(vec3 originalPosition,
                 vec3 newPosition,
                 float offset) {
-  vec3 tangent =  calcNewPosition(vec3(originalPosition.x + offset, originalPosition.y, 0)) - newPosition; 
-  vec3 bitangent = calcNewPosition(vec3(originalPosition.x, originalPosition.y + offset, 0)) - newPosition; 
+  float foamModulation;
+  vec3 tangent =  calcNewPosition(vec3(originalPosition.x + offset, originalPosition.y, 0), foamModulation) - newPosition; 
+  vec3 bitangent = calcNewPosition(vec3(originalPosition.x, originalPosition.y + offset, 0),foamModulation) - newPosition; 
   vec3 normal = normalize(cross(tangent , bitangent)) ;
   return normal;
 }
 
 void main(void)
 {
-    vec3 newPosition = calcNewPosition(position);
+    float foamModulation;
+    vec3 newPosition = calcNewPosition(position, foamModulation);
     vec3 normalFD = calcNormal(position, newPosition, NORMAL_OFFSET);
     gl_Position = projection * view * model * vec4(newPosition, 1.0) ;
     vs_out.FragPos = vec3(model * vec4(newPosition,1.0));
@@ -143,4 +146,5 @@ void main(void)
     vs_out.Color = vec3(color);
     vec3 modelUp = normalize(mat3(model) * vec3(0.0, 0.0, 1.0));
     vs_out.ModelUp = modelUp;
+    vs_out.FoamModulation = foamModulation;
 }

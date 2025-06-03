@@ -5,6 +5,7 @@ in VS_OUT {
     vec3 Normal;
     vec3 Color;
     vec3 ModelUp;
+    float FoamModulation;
 } fs_in;
 
 layout(std140) uniform Matrices
@@ -22,16 +23,19 @@ out vec4 FragColor;
 
 // Constants
 const float FOG_DENSITY = 0.01;
-const float AMBIENT_STRENGTH = 0.05;
-const float SPECULAR_STRENGTH = 0.25;
-const float SHININESS = 64.0;
+const float AMBIENT_STRENGTH = 0.001;
+const float SPECULAR_STRENGTH = 0.125;
+const float SHININESS = 16.0;
 
 const float FOAM_SLOPE_MIN = 0.1;
 const float FOAM_SLOPE_MAX = 0.3;
 
-const float CAUSTIC_INTENSITY = 0.25;
+const float CAUSTIC_INTENSITY = 0.125;
 const float CAUSTIC_SCALE = 4.0;
 const float CAUSTIC_SPEED = 0.4;
+
+const float FOAM_BRIGHTNESS_BASE     = 0.4;  // Minimum foam brightness
+const float FOAM_BRIGHTNESS_VARIANCE = 0.2;  // Additional brightness from FBM modulation
 
 // Hash and FBM
 float hash(vec2 p) {
@@ -84,8 +88,13 @@ void main() {
 
     // Slope-based foam
     float slope = 1.0 - dot(normal, fs_in.ModelUp);
-    float foamMask = smoothstep(FOAM_SLOPE_MIN, FOAM_SLOPE_MAX, slope);
-    vec3 foamColor = vec3(1.0);
+    float foamBase = smoothstep(FOAM_SLOPE_MIN, FOAM_SLOPE_MAX, slope);
+
+    float foamMask = foamBase * fs_in.FoamModulation;
+    vec3 foamColor = vec3(1.0) * (FOAM_BRIGHTNESS_BASE + FOAM_BRIGHTNESS_VARIANCE * fs_in.FoamModulation);
+    
+    // Optional: make foam colour slightly modulated
+    // vec3 foamColor = vec3(1.0) * (0.8 + 0.2 * foamNoise);
 
     // Caustic flicker in troughs
     float causticStrength = smoothstep(-0.2, 0.2, -fs_in.FragPos.y);
