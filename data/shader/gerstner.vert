@@ -48,7 +48,7 @@ const float speedScale = 3.0;
 const float FBM_SCALE = 0.2;           // spatial frequency
 const float FBM_TIME_SPEED_X = 0.1;    // x scroll speed
 const float FBM_TIME_SPEED_Y = 0.07;   // y scroll speed
-const float FBM_AMPLITUDE = 0.02;      // max vertical displacement
+const float FBM_AMPLITUDE = 0.2;      // max vertical displacement
 const float FBM_MODULATION_MIN = 0.0;  // waveHeight threshold low
 const float FBM_MODULATION_MAX = 1.0;  // waveHeight threshold high
 

@@ -70,7 +70,8 @@ void OceanGestalt::loop() {
 
   // clear
   glClear(GL_COLOR_BUFFER_BIT);
-  glClearColor(0.0, 0.0, 0.0, 0.0);
+  // glClearColor(0.0, 0.0, 0.0, 0.0);
+  glClearColor(0.0f, 0.05f, 0.1f, 1.0f); //we should set this in the environment
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   for (Model* model : models) {
     model->draw(uniforms);
