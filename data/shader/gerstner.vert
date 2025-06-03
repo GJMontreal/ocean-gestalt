@@ -52,6 +52,8 @@ const float FBM_AMPLITUDE = 0.2;      // max vertical displacement
 const float FBM_MODULATION_MIN = 0.0;  // waveHeight threshold low
 const float FBM_MODULATION_MAX = 1.0;  // waveHeight threshold high
 
+const float GRAVITY = 9.81; 
+
 float hash(vec2 p) {
     return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
 }
@@ -84,18 +86,22 @@ float fbm(vec2 p) {
     return sum;
 }
 
-vec3 waveOffset(float time, vec3 aPosition, WAVE wave){
-    float k =  2.0f * PI / wave.wavelength;
-    vec2 D = normalize(wave.direction.xy);  // normalized direction
-    vec2 K = D * k;              
-    float w = speedScale * k;
-    float wT = w * time;        
-    float KPwT = dot(K, vec2(aPosition)) - wT;
-    float S0 = sin(KPwT);
-    float C0 = cos(KPwT);
-    float z = wave.amplitude * C0;
-    vec2 xy = aPosition.xy - D * wave.steepness * S0 * wave.amplitude; //are we sure about this?
-    return vec3(xy,z);
+const float VELOCITY_SCALE = 1.0; // Scale spatial dimensions and wave wavelengths
+
+vec3 waveOffset(float time, vec3 aPosition, WAVE wave) {
+    float k = 2.0 * PI / wave.wavelength;
+    float w = VELOCITY_SCALE * sqrt(GRAVITY * k); // only frequency is scaled
+    vec2 D = normalize(wave.direction.xy);
+
+    float phase = dot(D * k, aPosition.xy) - w * time;
+
+    float S = sin(phase);
+    float C = cos(phase);
+
+    float z = wave.amplitude * C;
+    vec2 xy = aPosition.xy - D * wave.steepness * S * wave.amplitude;
+
+    return vec3(xy, z);
 }
 
 
