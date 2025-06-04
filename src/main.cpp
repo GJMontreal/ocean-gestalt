@@ -8,14 +8,14 @@
 
 #include "OceanGestalt.hpp"
 #include "RestServer.hpp"
+#include "OceanApi.hpp"
 
 #include <memory>
-// #include <GLFW/glfw3.h>
 
-#include <memory>
 int main(int argc, const char* argv[]) {
   auto app = std::make_shared<OceanGestalt>();
-  auto server = std::make_unique<RestServer>();
+  auto api = std::make_unique<OceanApi>(app);
+  auto server = std::make_unique<RestServer>(std::move(api));
   app->run();
   return 0;
 }

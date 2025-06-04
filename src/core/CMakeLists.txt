@@ -19,6 +19,7 @@ add_library(app-core STATIC
   Light.cpp
   Moveable.cpp
   KeyExecutable.cpp
+  OceanApi.cpp
 )
 
 set_property(TARGET app-core PROPERTY CXX_STANDARD 17)

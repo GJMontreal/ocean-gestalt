@@ -4,16 +4,18 @@
 #include <memory>
 
 #include <CivetServer.h>
+#include "ApiAdapter.hpp"
 
 class RestServer{
   public:
-  RestServer(int port = 8080);
+  RestServer(std::unique_ptr<ApiAdapter>&& api, int port = 8080);
   ~RestServer() = default;
 
   void addHandlers();
 
 private:
   std::unique_ptr<CivetServer> server;
+  std::unique_ptr<ApiAdapter> api;
 };
 
 

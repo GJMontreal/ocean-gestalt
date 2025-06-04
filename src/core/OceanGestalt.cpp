@@ -15,12 +15,13 @@
 
 #include <iostream>
 
+#include <memory>
 #include <nlohmann/json.hpp>
 
 using std::cout;
 using std::endl;
 
-
+// our application should keep a reference to the OceanApi
 OceanGestalt::OceanGestalt()
     : Application()
 {
