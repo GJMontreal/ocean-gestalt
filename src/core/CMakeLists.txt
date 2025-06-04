@@ -31,6 +31,7 @@ target_link_libraries(app-core
   PRIVATE glfw
   PRIVATE libglew_static
   PRIVATE glm
+  PRIVATE nlohmann_json::nlohmann_json
 )
 
 target_include_directories(app-core 
