@@ -4,6 +4,8 @@ cmake_policy(VERSION 3.5)
 project (ocean-gestalt)
 
 add_subdirectory(src/core)
+add_subdirectory(src/rest-api)
+
 # The main executable
 add_executable(ocean-gestalt
   src/main.cpp
@@ -67,28 +69,14 @@ else() # Not Web
   add_subdirectory(lib/glfw EXCLUDE_FROM_ALL)
   add_subdirectory(lib/glew EXCLUDE_FROM_ALL)
 
-  add_library(civetweb STATIC
-    lib/civetweb/src/civetweb.c
-  )
-
-  target_include_directories(civetweb PUBLIC
-    lib/civetweb/include
-  )
-
-  target_compile_definitions(civetweb PRIVATE
-    CIVETWEB_ENABLE_CXX
-    NO_SSL
-  )
-
   target_link_libraries(ocean-gestalt
-    PRIVATE glfw
-    PRIVATE libglew_static
-    PRIVATE civetweb
+    PRIVATE rest-api
     PRIVATE app-core
   )
 
   target_include_directories(ocean-gestalt 
-    PRIVATE lib/civetweb/include
+    PRIVATE lib/glew/include
+    PRIVATE lib/glfw/include
   )
 endif()
 
