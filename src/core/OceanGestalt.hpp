@@ -31,11 +31,13 @@ class OceanGestalt : public Application, public Updatable, public KeyExecutable{
  public:
   OceanGestalt();
  
+  void toggleSimulation();
  protected:
   void setUIDelegate() override;
   void loop() override;
   void processInput(GLFWwindow *window, float deltaTime) override;
 
+ 
  private:
   // for restoring the window from fullscreen
   int windowXPos;
@@ -55,7 +57,7 @@ class OceanGestalt : public Application, public Updatable, public KeyExecutable{
   vector<Model*> models;
 
   void toggleNormalDisplay();
-  void toggleSimulation();
+
   void toggleWireframe();
   void toggleMesh();
   void toggleDrawTriangles();

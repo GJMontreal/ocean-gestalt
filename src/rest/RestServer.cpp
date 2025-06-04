@@ -1,4 +1,6 @@
 #include "RestServer.hpp"
+#include "PauseHandler.hpp"
+
 #include <string>
 
 RestServer::RestServer(std::unique_ptr<ApiAdapter>&& api, int port)
@@ -12,5 +14,5 @@ RestServer::RestServer(std::unique_ptr<ApiAdapter>&& api, int port)
 }
 
 void RestServer::addHandlers() {
-
+  server->addHandler("/pause", new PauseHandler(*api));
 }

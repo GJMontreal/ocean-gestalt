@@ -4,6 +4,7 @@ cmake_policy(VERSION 3.5)
 
 add_library(app-rest STATIC
   RestServer.cpp
+  PauseHandler.cpp
 )
 
 set_property(TARGET app-rest PROPERTY CXX_STANDARD 17)
