@@ -16,4 +16,5 @@ target_include_directories(app-rest
 
 target_link_libraries(app-rest
   PUBLIC civetweb
+  PRIVATE nlohmann_json::nlohmann_json
 )
