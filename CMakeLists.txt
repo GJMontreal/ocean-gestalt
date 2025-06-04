@@ -82,9 +82,18 @@ else() # Not Web
   add_subdirectory(lib/glfw EXCLUDE_FROM_ALL)
   add_subdirectory(lib/glew EXCLUDE_FROM_ALL)
 
+  add_library(civetweb STATIC
+    lib/civetweb/src/civetweb.c
+  )
+
+  target_include_directories(civetweb PUBLIC
+    lib/civetweb/include
+  )
+
   target_link_libraries(ocean-gestalt
   PRIVATE glfw
   PRIVATE libglew_static
+  PRIVATE civetweb
   )
 endif()
 
