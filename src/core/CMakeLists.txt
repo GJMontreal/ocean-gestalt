@@ -1,5 +1,6 @@
 # core/CMakeLists.txt
-
+cmake_minimum_required (VERSION 3.5)
+cmake_policy(VERSION 3.5)
 
 add_library(app-core STATIC
   Application.cpp
@@ -22,11 +23,6 @@ add_library(app-core STATIC
 
 set_property(TARGET app-core PROPERTY CXX_STANDARD 17)
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/lib/glfw ${CMAKE_BINARY_DIR}/lib/glfw)
-add_subdirectory(${CMAKE_SOURCE_DIR}/lib/glew ${CMAKE_BINARY_DIR}/lib/glew)
-add_subdirectory(${CMAKE_SOURCE_DIR}/lib/glm ${CMAKE_BINARY_DIR}/lib/glm)
-target_compile_definitions(app-core PRIVATE GLEW_STATIC)
-
 target_link_libraries(app-core
   PRIVATE glfw
   PRIVATE libglew_static
@@ -36,5 +32,5 @@ target_link_libraries(app-core
 
 target_include_directories(app-core 
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_BINARY_DIR}/src/core
+  PRIVATE ${CMAKE_BINARY_DIR}/src/core
 )

@@ -63,9 +63,9 @@ if (EMSCRIPTEN)
 else() # Not Web
 
 
-  # add_definitions(-DGLEW_STATIC)
-  # add_subdirectory(lib/glfw EXCLUDE_FROM_ALL)
-  # add_subdirectory(lib/glew EXCLUDE_FROM_ALL)
+  add_definitions(-DGLEW_STATIC)
+  add_subdirectory(lib/glfw EXCLUDE_FROM_ALL)
+  add_subdirectory(lib/glew EXCLUDE_FROM_ALL)
 
   add_library(civetweb STATIC
     lib/civetweb/src/civetweb.c
@@ -81,6 +81,8 @@ else() # Not Web
   )
 
   target_link_libraries(ocean-gestalt
+    PRIVATE glfw
+    PRIVATE libglew_static
     PRIVATE civetweb
     PRIVATE app-core
   )
@@ -90,8 +92,8 @@ else() # Not Web
   )
 endif()
 
-# add_subdirectory(lib/glm)
-# target_link_libraries(ocean-gestalt PRIVATE glm)
+add_subdirectory(lib/glm)
+target_link_libraries(ocean-gestalt PRIVATE glm)
 
 include(FetchContent)
 
