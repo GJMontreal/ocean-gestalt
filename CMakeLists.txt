@@ -3,26 +3,10 @@ cmake_minimum_required (VERSION 3.5)
 cmake_policy(VERSION 3.5)
 project (ocean-gestalt)
 
+add_subdirectory(src/core)
 # The main executable
 add_executable(ocean-gestalt
-  src/Application.cpp
-  src/OceanGestalt.cpp
-  src/glError.cpp
   src/main.cpp
-  src/Shader.hpp
-  src/Shader.cpp
-  src/Wave.cpp
-  src/Mesh.cpp
-  src/Model.cpp
-  src/Ocean.cpp
-  src/Configuration.cpp
-  src/Serialization.cpp
-  src/Camera.cpp
-  src/WaveUI.cpp
-  src/WaveGenerator.cpp
-  src/Light.cpp
-  src/Moveable.cpp
-  src/KeyExecutable.cpp
 )
 
 set_property(TARGET ocean-gestalt PROPERTY CXX_STANDARD 17)
@@ -79,9 +63,9 @@ if (EMSCRIPTEN)
 else() # Not Web
 
 
-  add_definitions(-DGLEW_STATIC)
-  add_subdirectory(lib/glfw EXCLUDE_FROM_ALL)
-  add_subdirectory(lib/glew EXCLUDE_FROM_ALL)
+  # add_definitions(-DGLEW_STATIC)
+  # add_subdirectory(lib/glfw EXCLUDE_FROM_ALL)
+  # add_subdirectory(lib/glew EXCLUDE_FROM_ALL)
 
   add_library(civetweb STATIC
     lib/civetweb/src/civetweb.c
@@ -97,9 +81,8 @@ else() # Not Web
   )
 
   target_link_libraries(ocean-gestalt
-    PRIVATE glfw
-    PRIVATE libglew_static
     PRIVATE civetweb
+    PRIVATE app-core
   )
 
   target_include_directories(ocean-gestalt 
@@ -107,8 +90,8 @@ else() # Not Web
   )
 endif()
 
-add_subdirectory(lib/glm)
-target_link_libraries(ocean-gestalt PRIVATE glm)
+# add_subdirectory(lib/glm)
+# target_link_libraries(ocean-gestalt PRIVATE glm)
 
 include(FetchContent)
 
@@ -118,10 +101,11 @@ FetchContent_MakeAvailable(json)
 target_link_libraries(ocean-gestalt PRIVATE nlohmann_json::nlohmann_json)
 
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/asset.hpp.in
-  ${CMAKE_CURRENT_BINARY_DIR}/src/asset.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/core/asset.hpp.in
+  ${CMAKE_CURRENT_BINARY_DIR}/src/core/asset.hpp
 )
+
 target_include_directories(ocean-gestalt
-  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src
+  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/core
+  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/core
 )
