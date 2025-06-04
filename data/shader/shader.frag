@@ -90,11 +90,23 @@ void main() {
 
     // Slope-based foam
     float slope = 1.0 - dot(normal, fs_in.ModelUp);
-    float foamBase = smoothstep(FOAM_SLOPE_MIN, FOAM_SLOPE_MAX, slope);
+    float slopeFoam = smoothstep(FOAM_SLOPE_MIN, FOAM_SLOPE_MAX, slope);
+    float crestFoam = smoothstep(0.0, 0.5, fs_in.FragPos.y); // adjust thresholds for your wave scale
+    float foamMask = slopeFoam * crestFoam * fs_in.FoamModulation;
 
-    float foamMask = foamBase * fs_in.FoamModulation;
-    vec3 foamColor = vec3(1.0) * (FOAM_BRIGHTNESS_BASE + FOAM_BRIGHTNESS_VARIANCE * fs_in.FoamModulation);
+   
+    // float foamBase = smoothstep(FOAM_SLOPE_MIN, FOAM_SLOPE_MAX, slope);
+
+    // float foamMask = foamBase * fs_in.FoamModulation;
+    // vec3 foamColor = vec3(1.0) * (FOAM_BRIGHTNESS_BASE + FOAM_BRIGHTNESS_VARIANCE * fs_in.FoamModulation);
     
+    vec2 foamUV = fs_in.FragPos.xz * 1.5 + vec2(time * 0.2, time * 0.15);  // controls scale and animation
+    float foamNoise = fbm(foamUV);
+    foamNoise = smoothstep(0.4, 1.0, foamNoise);  // optional to shape distribution
+
+    vec3 foamColor = mix(vec3(0.8), vec3(1.0), foamNoise);  // subtle noisy foam
+    foamColor *= (FOAM_BRIGHTNESS_BASE + FOAM_BRIGHTNESS_VARIANCE * fs_in.FoamModulation);
+
     // Caustic flicker in troughs
     float causticStrength = smoothstep(-0.6, 0.1, -fs_in.FragPos.y);
 
@@ -112,16 +124,23 @@ void main() {
     vec3 causticLight = CAUSTIC_COLOUR * causticFlicker * causticMask * causticStrength * CAUSTIC_INTENSITY;
 
     // Combine lighting
-    // vec3 litColor = (ambient + diffuse + specular + causticLight) * shiftedColor;
-    // vec3 finalColor = (ambient + diffuse + specular + causticLight);
-    vec3 baseColor = fs_in.Color * shiftedColor;
-    // shiftedColor = vec3(1.0);
+    // vec3 baseColor = fs_in.Color * shiftedColor;
+    
+    float lightingIntensity = diff + spec + fresnel;
+
     shiftedColor = pow(shiftedColor, vec3(0.45));
+    // shiftedColor = vec3(1.0);
     vec3 finalColor =
     ambient  * shiftedColor +
     diffuse * shiftedColor +
     specular * shiftedColor +            // white or lightly tinted
     causticLight; 
+
+     // or length(ambient + diffuse + specular)
+    lightingIntensity = clamp(lightingIntensity, 0.0, 1.0);
+    float litFoamMask = foamMask * lightingIntensity;
+    finalColor = mix(finalColor, foamColor, litFoamMask);
+
     // Foam blend
     finalColor = mix(finalColor, foamColor, foamMask);
 
