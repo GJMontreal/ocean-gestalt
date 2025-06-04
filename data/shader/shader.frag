@@ -23,19 +23,21 @@ out vec4 FragColor;
 
 // Constants
 const float FOG_DENSITY = 0.01;
-const float AMBIENT_STRENGTH = 0.001;
-const float SPECULAR_STRENGTH = 0.125;
-const float SHININESS = 16.0;
+const float AMBIENT_STRENGTH = 0.9;
+const float SPECULAR_STRENGTH = 0.9;
+const float SHININESS = 8.0;
 
-const float FOAM_SLOPE_MIN = 0.1;
-const float FOAM_SLOPE_MAX = 0.3;
+const float FOAM_SLOPE_MIN = 0.2;
+const float FOAM_SLOPE_MAX = 0.5;
 
-const float CAUSTIC_INTENSITY = 0.125;
+const float CAUSTIC_INTENSITY = 0.425;
 const float CAUSTIC_SCALE = 4.0;
 const float CAUSTIC_SPEED = 0.4;
 
-const float FOAM_BRIGHTNESS_BASE     = 0.4;  // Minimum foam brightness
-const float FOAM_BRIGHTNESS_VARIANCE = 0.2;  // Additional brightness from FBM modulation
+const float FOAM_BRIGHTNESS_BASE     = 0.2;  // Minimum foam brightness
+const float FOAM_BRIGHTNESS_VARIANCE = 0.1;  // Additional brightness from FBM modulation
+
+const vec3 CAUSTIC_COLOUR = vec3(1.0, 0.9, 0.7);
 
 // Hash and FBM
 float hash(vec2 p) {
@@ -93,25 +95,41 @@ void main() {
     float foamMask = foamBase * fs_in.FoamModulation;
     vec3 foamColor = vec3(1.0) * (FOAM_BRIGHTNESS_BASE + FOAM_BRIGHTNESS_VARIANCE * fs_in.FoamModulation);
     
-    // Optional: make foam colour slightly modulated
-    // vec3 foamColor = vec3(1.0) * (0.8 + 0.2 * foamNoise);
-
     // Caustic flicker in troughs
-    float causticStrength = smoothstep(-0.2, 0.2, -fs_in.FragPos.y);
-    float causticFlicker = fbm(fs_in.FragPos.xz * CAUSTIC_SCALE + vec2(time * CAUSTIC_SPEED));
+    float causticStrength = smoothstep(-0.6, 0.1, -fs_in.FragPos.y);
+
+    vec2 flickerUV = vec2(fs_in.FragPos.x * 2.0, fs_in.FragPos.z * 0.75); // stretched FBM domain
+    flickerUV += vec2(time * 0.3, time * 0.1);
+    float causticFlicker = fbm(flickerUV);
+    causticFlicker = smoothstep(0.55, 0.8, causticFlicker);
+
+    float NdotL = max(dot(normalize(fs_in.Normal), normalize(lightPos - fs_in.FragPos)), 0.0);
+    causticFlicker *= NdotL;
+
+    causticFlicker = pow(causticFlicker, 6.0);
+    
     float causticMask = 1.0 - foamMask;
-    vec3 causticLight = vec3(1.0, 0.9, 0.7) * causticFlicker * causticMask * causticStrength * CAUSTIC_INTENSITY;
+    vec3 causticLight = CAUSTIC_COLOUR * causticFlicker * causticMask * causticStrength * CAUSTIC_INTENSITY;
 
     // Combine lighting
-    vec3 litColor = (ambient + diffuse + specular + causticLight) * shiftedColor;
-
+    // vec3 litColor = (ambient + diffuse + specular + causticLight) * shiftedColor;
+    // vec3 finalColor = (ambient + diffuse + specular + causticLight);
+    vec3 baseColor = fs_in.Color * shiftedColor;
+    // shiftedColor = vec3(1.0);
+    shiftedColor = pow(shiftedColor, vec3(0.45));
+    vec3 finalColor =
+    ambient  * shiftedColor +
+    diffuse * shiftedColor +
+    specular * shiftedColor +            // white or lightly tinted
+    causticLight; 
     // Foam blend
-    vec3 finalColor = mix(litColor, foamColor, foamMask);
+    finalColor = mix(finalColor, foamColor, foamMask);
 
     // Fog
     float fogFactor = clamp(exp(-FOG_DENSITY * depth), 0.0, 1.0);
     vec3 fogColor = vec3(0.4, 0.6, 0.7); // sky-ish blue
     vec3 fogged = mix(fogColor, finalColor, fogFactor);
 
-    FragColor = vec4(fogged, 1.0);
+    // FragColor = vec4(fogged, 1.0);
+    FragColor = vec4(finalColor, 1.0);
 }
