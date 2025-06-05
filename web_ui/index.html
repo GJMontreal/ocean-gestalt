@@ -30,27 +30,32 @@
       padding: 0 0.5rem;
     }
 
-    label {
+    .control-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-weight: 500;
-      margin-bottom: 0.75rem;
+      margin-bottom: 1rem;
       gap: 1rem;
+    }
+
+    .control-row label {
+      flex: 1;
+      font-weight: 500;
+    }
+
+    .control-row input[type="range"],
+    .control-row input[type="color"],
+    .control-row input[type="checkbox"] {
+      flex-shrink: 0;
     }
 
     input[type="range"],
     input[type="color"] {
       width: 200px;
-      max-width: 100%;
-      margin-top: 0;
-      flex-shrink: 0;
     }
 
     input[type="checkbox"] {
       transform: scale(1.2);
-      margin-top: 0;
-      flex-shrink: 0;
     }
   </style>
 </head>
