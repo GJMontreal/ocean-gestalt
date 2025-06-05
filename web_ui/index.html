@@ -1,2 +1,62 @@
-<script type="module" src="main.js"></script>
-<div id="controls"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Control Panel</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 2rem;
+      background: #f8f9fa;
+      color: #212529;
+    }
+
+    #controls {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    fieldset {
+      border: 1px solid #dee2e6;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    legend {
+      font-weight: bold;
+      padding: 0 0.5rem;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      gap: 1rem;
+    }
+
+    input[type="range"],
+    input[type="color"] {
+      width: 200px;
+      max-width: 100%;
+      margin-top: 0;
+      flex-shrink: 0;
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.2);
+      margin-top: 0;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Control Panel</h1>
+  <div id="controls"></div>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
