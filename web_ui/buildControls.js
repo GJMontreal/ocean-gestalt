@@ -16,14 +16,25 @@ export function buildControls(tree, path = []) {
     if (isControl(node)) {
       const controlRow = document.createElement("div");
       controlRow.className = "control-row";
+
       const labelEl = document.createElement("label");
       labelEl.textContent = label;
       labelEl.setAttribute("for", fullPath.join("_"));
+
+      
       const control = createControl(label, node, fullPath);
       if (control) {
-        control.id = fullPath.join("_");
+
         controlRow.appendChild(labelEl);
-        controlRow.appendChild(control);
+
+        controlRow.appendChild(control.wrapper);
+
+        const valueElem = document.createElement("span");
+        valueElem.className = "control-value";
+        valueElem.textContent = control.getValue();
+        control.input.oninput = () => valueElem.textContent = control.input.value;
+        controlRow.appendChild(valueElem);
+
         elements.push(controlRow);
       }
     } else if (isGroup(node)) {
@@ -63,32 +74,45 @@ function isGroup(node) {
   );
 }
 
+function createNamedDiv(name) {
+  const spacer = document.createElement("div");
+  spacer.className = name;
+  return spacer;
+}
+
 function createControl(label, node, path) {
   const wrapper = document.createElement("div");
+  wrapper.id = path.join("_");
+
+  let input = null;
+  let getValue = () => "";
 
   switch (node.type) {
     case "bool":
-      const toggle = document.createElement("input");
-      toggle.type = "checkbox";
-      toggle.checked = node.value;
-      wrapper.appendChild(toggle);
+      input = document.createElement("input");
+      input.type = "checkbox";
+      input.checked = node.value;
+      wrapper.appendChild(input);
+      getValue = () => input.checked ? "on" : "off";
       break;
 
     case "float":
-      const slider = document.createElement("input");
-      slider.type = "range";
-      slider.min = node.min ?? 0;
-      slider.max = node.max ?? 1;
-      slider.step = 0.01;
-      slider.value = node.value;
-      wrapper.appendChild(slider);
+      input = document.createElement("input");
+      input.type = "range";
+      input.min = node.min ?? 0;
+      input.max = node.max ?? 1;
+      input.step = 0.01;
+      input.value = node.value;
+      wrapper.appendChild(input);
+      getValue = () => Number(input.value).toFixed(2);
       break;
 
     case "vec4":
-      const color = document.createElement("input");
-      color.type = "color";
-      color.value = rgbToHex(node.value);
-      wrapper.appendChild(color);
+      input = document.createElement("input");
+      input.type = "color";
+      input.value = rgbToHex(node.value);
+      wrapper.appendChild(input);
+      getValue = () => JSON.stringify(hexToVec4(input.value));
       break;
 
     default:
@@ -97,10 +121,22 @@ function createControl(label, node, path) {
       wrapper.appendChild(fallback);
   }
 
-  return wrapper;
+  return {wrapper,input ,getValue };
 }
 
 function rgbToHex(vec4) {
   const [r, g, b] = vec4.map(x => Math.round(x * 255));
   return `#${[r, g, b].map(n => n.toString(16).padStart(2, "0")).join("")}`;
+}
+
+function hexToVec4(hex) {
+  // Strip leading '#' if present
+  hex = hex.replace(/^#/, "");
+
+  // Parse r, g, b components (2 hex chars each)
+  const r = parseInt(hex.slice(0, 2), 16) / 255;
+  const g = parseInt(hex.slice(2, 4), 16) / 255;
+  const b = parseInt(hex.slice(4, 6), 16) / 255;
+
+  return [r, g, b, 1.0];
 }

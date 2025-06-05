@@ -37,7 +37,7 @@
       },
       "base_color": {
         "type": "vec4",
-        "value": [0, 0, 0, 1],
+        "value": [0, 0, 0.4, 1],
         "_meta": {
           "display": "Base Colour",
           "control": "color",

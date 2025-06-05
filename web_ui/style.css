@@ -1,0 +1,61 @@
+body {
+  font-family: sans-serif;
+  background: #f8f9fa;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  padding: 1rem 2rem 0 2rem;
+  font-size: 1.5rem;
+}
+
+#controls {
+  padding: 1rem 2rem;
+}
+
+fieldset {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+}
+
+legend {
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 0 0.5rem;
+}
+
+.control-row {
+  display: grid;
+  grid-template-columns: 150px 1fr 80px;
+  align-items: center;
+  gap: 10px;
+  margin: 0.5rem 0;
+}
+
+label {
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+input[type="range"],
+input[type="color"],
+input[type="checkbox"] {
+  width: 100%;
+  max-width: 100%;
+}
+
+.control-value {
+  text-align: right;
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.control-spacer {
+  display: none; /* no longer needed with grid layout */
+}
+
