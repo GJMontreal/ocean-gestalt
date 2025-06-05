@@ -30,7 +30,7 @@ legend {
 
 .control-row {
   display: grid;
-  grid-template-columns: 150px 1fr 80px;
+  grid-template-columns: 150px 1fr 150px;
   align-items: center;
   gap: 10px;
   margin: 0.5rem 0;

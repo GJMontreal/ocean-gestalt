@@ -32,7 +32,11 @@ export function buildControls(tree, path = []) {
         const valueElem = document.createElement("span");
         valueElem.className = "control-value";
         valueElem.textContent = control.getValue();
-        control.input.oninput = () => valueElem.textContent = control.input.value;
+        control.input.oninput = () => {
+          const newValue = control.getValue();
+          valueElem.textContent = newValue;
+          postUpdate(fullPath, newValue);
+        };
         controlRow.appendChild(valueElem);
 
         elements.push(controlRow);
@@ -134,9 +138,20 @@ function hexToVec4(hex) {
   hex = hex.replace(/^#/, "");
 
   // Parse r, g, b components (2 hex chars each)
-  const r = parseInt(hex.slice(0, 2), 16) / 255;
-  const g = parseInt(hex.slice(2, 4), 16) / 255;
-  const b = parseInt(hex.slice(4, 6), 16) / 255;
+  const r = parseFloat((parseInt(hex.slice(0, 2), 16) / 255).toFixed(2));
+  const g = parseFloat((parseInt(hex.slice(2, 4), 16) / 255).toFixed(2));
+  const b = parseFloat((parseInt(hex.slice(4, 6), 16) / 255).toFixed(2));
 
   return [r, g, b, 1.0];
+}
+
+function postUpdate(path, value) {
+  fetch("/api/update", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      path: path.join("."),  // flatten path array
+      value
+    })
+  }).catch(err => console.error("POST failed:", err));
 }
