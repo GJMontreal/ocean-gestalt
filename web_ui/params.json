@@ -1,64 +1,49 @@
 {
-    "simulation": {
-        "paused": {
-            "type": "bool",
-            "value": false
-        },
-        "wave_speed": {
-            "type": "float",
-            "value": 2.5,
-            "min": 0,
-            "max": 10
-        }
+  "simulation": {
+    "_meta": { "display": "Simulation" },
+    "paused": {
+      "type": "bool",
+      "value": false,
+      "_meta": { "display": "Paused", "control": "toggle" }
     },
-    "shaders": {
-        "mesh": {
-            "display": "Mesh Shader",
-            "uniforms": {
-                "foam_intensity": {
-                    "type": "float",
-                    "value": 0.3,
-                    "min": 0,
-                    "max": 1
-                }
-            }
-        },
-        "wireframe": {
-            "uniforms": {
-                "foam_intensity": {
-                    "type": "float",
-                    "value": 0.3,
-                    "min": 0,
-                    "max": 1,
-                    "display": "Foam Intensity"
-                },
-                "base_color": {
-                    "r": {
-                        "type": "float",
-                        "value": 0,
-                        "min": 0,
-                        "max": 1
-                    },
-                    "g": {
-                        "type": "float",
-                        "value": 0,
-                        "min": 0,
-                        "max": 1
-                    },
-                    "b": {
-                        "type": "float",
-                        "value": 0,
-                        "min": 0,
-                        "max": 1
-                    },
-                    "a": {
-                        "type": "float",
-                        "value": 0,
-                        "min": 0,
-                        "max": 1
-                    }
-                }
-            }
-        }
+    "wave_speed": {
+      "type": "float",
+      "value": 2.5,
+      "min": 0,
+      "max": 10,
+      "_meta": { "display": "Wave Speed", "control": "slider" }
     }
+  },
+  "shaders": {
+    "_meta": { "display": "Shaders" },
+    "mesh": {
+      "_meta": { "display": "Mesh Shader" },
+      "foam_intensity": {
+        "type": "float",
+        "value": 0.3,
+        "min": 0,
+        "max": 1,
+        "_meta": { "display": "Foam Intensity", "control": "slider" }
+      }
+    },
+    "wireframe": {
+      "_meta": { "display": "Wireframe Shader" },
+      "foam_intensity": {
+        "type": "float",
+        "value": 0.3,
+        "min": 0,
+        "max": 1,
+        "_meta": { "display": "Foam Intensity", "control": "slider" }
+      },
+      "base_color": {
+        "type": "vec4",
+        "value": [0, 0, 0, 1],
+        "_meta": {
+          "display": "Base Colour",
+          "control": "color",
+          "range": [0, 1]
+        }
+      }
+    }
+  }
 }

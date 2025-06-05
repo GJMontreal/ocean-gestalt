@@ -1,69 +1,50 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
-import os
+import http.server
+import socketserver
 import json
-import mimetypes
+import os
 
+PORT = 8000
 PARAMS_FILE = "params.json"
-INDEX_FILE = "index.html"
+STATIC_DIR = "."
 
-class Handler(BaseHTTPRequestHandler):
-    def _send_json(self, data, status=200):
-        body = json.dumps(data).encode()
-        self.send_response(status)
-        self.send_header("Content-Type", "application/json")
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
-
-    def _send_file(self, path):
-        try:
-            with open(path, "rb") as f:
-                content = f.read()
-            self.send_response(200)
-            mime, _ = mimetypes.guess_type(path)
-            self.send_header("Content-Type", mime or "application/octet-stream")
-            self.send_header("Content-Length", str(len(content)))
-            self.end_headers()
-            self.wfile.write(content)
-        except FileNotFoundError:
-            self.send_error(404)
-
+class Handler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
-        if self.path == "/params":
-            if not os.path.exists(PARAMS_FILE):
-                self.send_error(500, "params.json not found")
-            else:
-                with open(PARAMS_FILE) as f:
+        if self.path == "/api/params":
+            try:
+                with open(PARAMS_FILE, "r") as f:
                     data = json.load(f)
                 self._send_json(data)
-        elif self.path == "/" or self.path == "/index.html":
-            self._send_file(INDEX_FILE)
+            except Exception as e:
+                self.send_error(500, f"Error reading params: {e}")
         else:
-            # Serve static assets if any
-            rel_path = self.path.lstrip("/")
-            if os.path.exists(rel_path):
-                self._send_file(rel_path)
-            else:
-                self.send_error(404)
+            # Serve static files
+            if self.path == "/":
+                self.path = "/index.html"
+            super().do_GET()
 
-def do_POST(self):
-    if self.path == "/params":
-        length = int(self.headers.get('Content-Length', 0))
-        body = self.rfile.read(length).decode()
+    def do_POST(self):
+        if self.path == "/api/update":
+            length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(length).decode()
 
-        try:
-            data = json.loads(body)
-            print("\n[POST /params] Received update:")
-            print(json.dumps(data, indent=2))
-        except json.JSONDecodeError:
-            print("\n[POST /params] Invalid JSON received:")
-            print(body)
+            try:
+                data = json.loads(body)
+                print("\n[POST /api/update] Received:")
+                print(json.dumps(data, indent=2))
+                self._send_json({"status": "ok"})
+            except json.JSONDecodeError:
+                self.send_error(400, "Invalid JSON")
+        else:
+            self.send_error(404)
 
-        self._send_json({"status": "ok"})
-    else:
-        self.send_error(404)
+    def _send_json(self, data):
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(json.dumps(data).encode())
 
+os.chdir(STATIC_DIR)
 
-if __name__ == "__main__":
-    print("Serving on http://localhost:8080")
-    HTTPServer(('localhost', 8080), Handler).serve_forever()
+with socketserver.TCPServer(("", PORT), Handler) as httpd:
+    print(f"Serving UI at http://localhost:{PORT}")
+    httpd.serve_forever()

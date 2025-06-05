@@ -1,8 +1,2 @@
-<script type="module">
-  import { buildControls } from './controls.js';
-
-  fetch('/api/params')
-    .then(res => res.json())
-    .then(data => buildControls(data))
-    .catch(err => console.error(err));
-</script>
+<script type="module" src="main.js"></script>
+<div id="controls"></div>
