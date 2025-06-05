@@ -116,5 +116,6 @@ build
 .cache
 .vscode
 .venv
-build*
+build
+build_emscripten
 __pycache__
