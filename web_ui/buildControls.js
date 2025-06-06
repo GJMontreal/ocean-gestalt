@@ -1,5 +1,8 @@
 // buildControls.js
-export function buildControls(tree, path = []) {
+
+
+
+export function buildControls(tree, path = [], apiBase) {
   const elements = [];
 
   if (!Array.isArray(path)) {
@@ -35,14 +38,14 @@ export function buildControls(tree, path = []) {
         control.input.oninput = () => {
           const newValue = control.getValue();
           valueElem.textContent = newValue;
-          postUpdate(fullPath, newValue);
+          postUpdate(fullPath, newValue, apiBase);
         };
         controlRow.appendChild(valueElem);
 
         elements.push(controlRow);
       }
     } else if (isGroup(node)) {
-      const children = buildControls(node, fullPath);
+      const children = buildControls(node, fullPath, apiBase);
       if (children.length > 0) {
         const group = document.createElement("fieldset");
         const legend = document.createElement("legend");
@@ -145,8 +148,8 @@ function hexToVec4(hex) {
   return [r, g, b, 1.0];
 }
 
-function postUpdate(path, value) {
-  fetch("/api/update", {
+function postUpdate(path, value, apiBase) {
+  fetch(`${apiBase}/api/update`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
