@@ -1,29 +1,29 @@
-#include "PauseHandler.hpp"
+#include "UpdateHandler.hpp"
 #include <nlohmann/json.hpp>
-#include <string>
+#include <iostream>
 
 using json = nlohmann::json;
 
-bool PauseHandler::handlePost(CivetServer*, struct mg_connection* conn) {
-    char buffer[1024];
+static const int BUFFER_SIZE = 1024;
+
+bool UpdateHandler::handlePost(CivetServer*, struct mg_connection* conn) {
+    char buffer[BUFFER_SIZE];
     int len = mg_read(conn, buffer, sizeof(buffer) - 1);
     buffer[len] = '\0';
 
     try {
         json request = json::parse(buffer);
 
-        if (!request.contains("pause") || !request["pause"].is_boolean()) {
+        // our request must contain
+        if (!request.contains("path")  || !request.contains("value") 
+        || !request["path"].is_string() || !request["value"].is_string()) {
             mg_printf(conn,
-                "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain\r\n\r\nMissing or invalid 'pause' field\n");
+                "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain\r\n\r\nMissing or invalid payload\n");
             return true;
         }
 
-        bool pause = request["pause"];
-        api.pauseSimulation(pause);
-
         json response = {
-            {"status", "ok"},
-            {"paused", pause}
+            {"status", "ok"}
         };
 
         std::string body = response.dump();

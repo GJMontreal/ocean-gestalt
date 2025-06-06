@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma once
-
 #include <CivetServer.h>
 #include "ApiAdapter.hpp"
 
