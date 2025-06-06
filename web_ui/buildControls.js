@@ -34,12 +34,21 @@ export function buildControls(tree, path = [], apiBase) {
 
         const valueElem = document.createElement("span");
         valueElem.className = "control-value";
-        valueElem.textContent = control.getValue();
+ 
         control.input.oninput = () => {
           const newValue = control.getValue();
           valueElem.textContent = newValue;
           postUpdate(fullPath, newValue, apiBase);
         };
+
+        fetch(`${apiBase}/api/${fullPath.join('/')}`)
+          .then(res => res.json())
+          .then(data => {
+            control.setValue(data.value);
+            valueElem.textContent = data.value;
+          })
+          .catch(err => console.error("Failed to load value for", fullPath.join('/'), err));
+
         controlRow.appendChild(valueElem);
 
         elements.push(controlRow);
@@ -93,14 +102,16 @@ function createControl(label, node, path) {
 
   let input = null;
   let getValue = () => "";
+  let setValue = (value) => ""; 
 
   switch (node.type) {
     case "bool":
       input = document.createElement("input");
       input.type = "checkbox";
-      input.checked = node.value;
       wrapper.appendChild(input);
+
       getValue = () => input.checked ? "on" : "off";
+      setValue = (value) =>       input.checked = value;
       break;
 
     case "float":
@@ -109,17 +120,19 @@ function createControl(label, node, path) {
       input.min = node.min ?? 0;
       input.max = node.max ?? 1;
       input.step = 0.01;
-      input.value = node.value;
+      
       wrapper.appendChild(input);
       getValue = () => Number(input.value).toFixed(2);
+      setValue = (value) => input.value = value;
       break;
 
     case "vec4":
       input = document.createElement("input");
       input.type = "color";
-      input.value = rgbToHex(node.value);
+      
       wrapper.appendChild(input);
       getValue = () => JSON.stringify(hexToVec4(input.value));
+      setValue = (value) => input.value = rgbToHex(value);
       break;
 
     default:
@@ -128,7 +141,7 @@ function createControl(label, node, path) {
       wrapper.appendChild(fallback);
   }
 
-  return {wrapper,input ,getValue };
+  return {wrapper, input, getValue, setValue };
 }
 
 function rgbToHex(vec4) {
@@ -149,7 +162,8 @@ function hexToVec4(hex) {
 }
 
 function postUpdate(path, value, apiBase) {
-  fetch(`${apiBase}/api/update`, {
+  const endpoint = path.join("/");
+  fetch(`${apiBase}/api/update/${endpoint}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
