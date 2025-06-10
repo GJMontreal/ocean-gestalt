@@ -9,5 +9,5 @@ class UniformHandler : public PathHandler {
  
 protected:
   std::optional<std::string> handleGet(std::string path) override;
-  bool handlePost(std::string path, std::string value) override;
+  std::optional<std::string> handlePost(std::string path, std::string value) override;
 };

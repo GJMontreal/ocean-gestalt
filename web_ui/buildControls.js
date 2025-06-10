@@ -24,28 +24,27 @@ export function buildControls(tree, path = [], apiBase) {
       labelEl.textContent = label;
       labelEl.setAttribute("for", fullPath.join("_"));
 
-      
-      const control = createControl(label, node, fullPath);
+      const valueElem = document.createElement("span");
+      valueElem.className = "control-value";
+
+      const control = createControl(label, node, fullPath, valueElem);
       if (control) {
 
         controlRow.appendChild(labelEl);
 
         controlRow.appendChild(control.wrapper);
-
-        const valueElem = document.createElement("span");
-        valueElem.className = "control-value";
  
         control.input.oninput = () => {
           const newValue = control.getValue();
           valueElem.textContent = newValue;
-          postUpdate(fullPath, newValue, apiBase);
+          postUpdate(fullPath, newValue, apiBase, control); //we should use the result of the post to update our value
         };
 
         fetch(`${apiBase}/api/${fullPath.join('/')}`)
           .then(res => res.json())
           .then(data => {
             control.setValue(data.value);
-            valueElem.textContent = data.value;
+            // valueElem.textContent = data.value;
           })
           .catch(err => console.error("Failed to load value for", fullPath.join('/'), err));
 
@@ -95,7 +94,7 @@ function createNamedDiv(name) {
   return spacer;
 }
 
-function createControl(label, node, path) {
+function createControl(label, node, path, valueElem) {
   const wrapper = document.createElement("div");
   wrapper.id = path.join("_");
 
@@ -122,7 +121,10 @@ function createControl(label, node, path) {
       
       wrapper.appendChild(input);
       getValue = () => Number(input.value).toFixed(2);
-      setValue = (value) => input.value = value;
+      setValue = (value) => {
+        input.value = value;
+        valueElem.textContent = value;
+      }
       break;
 
     case "vec4":
@@ -160,7 +162,7 @@ function hexToVec4(hex) {
   return [r, g, b, 1.0];
 }
 
-function postUpdate(path, value, apiBase) {
+function postUpdate(path, value, apiBase, control) {
   const endpoint = path.join("/");
   fetch(`${apiBase}/api/${endpoint}`, {
     method: "POST",
@@ -169,5 +171,15 @@ function postUpdate(path, value, apiBase) {
       path: path.join("."),  // flatten path array
       value
     })
-  }).catch(err => console.error("POST failed:", err));
+  })
+    .then(res =>{
+      if (!res.ok) throw new Error(`Server responded with status ${res.status}`);
+      return res.json();
+    })
+    .then(data =>{
+        if (data.value !== undefined) {
+          control.setValue(data.value);
+        }
+    })
+  .catch(err => console.error("POST failed:", err));
 }

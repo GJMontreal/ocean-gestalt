@@ -17,7 +17,7 @@ class PathHandler : public CivetHandler {
   virtual std::optional<std::string> handleGet(std::string path)=0;
  
   bool handlePost(CivetServer*, struct mg_connection* conn) override;
-  virtual bool handlePost(std::string path, std::string value)=0;
+  virtual std::optional<std::string> handlePost(std::string path, std::string value)=0;
 
   std::string getSubPath(const struct mg_request_info* req_info) const;
 
