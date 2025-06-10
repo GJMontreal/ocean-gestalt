@@ -1,12 +1,20 @@
 #include "UniformHandler.hpp"
 
+#include <iostream>
+#include <optional>
+
 template <typename T>
 SetUniformFunc makeUniformSetter(ApiAdapter& api) {
   return
       [&api](const std::string& shader, const std::string& name,
-             const nlohmann::json::value_type& v) -> std::optional<std::any> {
+             const nlohmann::json::value_type& v) -> std::any {
         try {
-          return api.setUniform(shader, name, v.get<T>());
+          auto value = api.setUniform(shader, name, v.get<T>());
+          if(value){
+            return *value;
+          }
+          return std::nullopt;
+          // return api.setUniform(shader, name, v.get<T>());
         } catch (...) {
           return std::nullopt;
         }
@@ -51,7 +59,11 @@ std::optional<std::string> UniformHandler::handlePost(
       }
       if(auto result = handler.apply(uniform->shaderName, uniform->uniformName, value))
       {
-        return anyToJson(*result);
+        auto retval = anyToJson(*result);
+        if(retval){
+          return retval->dump();
+        }
+        return std::nullopt;
       }
     }
   }
@@ -70,7 +82,9 @@ std::optional<UniformKey> UniformHandler::splitPath(const std::string_view& path
   }
 }
 
+// we don't want nlohmann::json here we want a string
 std::optional<nlohmann::json> UniformHandler::anyToJson(const std::any& a) {
+  std::cout << a.type().name() << std::endl;
   if (a.type() == typeid(float)) {
     return nlohmann::json(std::any_cast<float>(a));
   } else if (a.type() == typeid(std::string)) {

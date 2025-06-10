@@ -42,6 +42,11 @@ OceanGestalt::OceanGestalt() : Application() {
 #ifndef __EMSCRIPTEN__
   initUniformBuffers();
 #endif
+
+    // do anything we need to after everything's setup
+    for(auto const& cb : onReadyCallbacks){
+      cb();
+    }
 }
 
 void OceanGestalt::setUIDelegate() {
@@ -233,4 +238,8 @@ void OceanGestalt::updateWaves() const {
   for (Model* model : models) {
     model->updateShaderUniforms();
   }
+}
+
+void OceanGestalt::doOnReady(const std::function<void()>& callback){ 
+  onReadyCallbacks.push_back(callback);
 }

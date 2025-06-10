@@ -1,7 +1,7 @@
 #pragma once
 
 #include <CivetServer.h>
-#include "api/ApiAdapter.hpp"
+#include "ApiAdapter.hpp"
 
 #include "nlohmann/json.hpp"
 

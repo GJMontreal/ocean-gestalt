@@ -5,6 +5,7 @@ project (ocean-gestalt)
 
 add_subdirectory(src/core)
 add_subdirectory(src/rest)
+add_subdirectory(src/api)
 
 # The main executable
 add_executable(ocean-gestalt
@@ -86,6 +87,7 @@ else() # Not Web
   target_link_libraries(ocean-gestalt
     PRIVATE app-core
     PRIVATE app-rest
+    PRIVATE app-api
   )
 
   target_include_directories(ocean-gestalt 

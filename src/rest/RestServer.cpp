@@ -15,6 +15,7 @@ RestServer::RestServer(std::unique_ptr<ApiAdapter>&& api, int port)
 
   std::cout << "Starting api server at " << port << std::endl;
   server = std::make_unique<CivetServer>(options);
+  addHandlers();
 }
 
 void RestServer::addHandlers() {

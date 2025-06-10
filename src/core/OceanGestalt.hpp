@@ -12,8 +12,10 @@
 
 #include "Application.hpp"
 #include "Configuration.hpp"
+#include "ConfigurationInterface.hpp"
 #include "InputProcessor.hpp"
 #include "KeyExecutable.hpp"
+#include "OceanGestaltInterface.hpp"
 #include "Shader.hpp"
 #include "Model.hpp"
 #include "WaveUI.hpp"
@@ -27,12 +29,17 @@ using std::vector;
 
 using glm::mat4;
 
-class OceanGestalt : public Application, public Updatable, public KeyExecutable{
+class OceanGestalt : public OceanGestaltInterface,
+                     public Application,
+                     public Updatable,
+                     public KeyExecutable {
  public:
   OceanGestalt();
- 
+
   void toggleSimulation();
-  Configuration& getConfiguration(){ return *configuration; };
+
+  ConfigurationInterface& getConfiguration() override { return *configuration; };
+  void doOnReady(const std::function<void()>& callback) override;
  protected:
   void setUIDelegate() override;
   void loop() override;
@@ -71,6 +78,8 @@ class OceanGestalt : public Application, public Updatable, public KeyExecutable{
   void setUniformBuffers(mat4& projection, mat4& view) const;
   
   void updateWaves() const;
+
+  std::vector<std::function<void()>> onReadyCallbacks;
 };
 
 #endif

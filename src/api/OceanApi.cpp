@@ -3,15 +3,24 @@
 #include <cstddef>
 #include <iostream>
 #include <string>
-#include "OceanGestalt.hpp"
-#include "Configuration.hpp"
 
-OceanApi::OceanApi(std::shared_ptr<OceanGestalt> app) : app(app) {}
+#include "ConfigurationInterface.hpp"
+#include "OceanGestaltInterface.hpp"
+
+OceanApi::OceanApi(std::shared_ptr<OceanGestaltInterface> app) : app(app) {
+  // TODO: this might be a good time to build a map of our uniforms
+  // though I suppose it depends on when things are instantiated
+  // I could see all of this here happening well before the shaders are compiled
+}
+
+void OceanApi::setupShaderNormalInterface(){
+  std::cout << "Setting up shader normals" << std::endl;
+}
 
 void OceanApi::pauseSimulation(bool pause) {
   std::cout << "pause " << pause << std::endl;
   // we can call into the app to do whatever we need to
-  app->toggleSimulation();
+  // app->toggleSimulation();
 }
 
 void OceanApi::updateSimulation(std::string path, std::string value) {
@@ -26,11 +35,11 @@ std::optional<std::string> OceanApi::setUniform(std::string shaderName,
   return std::string(value);
 }
 
-std::optional<std::string> OceanApi::setUniform(std::string shaderName,
+std::optional<float> OceanApi::setUniform(std::string shaderName,
                                                 std::string uniformName,
                                                 float value) {
   // the first part of the path will be the mesh to which this applies
-  return std::string("0.23");
+  return 0.23;
 }
 
 std::optional<std::string> OceanApi::setUniform(std::string shaderName,
@@ -41,7 +50,7 @@ std::optional<std::string> OceanApi::setUniform(std::string shaderName,
 
 std::optional<std::string> OceanApi::getUniform(std::string shaderName, std::string uniformName) {
   auto configuration = app->getConfiguration();
-  shared_ptr<ShaderProgram> program; 
+  std::shared_ptr<ShaderProgram> program; 
   if(shaderName == "mesh"){
     program = configuration.meshShader;
   }else if (shaderName == "wireframe"){

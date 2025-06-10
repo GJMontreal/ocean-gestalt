@@ -5,6 +5,7 @@
 #include "Camera.hpp"
 #include "Light.hpp"
 #include "Shader.hpp"
+#include "ConfigurationInterface.hpp"
 
 #include <memory.h>
 #include <nlohmann/json.hpp>
@@ -18,7 +19,7 @@ using std::vector;
 using std::string;
 
 
-class Configuration {
+class Configuration: public ConfigurationInterface {
  public:
   explicit Configuration(const string& environment, 
     const string& shader, 
@@ -31,9 +32,9 @@ class Configuration {
   
   shared_ptr<Light> light;
 
-  shared_ptr<ShaderProgram> meshShader;  
-  shared_ptr<ShaderProgram> wireframeShader;
-  shared_ptr<ShaderProgram> normalShader;
+  // shared_ptr<ShaderProgram> meshShader;  
+  // shared_ptr<ShaderProgram> wireframeShader;
+  // shared_ptr<ShaderProgram> normalShader;
   
   int meshSize;
   int meshSubdivisions;

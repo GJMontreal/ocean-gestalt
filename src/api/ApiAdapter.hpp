@@ -12,7 +12,7 @@ public:
     virtual std::optional<std::string> setUniform(std::string shaderName,
                                                   std::string uniformName,
                                                   std::string value) = 0;
-    virtual std::optional<std::string> setUniform(std::string shaderName,
+    virtual std::optional<float> setUniform(std::string shaderName,
                                                   std::string uniformName,
                                                   float value) = 0;
     virtual std::optional<std::string> setUniform(std::string shaderName,

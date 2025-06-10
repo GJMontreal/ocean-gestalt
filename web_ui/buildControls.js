@@ -120,10 +120,10 @@ function createControl(label, node, path, valueElem) {
       input.step = 0.01;
       
       wrapper.appendChild(input);
-      getValue = () => Number(input.value).toFixed(2);
+      getValue = () => Number(input.value);
       setValue = (value) => {
         input.value = value;
-        valueElem.textContent = value;
+        valueElem.textContent = value.toFixed(2);
       }
       break;
 
