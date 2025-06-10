@@ -10,8 +10,7 @@ struct JsonTypeHandler {
   SetUniformFunc apply;
 };
 
-
-struct UniformParts{
+struct UniformKey{
   std::string shaderName;
   std::string uniformName;
 };
@@ -31,5 +30,5 @@ class UniformHandler : public PathHandler {
 
     // utilities
     std::optional<nlohmann::json> anyToJson(const std::any& a);
-    std::optional<UniformParts> splitPath(const std::string_view& path);
+    std::optional<UniformKey> splitPath(const std::string_view& path);
 };

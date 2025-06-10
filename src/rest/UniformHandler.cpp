@@ -1,23 +1,5 @@
 #include "UniformHandler.hpp"
 
-#include <iostream>
-#include <optional>
-#include <vector>
-#include "nlohmann/json.hpp"
-
-using json = nlohmann::json;
-
-std::optional<nlohmann::json> UniformHandler::anyToJson(const std::any& a) {
-  if (a.type() == typeid(float)) {
-    return nlohmann::json(std::any_cast<float>(a));
-  } else if (a.type() == typeid(std::string)) {
-    return nlohmann::json(std::any_cast<std::string>(a));
-  } else if (a.type() == typeid(std::vector<float>)) {
-    return nlohmann::json(std::any_cast<std::vector<float>>(a));
-  }
-  return std::nullopt;
-}
-
 template <typename T>
 SetUniformFunc makeUniformSetter(ApiAdapter& api) {
   return
@@ -33,7 +15,6 @@ SetUniformFunc makeUniformSetter(ApiAdapter& api) {
 
 UniformHandler::UniformHandler(ApiAdapter& api) : PathHandler(api) {
   handlers = {
-
       {[](auto& v) { return v.is_number_float(); },
        makeUniformSetter<float>(api)},
 
@@ -77,14 +58,25 @@ std::optional<std::string> UniformHandler::handlePost(
   return std::nullopt;
 }
 
-std::optional<UniformParts> UniformHandler::splitPath(const std::string_view& path) {
+std::optional<UniformKey> UniformHandler::splitPath(const std::string_view& path) {
   size_t pos = path.find('/');
   if (pos != std::string::npos) {
-    UniformParts uniform;
+    UniformKey uniform;
     uniform.shaderName = path.substr(0, pos);
     uniform.uniformName = path.substr(pos + 1);
     return uniform;
   } else {
     return std::nullopt;
   }
+}
+
+std::optional<nlohmann::json> UniformHandler::anyToJson(const std::any& a) {
+  if (a.type() == typeid(float)) {
+    return nlohmann::json(std::any_cast<float>(a));
+  } else if (a.type() == typeid(std::string)) {
+    return nlohmann::json(std::any_cast<std::string>(a));
+  } else if (a.type() == typeid(std::vector<float>)) {
+    return nlohmann::json(std::any_cast<std::vector<float>>(a));
+  }
+  return std::nullopt;
 }
