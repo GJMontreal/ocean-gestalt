@@ -3,9 +3,9 @@
 #include "Configuration.hpp"
 #include "Ocean.hpp"
 #include "Uniforms.hpp"
+#include "WaveGenerator.hpp"
 #include "asset.hpp"
 #include "glError.hpp"
-#include "WaveGenerator.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -22,20 +22,19 @@ using std::cout;
 using std::endl;
 
 // our application should keep a reference to the OceanApi
-OceanGestalt::OceanGestalt()
-    : Application()
-{
-  auto config = std::make_shared<Configuration>(CONFIGURATION_DIR "environment.json",
-  CONFIGURATION_DIR "shader.json",CONFIGURATION_DIR "generator.json");
-  this->camera = config->camera; 
+OceanGestalt::OceanGestalt() : Application() {
+  auto config = std::make_shared<Configuration>(
+      CONFIGURATION_DIR "environment.json", CONFIGURATION_DIR "shader.json",
+      CONFIGURATION_DIR "generator.json", CONFIGURATION_DIR "api.json");
+  this->camera = config->camera;
   this->moveable = this->camera;
   this->light = config->light;
-  
+
   configuration = config;
   models.push_back(new Ocean(config));
-  
+
   waveUI = unique_ptr<WaveUI>(new WaveUI(config->waves));
-  
+
   glEnable(GL_BLEND);
   // glBlendFunc(GL_ONE, GL_ONE);  // Not certain what our blend mode should be?
 
@@ -49,8 +48,8 @@ void OceanGestalt::setUIDelegate() {
   waveUI->updatable = weak_from_this();
 }
 
-void OceanGestalt::loop() {  
-  if(wavesNeedUpdate){
+void OceanGestalt::loop() {
+  if (wavesNeedUpdate) {
     wavesNeedUpdate = false;
     updateWaves();
   }
@@ -62,17 +61,18 @@ void OceanGestalt::loop() {
                                 getWindowRatio(), 0.1f, 100.f);
 
   view = camera->GetViewMatrix();
-  
+
   Uniforms uniforms{.projection = projection, .view = view};
 
 #ifndef __EMSCRIPTEN__
- setUniformBuffers(projection, view);
+  setUniformBuffers(projection, view);
 #endif
 
   // clear
   glClear(GL_COLOR_BUFFER_BIT);
   // glClearColor(0.0, 0.0, 0.0, 0.0);
-  glClearColor(0.0f, 0.05f, 0.1f, 1.0f); //we should set this in the environment
+  glClearColor(0.0f, 0.05f, 0.1f,
+               1.0f);  // we should set this in the environment
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   for (Model* model : models) {
     model->draw(uniforms);
@@ -91,7 +91,7 @@ void OceanGestalt::initUniformBuffers() {
   glCheckError(__FILE__, __LINE__);
 }
 
-void OceanGestalt::setUniformBuffers(mat4& projection, mat4& view) const{
+void OceanGestalt::setUniformBuffers(mat4& projection, mat4& view) const {
   glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
   glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
                   glm::value_ptr(projection));
@@ -142,13 +142,20 @@ void OceanGestalt::toggleDrawLines() {
   }
 }
 
+void OceanGestalt::dumpUniforms() {
+  std::cout << "wireframe shader uniforms" << std::endl;
+  configuration->wireframeShader->listUniforms();
+  std::cout << "mesh shader uniforms" << std::endl;
+  configuration->meshShader->listUniforms();
+}
+
 void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
-  
+
   // TODO:
   // moveable->processInput(window, deltaTime);
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
     moveable->ProcessKeyboard(Movement::FORWARD, deltaTime);
   }
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -174,65 +181,55 @@ void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
     }
   });
 
-  executeIfPressed(window, GLFW_KEY_N, [this](){
-    toggleNormalDisplay();
-  });
+  executeIfPressed(window, GLFW_KEY_N, [this]() { toggleNormalDisplay(); });
 
-  executeIfPressed(window, GLFW_KEY_P, [this](){
-    toggleSimulation();
-  });
+  executeIfPressed(window, GLFW_KEY_P, [this]() { toggleSimulation(); });
 
-  executeIfPressed(window, GLFW_KEY_M, [this](){
-    toggleMesh();
-  });
+  executeIfPressed(window, GLFW_KEY_M, [this]() { toggleMesh(); });
 
-  executeIfPressed(window, GLFW_KEY_J, [this](){
-    toggleDrawTriangles();
-  });
-    
-  executeIfPressed(window, GLFW_KEY_K, [this](){
-    toggleDrawLines();
-  });
+  executeIfPressed(window, GLFW_KEY_J, [this]() { toggleDrawTriangles(); });
 
-  executeIfPressed(window, GLFW_KEY_L, [this](){
-    toggleWireframe();
-  });
+  executeIfPressed(window, GLFW_KEY_K, [this]() { toggleDrawLines(); });
+
+  executeIfPressed(window, GLFW_KEY_L, [this]() { toggleWireframe(); });
+
+  executeIfPressed(window, GLFW_KEY_B, [this](){ dumpUniforms(); });
 
   executeIfPressed(window, GLFW_KEY_O, [this]() {
     configuration->save(CONFIGURATION_DIR "/output.json");
   });
 
-  executeIfPressed(window, GLFW_KEY_R, [this](){
+  executeIfPressed(window, GLFW_KEY_R, [this]() {
     WaveGenerator(configuration->waves, configuration->stdDeviation,
-                    configuration->medianWavelength,
-                    configuration->medianAmplitude);
-      wavesNeedUpdate = true;
+                  configuration->medianWavelength,
+                  configuration->medianAmplitude);
+    wavesNeedUpdate = true;
   });
 
 #ifndef __EMSCRIPTEN__
-  executeIfPressed(window, GLFW_KEY_F, [this, window](){
-    toggleFullscreen(window);
-  });
+  executeIfPressed(window, GLFW_KEY_F,
+                   [this, window]() { toggleFullscreen(window); });
 #endif
 }
 
-void OceanGestalt::toggleFullscreen(GLFWwindow* window){
+void OceanGestalt::toggleFullscreen(GLFWwindow* window) {
   GLFWmonitor* monitor = glfwGetWindowMonitor(window);
-  if(monitor == nullptr){
-    //save position and size
+  if (monitor == nullptr) {
+    // save position and size
     glfwGetWindowPos(window, &windowXPos, &windowYPos);
-    glfwGetWindowSize(window,&windowWidth, &windowHeight);
+    glfwGetWindowSize(window, &windowWidth, &windowHeight);
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     monitor = glfwGetPrimaryMonitor();
-  }else{
+  } else {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     monitor = nullptr;
   }
-  glfwSetWindowMonitor(window, monitor, windowXPos, windowYPos, windowWidth, windowHeight, GLFW_DONT_CARE );
+  glfwSetWindowMonitor(window, monitor, windowXPos, windowYPos, windowWidth,
+                       windowHeight, GLFW_DONT_CARE);
 }
 
-void OceanGestalt::updateWaves() const{
+void OceanGestalt::updateWaves() const {
   for (Model* model : models) {
     model->updateShaderUniforms();
   }

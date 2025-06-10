@@ -5,13 +5,15 @@ cmake_policy(VERSION 3.5)
 add_library(app-rest STATIC
   RestServer.cpp
   PauseHandler.cpp
+  # /handler/ApiDescriptionHandler.cpp    
+  PathHandler.cpp
+  UniformHandler.cpp
 )
 
 set_property(TARGET app-rest PROPERTY CXX_STANDARD 17)
 
 target_include_directories(app-rest
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-  PRIVATE ${CMAKE_SOURCE_DIR}/src/core/api
   PRIVATE ${CMAKE_SOURCE_DIR}/src/core/
 )
 

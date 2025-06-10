@@ -79,6 +79,9 @@ class ShaderProgram {
   void setUniform(const std::string& name, float val);
   void setUniform(const std::string& name, int val);
 
+  void listUniforms() const;
+  std::optional<std::string> getUniform(const std::string& name) const;
+
   ~ShaderProgram();
 
  private:

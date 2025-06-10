@@ -8,7 +8,7 @@
 
 #include "OceanGestalt.hpp"
 #include "RestServer.hpp"
-#include "OceanApi.hpp"
+#include "api/OceanApi.hpp"
 
 #include <memory>
 

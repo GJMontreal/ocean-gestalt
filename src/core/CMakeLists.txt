@@ -33,6 +33,6 @@ target_link_libraries(app-core
 
 target_include_directories(app-core 
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
-  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/api
+  # PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/api
   PRIVATE ${CMAKE_BINARY_DIR}/src/core
 )

@@ -32,6 +32,7 @@ class OceanGestalt : public Application, public Updatable, public KeyExecutable{
   OceanGestalt();
  
   void toggleSimulation();
+  Configuration& getConfiguration(){ return *configuration; };
  protected:
   void setUIDelegate() override;
   void loop() override;
@@ -62,6 +63,7 @@ class OceanGestalt : public Application, public Updatable, public KeyExecutable{
   void toggleMesh();
   void toggleDrawTriangles();
   void toggleDrawLines();
+  void dumpUniforms();
 
   void toggleFullscreen(GLFWwindow*);
 

@@ -8,6 +8,10 @@ PARAMS_FILE = "params.json"
 STATIC_DIR = "."
 
 class Handler(http.server.SimpleHTTPRequestHandler):
+    def end_headers(self):
+        self.send_header("Access-Control-Allow-Origin", "*")
+        super().end_headers()
+
     def do_GET(self):
         if self.path == "/api/params":
             try:

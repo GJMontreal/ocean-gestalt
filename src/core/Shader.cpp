@@ -102,7 +102,6 @@ ShaderProgram::ShaderProgram(std::initializer_list<Shader> shaderList)
     : ShaderProgram() {
   for (auto& s : shaderList)
     glAttachShader(handle, s.getHandle());
-
   link();
 }
 
@@ -228,6 +227,27 @@ void ShaderProgram::setUniform(const std::string& name, int val) {
   glUniform1i(uniform(name), val);
 }
 
+void ShaderProgram::listUniforms() const {
+  GLint count;
+  glGetProgramiv(handle, GL_ACTIVE_UNIFORMS, &count);
+
+  for (GLint i = 0; i < count; ++i) {
+    char name[256];
+    GLsizei length;
+    GLint size;
+    GLenum type;
+
+    glGetActiveUniform(handle, i, sizeof(name), &length, &size, &type, name);
+
+    GLint location = glGetUniformLocation(handle, name);
+    std::cout << "Uniform: " << name << " (type: " << type
+              << ", location: " << location << ")" << std::endl;
+  }
+}
+
+std::optional<std::string> ShaderProgram::getUniform(const std::string& name) const{
+  return std::string("0.35"); // till we get this working
+}
 ShaderProgram::~ShaderProgram() {
   // glDeleteProgram(handle);
 }

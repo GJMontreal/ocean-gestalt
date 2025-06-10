@@ -4,7 +4,7 @@
 #include <memory>
 
 #include <CivetServer.h>
-#include "ApiAdapter.hpp"
+#include "api/ApiAdapter.hpp"
 
 class RestServer{
   public:

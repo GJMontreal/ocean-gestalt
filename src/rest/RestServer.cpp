@@ -1,7 +1,9 @@
 #include "RestServer.hpp"
 #include "PauseHandler.hpp"
+#include "UniformHandler.hpp"
 
 #include <string>
+#include <iostream>
 
 RestServer::RestServer(std::unique_ptr<ApiAdapter>&& api, int port)
     : api(std::move(api)) {
@@ -10,9 +12,13 @@ RestServer::RestServer(std::unique_ptr<ApiAdapter>&& api, int port)
         "listening_ports",portString.c_str(),
         nullptr
     };
+
+  std::cout << "Starting api server at " << port << std::endl;
   server = std::make_unique<CivetServer>(options);
 }
 
 void RestServer::addHandlers() {
-  server->addHandler("/pause", new PauseHandler(*api));
+  server->addHandler(PauseHandler::uri(), new PauseHandler(*api));
+  auto uniformHandler = new UniformHandler(*api);
+  server->addHandler(uniformHandler->uri(), uniformHandler);
 }

@@ -76,8 +76,7 @@ function isControl(node) {
     typeof node === "object" &&
     node !== null &&
     !Array.isArray(node) &&
-    "type" in node &&
-    "value" in node
+    "type" in node 
   );
 }
 
@@ -163,7 +162,7 @@ function hexToVec4(hex) {
 
 function postUpdate(path, value, apiBase) {
   const endpoint = path.join("/");
-  fetch(`${apiBase}/api/update/${endpoint}`, {
+  fetch(`${apiBase}/api/${endpoint}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
