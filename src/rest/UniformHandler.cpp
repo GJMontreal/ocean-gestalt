@@ -2,21 +2,33 @@
 
 #include <iostream>
 #include <optional>
-#include "nlohmann/json.hpp"
 #include <vector>
+#include "nlohmann/json.hpp"
 
 using json = nlohmann::json;
-typedef struct {
-  std::string shaderName;
-  std::string uniformName;
-} Uniform_t;
+
+std::optional<nlohmann::json> UniformHandler::anyToJson(const std::any& a) {
+  if (a.type() == typeid(float)) {
+    return nlohmann::json(std::any_cast<float>(a));
+  } else if (a.type() == typeid(std::string)) {
+    return nlohmann::json(std::any_cast<std::string>(a));
+  } else if (a.type() == typeid(std::vector<float>)) {
+    return nlohmann::json(std::any_cast<std::vector<float>>(a));
+  }
+  return std::nullopt;
+}
 
 template <typename T>
 SetUniformFunc makeUniformSetter(ApiAdapter& api) {
-  return [&api](const std::string& shader, const std::string& name,
-                const nlohmann::json::value_type& v) {
-    return api.setUniform(shader, name, v.get<T>());
-  };
+  return
+      [&api](const std::string& shader, const std::string& name,
+             const nlohmann::json::value_type& v) -> std::optional<std::any> {
+        try {
+          return api.setUniform(shader, name, v.get<T>());
+        } catch (...) {
+          return std::nullopt;
+        }
+      };
 }
 
 UniformHandler::UniformHandler(ApiAdapter& api) : PathHandler(api) {
@@ -39,42 +51,40 @@ UniformHandler::UniformHandler(ApiAdapter& api) : PathHandler(api) {
   };
 }
 
-static std::optional<Uniform_t> splitPath(std::string path){
-      size_t pos = path.find('/');
-        if (pos != std::string::npos) {
-          Uniform_t uniform;
-          uniform.shaderName = path.substr(0, pos);
-          uniform.uniformName = path.substr(pos + 1);
-          return uniform;
-        } else {
-            return std::nullopt;
-          }
-    }
+std::optional<std::string> UniformHandler::handleGet(const std::string& path) {
+  if (auto uniform = splitPath(path)) {
+    return api.getUniform(uniform->shaderName, uniform->uniformName);
+  } else {
+    return std::nullopt;
+  }
+}
 
-    std::optional<std::string> UniformHandler::handleGet(std::string path) {
-        //the first part of our path should be the shadername
-        size_t pos = path.find('/');
-        if (pos != std::string::npos) {
-          std::string shaderName = path.substr(0, pos);
-          std::string uniform = path.substr(pos + 1);
-          return api.getUniform(shaderName, uniform);
-        }else{
-          return std::nullopt;
-        }
-    }
+std::optional<std::string> UniformHandler::handlePost(
+    const std::string& path,
+    nlohmann::json::value_type value) {
+  if (auto uniform = splitPath(path)) {
 
-    std::optional<std::string> UniformHandler::handlePost(
-        std::string path,
-        nlohmann::json::value_type value) {
-      if (auto uniform = splitPath(path)) {
-        auto uniformName = uniform->uniformName;
-        auto shaderName = uniform->shaderName;
-
-        for (const auto& handler : handlers) {
-          if (handler.match(value)) {
-            return handler.apply(shaderName, uniformName, value);
-          }
-        }
+    for (const auto& handler : handlers) {
+      if (!handler.match(value)) {
+        continue;
       }
-      return std::nullopt;
+      if(auto result = handler.apply(uniform->shaderName, uniform->uniformName, value))
+      {
+        return anyToJson(*result);
+      }
     }
+  }
+  return std::nullopt;
+}
+
+std::optional<UniformParts> UniformHandler::splitPath(const std::string_view& path) {
+  size_t pos = path.find('/');
+  if (pos != std::string::npos) {
+    UniformParts uniform;
+    uniform.shaderName = path.substr(0, pos);
+    uniform.uniformName = path.substr(pos + 1);
+    return uniform;
+  } else {
+    return std::nullopt;
+  }
+}
