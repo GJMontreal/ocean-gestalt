@@ -1,6 +1,5 @@
 #include "PathHandler.hpp"
 
-#include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
 static const int BUFFER_SIZE = 1024;
@@ -42,6 +41,7 @@ std::string PathHandler::getSubPath(
 bool PathHandler::handleGet(CivetServer* server, struct mg_connection* conn) {
   const struct mg_request_info* req_info = mg_get_request_info(conn);
 
+  // TODO: use our refactored subfunction
   auto subPath = getSubPath(req_info);
   auto result = handleGet(subPath);
   if (result) {
@@ -76,7 +76,7 @@ bool PathHandler::handlePost(CivetServer* server, struct mg_connection* conn) {
     }
 
     auto value = request["value"];
-
+    
     auto result = handlePost(subPath, value);
     if (result) {
       std::string returnValue = *result;
