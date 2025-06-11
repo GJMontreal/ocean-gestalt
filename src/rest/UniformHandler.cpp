@@ -20,17 +20,32 @@ SetUniformFunc makeUniformSetter(ApiAdapter& api) {
       };
 }
 
+template <typename T>
+ReturnFunc makeReturnFunc(){
+  return [](std::any value){
+     return nlohmann::json(std::any_cast<T>(value));
+  };
+}
+
 UniformHandler::UniformHandler(ApiAdapter& api) : PathHandler(api) {
   handlers = {
       {[](auto& v) { return v.is_number_float(); },
-       makeUniformSetter<float>(api),{"float"}},
+       makeUniformSetter<float>(api),
+       makeReturnFunc<float>(),
+       {"float"}},
       {[](auto& v) {
          return v.is_array();},
-       makeUniformSetter<std::vector<float>>(api),{"vector"}},
+       makeUniformSetter<std::vector<float> >(api),
+       makeReturnFunc<std::vector<float> >(),
+       {"vector"}},
       {[](auto& v) { return v.is_string(); },
-       makeUniformSetter<std::string>(api),{"string"}},
+       makeUniformSetter<std::string>(api),
+       makeReturnFunc<std::string>(),
+       {"string"}},
        {[](auto& v) { return v.is_boolean(); },
-       makeUniformSetter<bool>(api),{"boolean"}}
+       makeUniformSetter<bool>(api),
+       makeReturnFunc<bool>(),
+       {"boolean"}}
       // Add more types as needed
   };
 }
@@ -54,7 +69,7 @@ std::optional<std::string> UniformHandler::handlePost(
       }
       if(auto result = handler.apply(uniform->shaderName, uniform->uniformName, value))
       {
-        auto retval = anyToJson(*result);
+        auto retval = handler.returnValue(*result);
         if(retval){
           return retval->dump();  // return a stringified JSON
         }
@@ -75,17 +90,4 @@ std::optional<UniformKey> UniformHandler::splitPath(const std::string_view& path
   } else {
     return std::nullopt;
   }
-}
-
-std::optional<nlohmann::json> UniformHandler::anyToJson(const std::any& a) {
-  if (a.type() == typeid(float)) {
-    return nlohmann::json(std::any_cast<float>(a));
-  } else if (a.type() == typeid(std::string)) {
-    return nlohmann::json(std::any_cast<std::string>(a));
-  } else if (a.type() == typeid(std::vector<float>)) {
-    return nlohmann::json(std::any_cast<std::vector<float>>(a));
-  } else if (a.type() == typeid(bool)){
-    return nlohmann::json(std::any_cast<bool>(a));
-  }
-  return std::nullopt;
 }

@@ -5,10 +5,13 @@
 using SetUniformFunc = std::function<std::optional<std::any>(
     const std::string&, const std::string&, const nlohmann::json::value_type&)>;
 
+using ReturnFunc = std::function<std::optional<nlohmann::json> (const std::any&)>;
+
 struct JsonTypeHandler {
   std::function<bool(const nlohmann::json::value_type&)> match;
   SetUniformFunc apply;
-  std::string handlerName;
+  ReturnFunc returnValue;
+  std::string handlerName;  //purely for simplifying debugging
 };
 
 struct UniformKey{
@@ -30,6 +33,5 @@ class UniformHandler : public PathHandler {
     std::vector<JsonTypeHandler> handlers;
 
     // utilities
-    std::optional<nlohmann::json> anyToJson(const std::any& a);
     std::optional<UniformKey> splitPath(const std::string_view& path);
 };
