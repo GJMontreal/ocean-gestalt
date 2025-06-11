@@ -42,10 +42,10 @@ std::optional<float> OceanApi::setUniform(std::string shaderName,
   return 0.23;
 }
 
-std::optional<std::string> OceanApi::setUniform(std::string shaderName,
+std::optional<std::vector<float> > OceanApi::setUniform(std::string shaderName,
                                                 std::string uniformName,
                                                 std::vector<float> const) {
-  return std::string(".12");
+  return std::vector<float>({0.1,0.3,0.4,1.0});
 }
 
 std::optional<std::string> OceanApi::getUniform(std::string shaderName, std::string uniformName) {

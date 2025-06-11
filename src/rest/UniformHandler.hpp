@@ -8,6 +8,7 @@ using SetUniformFunc = std::function<std::optional<std::any>(
 struct JsonTypeHandler {
   std::function<bool(const nlohmann::json::value_type&)> match;
   SetUniformFunc apply;
+  std::string handlerName;
 };
 
 struct UniformKey{

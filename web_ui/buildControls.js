@@ -36,15 +36,14 @@ export function buildControls(tree, path = [], apiBase) {
  
         control.input.oninput = () => {
           const newValue = control.getValue();
-          valueElem.textContent = newValue;
-          postUpdate(fullPath, newValue, apiBase, control); //we should use the result of the post to update our value
+          // valueElem.textContent = newValue;
+          postUpdate(fullPath, newValue, apiBase, control); 
         };
 
         fetch(`${apiBase}/api/${fullPath.join('/')}`)
           .then(res => res.json())
           .then(data => {
             control.setValue(data.value);
-            // valueElem.textContent = data.value;
           })
           .catch(err => console.error("Failed to load value for", fullPath.join('/'), err));
 
@@ -108,8 +107,11 @@ function createControl(label, node, path, valueElem) {
       input.type = "checkbox";
       wrapper.appendChild(input);
 
-      getValue = () => input.checked ? "on" : "off";
-      setValue = (value) =>       input.checked = value;
+      getValue = () => input.checked;
+      setValue = (value) => {
+        input.checked = value;
+        valueElem.textContent = value;
+      }
       break;
 
     case "float":
@@ -130,10 +132,12 @@ function createControl(label, node, path, valueElem) {
     case "vec4":
       input = document.createElement("input");
       input.type = "color";
-      
       wrapper.appendChild(input);
-      getValue = () => JSON.stringify(hexToVec4(input.value));
-      setValue = (value) => input.value = rgbToHex(value);
+      getValue = () => hexToVec4(input.value);
+      setValue = (value) => {
+        input.value = rgbToHex(value);
+        valueElem.textContent = `[${value.map(v => v.toFixed(2)).join(",")}]`;
+      }
       break;
 
     default:

@@ -23,7 +23,7 @@ public:
                                         std::string uniformName,
                                         float value) override;
                                         
-  std::optional<std::string> setUniform(std::string shaderName,
+  std::optional<std::vector<float> > setUniform(std::string shaderName,
                                         std::string uniformName,
                                         std::vector<float> const) override;
 
