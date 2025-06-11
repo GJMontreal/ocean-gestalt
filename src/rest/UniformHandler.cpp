@@ -84,6 +84,8 @@ std::optional<nlohmann::json> UniformHandler::anyToJson(const std::any& a) {
     return nlohmann::json(std::any_cast<std::string>(a));
   } else if (a.type() == typeid(std::vector<float>)) {
     return nlohmann::json(std::any_cast<std::vector<float>>(a));
+  } else if (a.type() == typeid(bool)){
+    return nlohmann::json(std::any_cast<bool>(a));
   }
   return std::nullopt;
 }
