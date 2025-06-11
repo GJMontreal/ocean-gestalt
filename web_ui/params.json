@@ -38,6 +38,10 @@
           "control": "color",
           "range": [0, 1]
         }
+      },
+      "normals": {
+      "type": "bool",
+      "_meta": { "display": "Show Normals", "control": "toggle" }
       }
     }
   }
