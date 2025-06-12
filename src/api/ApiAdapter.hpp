@@ -6,7 +6,7 @@
 #include <variant>
 #include <typeinfo>
 
-using UniformValue = std::variant< std::monostate, bool, int, float,
+using UniformValue = std::variant< bool, int, float,
       unsigned int, std::vector<float>, std::string >;
 
 class ApiAdapter {

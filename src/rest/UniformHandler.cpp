@@ -73,11 +73,12 @@ std::optional<std::string> UniformHandler::handlePost(
       }
       if(auto result = handler.apply(uniform->shaderName, uniform->uniformName, value))
       {
-        auto retval = handler.returnValue(*result);
-        if(retval){
-          return retval->dump();  // return a stringified JSON
-        }
-        return std::nullopt;
+        return std::visit([](auto&& val) -> std::string{return nlohmann::json(val).dump();},*result);
+        // auto retval = handler.returnValue(*result);
+        // if(retval){
+        //   return retval->dump();  // return a stringified JSON
+        // }
+        // return std::nullopt;
       }
     }
   }

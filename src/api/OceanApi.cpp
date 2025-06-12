@@ -15,10 +15,10 @@ OceanApi::OceanApi(OceanGestaltInterface& app) : app(app) {
   // do we have access to the shader programs
 
   
-  auto wireframe = std::make_unique<UniformInspector>(*(app.getConfiguration().wireframeShader));
-  auto mesh = std::make_unique<UniformInspector>(*(app.getConfiguration().meshShader));
-  shaderUniforms["mesh"] = std::move(mesh);
-  shaderUniforms["wireframe"] = std::move(wireframe); 
+  // auto wireframe = std::make_unique<UniformInspector>(*(app.getConfiguration().wireframeShader));
+  // auto mesh = std::make_unique<UniformInspector>(*(app.getConfiguration().meshShader));
+  // shaderUniforms["mesh"] = std::move(mesh);
+  // shaderUniforms["wireframe"] = std::move(wireframe); 
 }
 
 void OceanApi::setupShaderNormalInterface(){

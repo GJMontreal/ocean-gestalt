@@ -1,7 +1,9 @@
 # Projects Settings
-cmake_minimum_required (VERSION 3.5)
-cmake_policy(VERSION 3.5)
+cmake_minimum_required (VERSION 3.5...4.0)
+cmake_policy(VERSION 4.0)
 project (ocean-gestalt)
+
+# cspell: disable
 
 add_subdirectory(src/core)
 add_subdirectory(src/rest)
@@ -12,9 +14,11 @@ add_executable(ocean-gestalt
   src/main.cpp
 )
 
+target_compile_features(ocean-gestalt PRIVATE cxx_std_17)
+target_compile_options(ocean-gestalt PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-std=c++17>)
+
 set_property(TARGET ocean-gestalt PROPERTY CXX_STANDARD 17)
 add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
-
 
 if (EMSCRIPTEN)
   target_link_libraries(ocean-gestalt PUBLIC "-s MIN_WEBGL_VERSION=2")
@@ -112,6 +116,6 @@ configure_file(
 )
 
 target_include_directories(ocean-gestalt
-  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/core
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/core
+  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/core/include
+  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/core/
 )
