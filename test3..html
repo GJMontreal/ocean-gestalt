@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Functional Direction Knob</title>
+  <style>
+    canvas {
+      border: 1px solid #ccc;
+      display: block;
+      margin: 2em auto;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="direction-knob" width="100" height="100"></canvas>
+
+<script>
+(function() {
+  const canvas = document.getElementById("direction-knob");
+  const ctx = canvas.getContext("2d");
+  const radius = canvas.width / 2 - 20;
+  const center = { x: canvas.width / 2, y: canvas.height / 2 };
+
+  // Pure function: pointer coords -> angle in radians (0 = north, clockwise+)
+  function computeAngleFromPointer(x, y) {
+    const dx = x - center.x;
+    const dy = y - center.y;
+    let angle = Math.atan2(dy, dx) // -PI < angle < PI 
+    return angle;
+  }
+
+  function fromCompass(angle){
+    return angle - Math.PI / 2;  
+  }
+
+  function toCompass(angle){
+   angle =  (angle + Math.PI / 2) ;
+   if (angle < 0) angle = (Math.PI/2 + angle) + (3 * Math.PI / 2);  // yes weird
+   return angle;
+  }
+
+  // Pure function: draw knob at given angle
+  function drawKnob(angle) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Outer ring
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, radius, 0, 2 * Math.PI);
+    ctx.strokeStyle = "#888";
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    // Knob position
+    const knobX = center.x + radius * Math.cos(angle);
+    const knobY = center.y + radius * Math.sin(angle);
+
+    ctx.beginPath();
+    ctx.arc(knobX, knobY, 10, 0, 2 * Math.PI);
+    ctx.fillStyle = "#3498db";
+    ctx.fill();
+
+    // Arrow in knob
+    const triangleSize = 6;
+    const angles = [
+      angle,
+      angle + (2 * Math.PI / 3),
+      angle - (2 * Math.PI / 3)
+    ];
+    ctx.beginPath();
+    angles.forEach((a, i) => {
+      const x = knobX + triangleSize * Math.cos(a);
+      const y = knobY + triangleSize * Math.sin(a);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.closePath();
+    ctx.fillStyle = "#fff";
+    ctx.fill();
+
+    // Angle label in degrees
+    console.log(toCompass(angle));
+    let degrees = ((toCompass(angle) * 180 / Math.PI) ); 
+    //if (degrees < 0) degrees += 360; // this needs to move inside our toCompass function 
+    ctx.font = "16px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "#000";
+    ctx.fillText(`${degrees.toFixed(0)}°`, center.x, center.y);
+  }
+
+  // Handles input and draws updated state
+  function handlePointer(x, y) {
+    const angle = computeAngleFromPointer(x, y);
+    drawKnob(angle);
+    return angle;
+  }
+
+  // Pointer events
+  canvas.addEventListener("pointerdown", e => {
+    canvas.setPointerCapture(e.pointerId);
+    handlePointer(e.offsetX, e.offsetY);
+  });
+
+  canvas.addEventListener("pointermove", e => {
+    if (e.buttons > 0) {
+      handlePointer(e.offsetX, e.offsetY);
+    }
+  });
+
+  // Initial render
+  angle = fromCompass(0);
+  drawKnob(angle);
+})();
+</script>
+
+</body>
+</html>
