@@ -30,20 +30,16 @@ UniformHandler::UniformHandler(ApiAdapter& api) : PathHandler(api) {
   handlers = {
       {[](auto& v) { return v.is_number_float(); },
        makeUniformSetter<float>(api),
-       makeReturnFunc<float>(),
        {"float"}},
       {[](auto& v) {
          return v.is_array();},
        makeUniformSetter<std::vector<float> >(api),
-       makeReturnFunc<std::vector<float> >(),
        {"vector"}},
       {[](auto& v) { return v.is_string(); },
        makeUniformSetter<std::string>(api),
-       makeReturnFunc<std::string>(),
        {"string"}},
        {[](auto& v) { return v.is_boolean(); },
        makeUniformSetter<bool>(api),
-       makeReturnFunc<bool>(),
        {"boolean"}}
       // Add more types as needed
   };
@@ -74,11 +70,6 @@ std::optional<std::string> UniformHandler::handlePost(
       if(auto result = handler.apply(uniform->shaderName, uniform->uniformName, value))
       {
         return std::visit([](auto&& val) -> std::string{return nlohmann::json(val).dump();},*result);
-        // auto retval = handler.returnValue(*result);
-        // if(retval){
-        //   return retval->dump();  // return a stringified JSON
-        // }
-        // return std::nullopt;
       }
     }
   }

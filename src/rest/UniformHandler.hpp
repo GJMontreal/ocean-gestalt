@@ -11,7 +11,6 @@ using ReturnFunc = std::function<std::optional<nlohmann::json> (const std::any&)
 struct JsonTypeHandler {
   std::function<bool(const nlohmann::json::value_type&)> match;
   SetUniformFunc apply;
-  ReturnFunc returnValue;
   std::string handlerName;  //purely for simplifying debugging
 };
 
