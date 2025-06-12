@@ -1,8 +1,9 @@
 #pragma once
 
 #include "PathHandler.hpp"
+#include "ApiAdapter.hpp"
 
-using SetUniformFunc = std::function<std::optional<std::any>(
+using SetUniformFunc = std::function<std::optional<UniformValue>(
     const std::string&, const std::string&, const nlohmann::json::value_type&)>;
 
 using ReturnFunc = std::function<std::optional<nlohmann::json> (const std::any&)>;

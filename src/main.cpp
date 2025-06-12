@@ -14,7 +14,7 @@
 
 int main(int argc, const char* argv[]) {
   auto app = std::make_shared<OceanGestalt>();
-  auto api = std::make_unique<OceanApi>(app);
+  auto api = std::make_unique<OceanApi>(*app);
   // app->doOnReady([&api]{api->setupShaderNormalInterface();});
   auto server = std::make_unique<RestServer>(std::move(api));
   server->addHandlers(); // why does this have to explicit

@@ -1,6 +1,8 @@
 # core/CMakeLists.txt
-cmake_minimum_required (VERSION 3.5)
-cmake_policy(VERSION 3.5)
+cmake_minimum_required (VERSION 3.5...4.0)
+cmake_policy(VERSION 4.0)
+
+# cspell: disable
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -27,6 +29,8 @@ add_library(app-core STATIC
 )
 
 set_property(TARGET app-core PROPERTY CXX_STANDARD 17)
+target_compile_features(app-core PRIVATE cxx_std_17)
+target_compile_options(app-core PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-std=c++17>)
 
 target_link_libraries(app-core
   PRIVATE glfw
@@ -39,5 +43,5 @@ target_link_libraries(app-core
 target_include_directories(app-core 
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
   PRIVATE ${CMAKE_BINARY_DIR}/src/core
-  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )

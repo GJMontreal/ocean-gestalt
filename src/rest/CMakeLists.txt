@@ -1,6 +1,8 @@
 # rest/CMakeLists.txt
-cmake_minimum_required (VERSION 3.5)
-cmake_policy(VERSION 3.5)
+cmake_minimum_required (VERSION 3.5...4.0)
+cmake_policy(VERSION 4.0)
+
+# cspell: disable
 
 add_library(app-rest STATIC
   RestServer.cpp
@@ -10,6 +12,8 @@ add_library(app-rest STATIC
 )
 
 set_property(TARGET app-rest PROPERTY CXX_STANDARD 17)
+target_compile_features(app-rest PRIVATE cxx_std_17)
+target_compile_options(app-rest PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-std=c++17>)
 
 target_include_directories(app-rest
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}

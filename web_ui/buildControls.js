@@ -93,6 +93,8 @@ function createNamedDiv(name) {
   return spacer;
 }
 
+// right now we're driving
+// 
 function createControl(label, node, path, valueElem) {
   const wrapper = document.createElement("div");
   wrapper.id = path.join("_");
@@ -100,6 +102,30 @@ function createControl(label, node, path, valueElem) {
   let input = null;
   let getValue = () => "";
   let setValue = (value) => ""; 
+
+  if (node._meta?.control === "directionKnob") {
+    const wrapper = document.createElement("div");
+    wrapper.style.width = "150px";
+    wrapper.style.height = "150px";
+
+    const input = document.createElement("div");
+    wrapper.appendChild(input);
+
+    const knob = new VanillaKnob(input, {
+      angleArc: 360,
+      angleOffset: 0,
+      min: 0,
+      max: 360,
+      value: 0,
+      thickness: 0.3,
+      displayInput: true,
+    });
+
+    const getValue = () => knob.val();
+    const setValue = (v) => knob.val(Number(v));
+
+    return { wrapper, input: knob, getValue, setValue };
+  }
 
   switch (node.type) {
     case "bool":

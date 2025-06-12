@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ConfigurationInterface.hpp"
-
 class OceanGestaltInterface{
   public:
     virtual ConfigurationInterface& getConfiguration() = 0;

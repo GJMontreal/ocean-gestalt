@@ -1,13 +1,12 @@
 #include "UniformHandler.hpp"
 
-#include <iostream>
 #include <optional>
 
 template <typename T>
 SetUniformFunc makeUniformSetter(ApiAdapter& api) {
   return
       [&api](const std::string& shader, const std::string& name,
-             const nlohmann::json::value_type& v) -> std::optional<std::any> {
+             const nlohmann::json::value_type& v) -> std::optional<UniformValue> {
         try {
           auto value = api.setUniform(shader, name, v.get<T>());
           if(value){
@@ -52,10 +51,15 @@ UniformHandler::UniformHandler(ApiAdapter& api) : PathHandler(api) {
 
 std::optional<std::string> UniformHandler::handleGet(const std::string& path) {
   if (auto uniform = splitPath(path)) {
-    return api.getUniform(uniform->shaderName, uniform->uniformName);
-  } else {
-    return std::nullopt;
+    // we'll have to do something similar here
+    // getUniform should return std::optional<std::any>
+    auto retval = api.getUniform(uniform->shaderName, uniform->uniformName);
+    if(!retval){
+      return std::nullopt;
+    }
+    return std::string("");
   }
+  return std::nullopt;
 }
 
 std::optional<std::string> UniformHandler::handlePost(
