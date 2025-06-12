@@ -3,14 +3,12 @@
 #include "PathHandler.hpp"
 #include "ApiAdapter.hpp"
 
-using SetUniformFunc = std::function<std::optional<UniformValue>(
-    const std::string&, const std::string&, const nlohmann::json::value_type&)>;
-
-using ReturnFunc = std::function<std::optional<nlohmann::json> (const std::any&)>;
+using ApplyFunc = std::function<UniformValue(nlohmann::json::value_type&)>;
+using MatchFunc = std::function<bool(const nlohmann::json::value_type&)>;
 
 struct JsonTypeHandler {
-  std::function<bool(const nlohmann::json::value_type&)> match;
-  SetUniformFunc apply;
+  MatchFunc match;
+  ApplyFunc apply;
   std::string handlerName;  //purely for simplifying debugging
 };
 

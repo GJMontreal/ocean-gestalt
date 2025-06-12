@@ -3,43 +3,27 @@
 #include <optional>
 
 template <typename T>
-SetUniformFunc makeUniformSetter(ApiAdapter& api) {
-  return
-      [&api](const std::string& shader, const std::string& name,
-             const nlohmann::json::value_type& v) -> std::optional<UniformValue> {
-        try {
-          auto value = api.setUniform(shader, name, v.get<T>());
-          if(value){
-            return *value;
-          }
-          return std::nullopt;
-        } catch (...) {
-          return std::nullopt;
-        }
-      };
-}
-
-template <typename T>
-ReturnFunc makeReturnFunc(){
-  return [](std::any value){
-     return nlohmann::json(std::any_cast<T>(value));
+ApplyFunc makeApplyFunc(){
+  return 
+  [](const nlohmann::json::value_type& v)->UniformValue{
+    return v.get<T>();
   };
 }
 
 UniformHandler::UniformHandler(ApiAdapter& api) : PathHandler(api) {
   handlers = {
       {[](auto& v) { return v.is_number_float(); },
-       makeUniformSetter<float>(api),
+       makeApplyFunc<float>(),
        {"float"}},
       {[](auto& v) {
          return v.is_array();},
-       makeUniformSetter<std::vector<float> >(api),
+       makeApplyFunc<std::vector<float> >(),
        {"vector"}},
       {[](auto& v) { return v.is_string(); },
-       makeUniformSetter<std::string>(api),
+       makeApplyFunc<std::string>(),
        {"string"}},
        {[](auto& v) { return v.is_boolean(); },
-       makeUniformSetter<bool>(api),
+       makeApplyFunc<bool>(),
        {"boolean"}}
       // Add more types as needed
   };
@@ -67,7 +51,7 @@ std::optional<std::string> UniformHandler::handlePost(
       if (!handler.match(value)) {
         continue;
       }
-      if(auto result = handler.apply(uniform->shaderName, uniform->uniformName, value))
+      if(auto result = api.setUniform(uniform->shaderName,uniform->shaderName, handler.apply(value)))
       {
         return std::visit([](auto&& val) -> std::string{return nlohmann::json(val).dump();},*result);
       }
