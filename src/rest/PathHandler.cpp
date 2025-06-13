@@ -31,8 +31,7 @@ void PathHandler::writeCORSHeaders(struct mg_connection* conn,
 std::string PathHandler::getSubPath(
     const struct mg_request_info* req_info) const {
   std::string fullPath = req_info->local_uri;
-  //let's instead use the value of path inside the request, it will give us more flexibility
-  // Strip prefix
+
   const std::string prefix(uri());
   std::string subPath = fullPath.substr(prefix.length() - 1);
   return subPath;
@@ -68,16 +67,17 @@ bool PathHandler::handlePost(CivetServer* server, struct mg_connection* conn) {
     json request = json::parse(buffer);
 
     // we should probably verify that "value" is a valid type as well
-    if (!request.contains("value")) {
+    if (!request.contains("value") || !request.contains("path")) {
       mg_printf(conn,
                 "HTTP/1.1 400 Bad Request\r\nContent-Type: "
-                "text/plain\r\n\r\nMissing or invalid value\n");
+                "text/plain\r\n\r\nMissing or invalid json\n");
       return false;
     }
 
     auto value = request["value"];
+    auto path = request["path"];
     
-    auto result = handlePost(subPath, value);
+    auto result = handlePost(path, value);
     if (result) {
       std::string returnValue = *result;
       writeCORSHeaders(conn);

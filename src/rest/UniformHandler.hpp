@@ -2,7 +2,6 @@
 
 #include "PathHandler.hpp"
 #include "ApiAdapter.hpp"
-#include "UniformValue.hpp"
 
 using ApplyFunc = std::function<UniformValue(nlohmann::json::value_type&)>;
 using MatchFunc = std::function<bool(const nlohmann::json::value_type&)>;

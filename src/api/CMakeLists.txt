@@ -4,7 +4,9 @@ cmake_policy(VERSION 4.0)
 # cspell: disable
 
 add_library(app-api STATIC
+  clangd_headers.cpp
   OceanApi.cpp
+  PathHandler.cpp
   UniformState.cpp
 )
 

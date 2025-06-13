@@ -2,6 +2,7 @@
 
 #include "AppContextInterface.hpp"
 #include "UniformValue.hpp"
+#include "ApiValue.hpp"
 
 #include <future>
 #include <map>

@@ -2,21 +2,23 @@
 
 #include "ApiAdapter.hpp"
 #include "UniformState.hpp"
-
+#include "PathHandler.hpp"
 #include <optional>
+
 
 class OceanGestaltInterface;
 class OceanApi : public ApiAdapter {
 public:
-  OceanApi(OceanGestaltInterface& app, UniformState& state) :
-  app(app), uniformState(state){};
+  OceanApi(OceanGestaltInterface& app, UniformState& state);
 
   void setupShaderNormalInterface();
 
   void pauseSimulation(bool pause) override;
   void updateSimulation(std::string path, std::string value) override;
   
-  virtual std::optional<UniformValue> setUniform(const std::string& shaderName,
+  std::optional<ApiValue> setValue(const std::string& path, ApiValue& value) override;
+  
+  std::optional<UniformValue> setUniform(const std::string& shaderName,
                                   const std::string& uniformName,
                                   UniformValue value) override;
   
@@ -24,7 +26,11 @@ public:
 
   void renderThreadCallback();
   
+  protected:
+    std::vector<std::string> splitPath(const std::string& input, char delimiter = '.');
   private:
   OceanGestaltInterface& app;
   UniformState& uniformState;
+
+  std::vector<std::unique_ptr<PathHandler>> pathHandlers;
 };

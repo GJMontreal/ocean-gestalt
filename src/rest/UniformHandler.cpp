@@ -5,7 +5,7 @@
 template <typename T>
 ApplyFunc makeApplyFunc(){
   return 
-  [](const nlohmann::json::value_type& v)->UniformValue{
+  [](const nlohmann::json::value_type& v)->ApiValue{
     return v.get<T>();
   };
 }
@@ -43,18 +43,13 @@ std::optional<std::string> UniformHandler::handleGet(const std::string& path) {
 std::optional<std::string> UniformHandler::handlePost(
     const std::string& path,
     nlohmann::json::value_type value) {
-  std::optional<UniformKey> uniformKey;
-  if (!(uniformKey = splitPath(path))) {
-    return std::nullopt;
-  }
 
   for (const auto& handler : handlers) {
     if (!handler.match(value)) {
       continue;
     }
-    UniformValue parsed = handler.apply(value);
-    if (auto result = api.setUniform(uniformKey->shaderName,
-                                     uniformKey->uniformName, parsed)) {
+    ApiValue parsed = handler.apply(value);
+    if (auto result = api.setValue(path, parsed)) {
       return std::visit(
           [](auto&& val) -> std::string { return nlohmann::json(val).dump(); },
           *result);

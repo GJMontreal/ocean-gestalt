@@ -5,6 +5,10 @@
 // Minimal no-op adapter since UniformHandler needs a reference
 class DummyApi : public ApiAdapter {
 public:
+  std::optional<ApiValue> setValue(const std::string&, ApiValue&) override {
+    return std::nullopt;
+  }
+  
   std::optional<UniformValue> setUniform(const std::string&, const std::string&, UniformValue) override {
     return std::nullopt;
   }
