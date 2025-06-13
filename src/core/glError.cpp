@@ -14,10 +14,12 @@
 
 using namespace std;
 
-void glCheckError(const char* file, unsigned int line) {
+bool glCheckError(const char* file, unsigned int line) {
+  bool error = false;
   GLenum errorCode = glGetError();
 
   while (errorCode != GL_NO_ERROR) {
+    error = true;
     string fileString(file);
     string error = "unknown error";
 
@@ -36,4 +38,5 @@ void glCheckError(const char* file, unsigned int line) {
          << " error:" << error << endl;
     errorCode = glGetError();
   }
+  return error;
 }

@@ -11,8 +11,9 @@
 
 // Ask Opengl for errors:
 // Result is printed on the standard output
+// returns true if there was an error
 // usage :
 //      glCheckError(__FILE__,__LINE__);
-void glCheckError(const char* file, unsigned int line);
+bool glCheckError(const char* file, unsigned int line);
 
 #endif  // OPENGL_CMAKE_SKELETON_GLERROR_HPP

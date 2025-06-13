@@ -3,14 +3,17 @@
 #include "AppContextInterface.hpp"
 #include "UniformValue.hpp"
 
-#include <optional>
+#include <future>
 #include <map>
+#include <optional>
+
 
 // TODO: we should change this to use a path for the uniform 
 struct PendingUniformUpdate {
     std::string shader;
     std::string uniform;
     UniformValue value;
+    std::promise<bool> ack;
 };
 
 class UniformState{
