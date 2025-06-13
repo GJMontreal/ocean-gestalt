@@ -58,6 +58,11 @@ void OceanGestalt::loop() {
     wavesNeedUpdate = false;
     updateWaves();
   }
+
+  for(auto const& cb : renderThreadCallbacks){
+      cb();
+  }
+
   // exit on window close button pressed
   if (glfwWindowShouldClose(getWindow()))
     exit();
@@ -117,6 +122,11 @@ void OceanGestalt::toggleSimulation() {
   for (Model* model : models) {
     model->toggleRunning();
   }
+
+  configuration->wireframeShader->activate();
+  auto color = glm::vec4(0.5,0.5,0.5,1.0);
+  configuration->wireframeShader->setUniform("lineColor",color);
+  configuration->wireframeShader->deactivate();
 }
 
 void OceanGestalt::toggleWireframe() {
@@ -243,3 +253,11 @@ void OceanGestalt::updateWaves() const {
 void OceanGestalt::doOnReady(const std::function<void()>& callback){ 
   onReadyCallbacks.push_back(callback);
 }
+
+void OceanGestalt::onRender(const std::function<void()>& callback){
+  renderThreadCallbacks.push_back(callback);
+}
+
+void OceanGestalt::pauseSimulation(bool){
+  toggleSimulation();
+} 

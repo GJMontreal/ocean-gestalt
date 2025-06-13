@@ -33,6 +33,7 @@ void WaveUI::processInput(GLFWwindow* window, float deltaTime) {
     });
   }
 
+  // TODO: use our api for this
   bool updateUniforms = false;
   updateUniforms = adjustAmplitude(window, deltaTime);
   updateUniforms = updateUniforms || adjustDirection(window, deltaTime);

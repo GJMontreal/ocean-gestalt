@@ -14,13 +14,13 @@ bool PauseHandler::handlePost(CivetServer*, struct mg_connection* conn) {
     try {
         json request = json::parse(buffer);
 
-        if (!request.contains("pause") || !request["pause"].is_boolean()) {
+        if (!request.contains("value") || !request["value"].is_boolean()) {
             mg_printf(conn,
                 "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain\r\n\r\nMissing or invalid 'pause' field\n");
             return true;
         }
 
-        bool pause = request["pause"];
+        bool pause = request["value"];
         api.pauseSimulation(pause);
 
         json response = {

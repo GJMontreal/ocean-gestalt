@@ -1,48 +1,121 @@
-{"port":8080,
-  "simulation": {
-    "_meta": { "display": "Simulation" },
-    "paused": {
-      "type": "bool",
-      "_meta": { "display": "Paused", "control": "toggle" }
-    },
-    "wave_speed": {
-      "type": "float",
-      "min": 0,
-      "max": 10,
-      "_meta": { "display": "Wave Speed", "control": "slider" }
-    }
-  },
-  "uniforms": {
-    "_meta": { "display": "Shaders" },
-    "mesh": {
-      "_meta": { "display": "Mesh Shader" },
-      "foam_intensity": {
-        "type": "float",
-        "min": 0,
-        "max": 1,
-        "_meta": { "display": "Foam Intensity", "control": "slider" }
-      }
-    },
-    "wireframe": {
-      "_meta": { "display": "Wireframe Shader" },
-      "foam_intensity": {
-        "type": "float",
-        "min": 0,
-        "max": 1,
-        "_meta": { "display": "Foam Intensity", "control": "slider" }
-      },
-      "base_color": {
-        "type": "vec4",
+{
+    "port": 8080,
+    "simulation": {
         "_meta": {
-          "display": "Base Colour",
-          "control": "color",
-          "range": [0, 1]
+            "display": "Simulation"
+        },
+        "pause": {
+            "type": "bool",
+            "_meta": {
+                "display": "Paused",
+                "control": "toggle"
+            }
+        },
+        "wave_speed": {
+            "type": "float",
+            "min": 0,
+            "max": 10,
+            "_meta": {
+                "display": "Wave Speed",
+                "control": "slider"
+            }
         }
-      },
-      "normals": {
-      "type": "bool",
-      "_meta": { "display": "Show Normals", "control": "toggle" }
-      }
+    },
+    "waves": {
+        "_meta": {
+            "display": "Waves"
+        },
+        "wave[0]": {
+            "_meta": {
+                "display": "0"
+            },
+            "amplitude": {
+                "type": "float",
+                "min": 0,
+                "max": 40,
+                "_meta": {
+                    "display": "Amplitude",
+                    "control": "slider"
+                }
+            },
+            "direction": {
+                "type": "float",
+                "min": 0,
+                "max": 3600,
+                "_meta": {
+                    "display": "Direction",
+                    "control": "slider"
+                }
+            },
+            "steepness": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Steepness",
+                    "control": "slider"
+                }
+            },
+            "wavelength": {
+                "type": "float",
+                "min": 0,
+                "max": 3600,
+                "_meta": {
+                    "display": "Wavelength",
+                    "control": "slider"
+                }
+            }
+        }
+    },
+    "uniforms": {
+        "_meta": {
+            "display": "Shaders"
+        },
+        "mesh": {
+            "_meta": {
+                "display": "Mesh Shader"
+            },
+            "foam_intensity": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Foam Intensity",
+                    "control": "slider"
+                }
+            }
+        },
+        "wireframe": {
+            "_meta": {
+                "display": "Wireframe Shader"
+            },
+            "foam_intensity": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Foam Intensity",
+                    "control": "slider"
+                }
+            },
+            "lineColor": {
+                "type": "vec4",
+                "_meta": {
+                    "display": "Line Colour",
+                    "control": "color",
+                    "range": [
+                        0,
+                        1
+                    ]
+                }
+            },
+            "normals": {
+                "type": "bool",
+                "_meta": {
+                    "display": "Show Normals",
+                    "control": "toggle"
+                }
+            }
+        }
     }
-  }
 }

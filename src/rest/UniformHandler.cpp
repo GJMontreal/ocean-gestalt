@@ -18,7 +18,7 @@ UniformHandler::UniformHandler(ApiAdapter& api) : PathHandler(api) {
       {[](auto& v) {
          return v.is_array();},
        makeApplyFunc<std::vector<float> >(),
-       {"vector"}},
+       {"vector<float>"}},
       {[](auto& v) { return v.is_string(); },
        makeApplyFunc<std::string>(),
        {"string"}},
@@ -31,8 +31,6 @@ UniformHandler::UniformHandler(ApiAdapter& api) : PathHandler(api) {
 
 std::optional<std::string> UniformHandler::handleGet(const std::string& path) {
   if (auto uniform = splitPath(path)) {
-    // we'll have to do something similar here
-    // getUniform should return std::optional<std::any>
     auto retval = api.getUniform(uniform->shaderName, uniform->uniformName);
     if(!retval){
       return std::nullopt;
@@ -45,16 +43,21 @@ std::optional<std::string> UniformHandler::handleGet(const std::string& path) {
 std::optional<std::string> UniformHandler::handlePost(
     const std::string& path,
     nlohmann::json::value_type value) {
-  if (auto uniform = splitPath(path)) {
+  std::optional<UniformKey> uniformKey;
+  if (!(uniformKey = splitPath(path))) {
+    return std::nullopt;
+  }
 
-    for (const auto& handler : handlers) {
-      if (!handler.match(value)) {
-        continue;
-      }
-      if(auto result = api.setUniform(uniform->shaderName,uniform->shaderName, handler.apply(value)))
-      {
-        return std::visit([](auto&& val) -> std::string{return nlohmann::json(val).dump();},*result);
-      }
+  for (const auto& handler : handlers) {
+    if (!handler.match(value)) {
+      continue;
+    }
+    UniformValue parsed = handler.apply(value);
+    if (auto result = api.setUniform(uniformKey->shaderName,
+                                     uniformKey->uniformName, parsed)) {
+      return std::visit(
+          [](auto&& val) -> std::string { return nlohmann::json(val).dump(); },
+          *result);
     }
   }
   return std::nullopt;

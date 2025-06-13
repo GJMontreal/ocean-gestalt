@@ -5,7 +5,7 @@
 #include "Camera.hpp"
 #include "Light.hpp"
 #include "Shader.hpp"
-#include "ConfigurationInterface.hpp"
+#include "AppContextInterface.hpp"
 
 #include <memory.h>
 #include <nlohmann/json.hpp>
@@ -19,7 +19,7 @@ using std::vector;
 using std::string;
 
 
-class Configuration: public ConfigurationInterface {
+class Configuration: public AppContextInterface {
  public:
   explicit Configuration(const string& environment, 
     const string& shader, 
@@ -32,6 +32,7 @@ class Configuration: public ConfigurationInterface {
   
   shared_ptr<Light> light;
 
+  // where do these live now? in AppContext?
   // shared_ptr<ShaderProgram> meshShader;  
   // shared_ptr<ShaderProgram> wireframeShader;
   // shared_ptr<ShaderProgram> normalShader;
@@ -44,6 +45,7 @@ class Configuration: public ConfigurationInterface {
   float directionalVariance;
   float stdDeviation;
   
+  //TODO: these are normals - so they will move to UniformState
   vec4 meshColor;
   vec4 wireframeColor;
   vec4 normalColor;

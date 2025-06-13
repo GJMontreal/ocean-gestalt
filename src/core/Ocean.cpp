@@ -34,11 +34,12 @@ Model(aConfiguration){
   std::cout << "Constructing ocean" << std::endl;
 }
 
+
+// TODO: maybe deprecate this in favour of our api?
 void Ocean::updateShaderUniforms(){
   setWaveUniforms(configuration->waves,configuration->meshShader);
   setWaveUniforms(configuration->waves,configuration->wireframeShader); 
   configuration->wireframeShader->setUniform("lineColor",configuration->wireframeColor);
-  
   #ifndef __EMSCRIPTEN__
   setWaveUniforms(configuration->waves,configuration->normalShader);
   configuration->wireframeShader->setUniform("lineColor",configuration->normalColor);

@@ -2,6 +2,7 @@
 
 #include "PathHandler.hpp"
 #include "ApiAdapter.hpp"
+#include "UniformValue.hpp"
 
 using ApplyFunc = std::function<UniformValue(nlohmann::json::value_type&)>;
 using MatchFunc = std::function<bool(const nlohmann::json::value_type&)>;
@@ -16,6 +17,7 @@ struct UniformKey{
   std::string shaderName;
   std::string uniformName;
 };
+
 class UniformHandler : public PathHandler {
  public:
  
@@ -27,9 +29,9 @@ class UniformHandler : public PathHandler {
   std::optional<std::string> handlePost(const std::string& path,
                                         nlohmann::json::value_type) override;
 
+  // utilities
+  std::optional<UniformKey> splitPath(const std::string_view& path);
+  
   private:
     std::vector<JsonTypeHandler> handlers;
-
-    // utilities
-    std::optional<UniformKey> splitPath(const std::string_view& path);
 };

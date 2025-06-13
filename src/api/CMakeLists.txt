@@ -5,7 +5,7 @@ cmake_policy(VERSION 4.0)
 
 add_library(app-api STATIC
   OceanApi.cpp
-  UniformInfo.cpp
+  UniformState.cpp
 )
 
 set_property(TARGET app-api PROPERTY CXX_STANDARD 17)

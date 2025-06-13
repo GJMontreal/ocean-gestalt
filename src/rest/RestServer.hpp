@@ -8,14 +8,14 @@
 
 class RestServer{
   public:
-  RestServer(std::unique_ptr<ApiAdapter>&& api, int port = 8080);
+  RestServer(std::shared_ptr<ApiAdapter>&& api, int port = 8080);
   ~RestServer() = default;
 
   void addHandlers();
 
 private:
   std::unique_ptr<CivetServer> server;
-  std::unique_ptr<ApiAdapter> api;
+  std::shared_ptr<ApiAdapter> api;
 };
 
 

@@ -12,7 +12,7 @@
 
 #include "Application.hpp"
 #include "Configuration.hpp"
-#include "ConfigurationInterface.hpp"
+#include "AppContextInterface.hpp"
 #include "InputProcessor.hpp"
 #include "KeyExecutable.hpp"
 #include "OceanGestaltInterface.hpp"
@@ -38,8 +38,11 @@ class OceanGestalt : public OceanGestaltInterface,
 
   void toggleSimulation();
 
-  ConfigurationInterface& getConfiguration() override { return *configuration; };
+  AppContextInterface& getContext() override { return *configuration; };
   void doOnReady(const std::function<void()>& callback) override;
+  void onRender(const std::function<void()>& callback) override;
+  void pauseSimulation(bool) override;
+
  protected:
   void setUIDelegate() override;
   void loop() override;
@@ -52,6 +55,11 @@ class OceanGestalt : public OceanGestaltInterface,
   int windowYPos;
   int windowWidth;
   int windowHeight;
+
+  struct PendingUniformUpdate {
+    std::string shader;
+    std::string uniform;
+  };
 
   // shader matrix uniform
   glm::mat4 projection = mat4(1.0);
@@ -80,6 +88,7 @@ class OceanGestalt : public OceanGestaltInterface,
   void updateWaves() const;
 
   std::vector<std::function<void()>> onReadyCallbacks;
+  std::vector<std::function<void()>> renderThreadCallbacks;
 };
 
 #endif

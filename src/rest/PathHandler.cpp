@@ -31,7 +31,7 @@ void PathHandler::writeCORSHeaders(struct mg_connection* conn,
 std::string PathHandler::getSubPath(
     const struct mg_request_info* req_info) const {
   std::string fullPath = req_info->local_uri;
-
+  //let's instead use the value of path inside the request, it will give us more flexibility
   // Strip prefix
   const std::string prefix(uri());
   std::string subPath = fullPath.substr(prefix.length() - 1);
