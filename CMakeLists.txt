@@ -3,11 +3,13 @@ cmake_minimum_required (VERSION 3.5...4.0)
 cmake_policy(VERSION 4.0)
 project (ocean-gestalt)
 
+enable_testing()
 # cspell: disable
 
 add_subdirectory(src/core)
 add_subdirectory(src/rest)
 add_subdirectory(src/api)
+add_subdirectory(tests)
 
 # The main executable
 add_executable(ocean-gestalt
@@ -119,3 +121,4 @@ target_include_directories(ocean-gestalt
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/core/include
   PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/core/
 )
+
