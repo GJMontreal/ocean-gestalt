@@ -43,17 +43,22 @@ OceanGestalt::OceanGestalt() : Application() {
   initUniformBuffers();
 #endif
 
-    // do anything we need to after everything's setup
-    for(auto const& cb : onReadyCallbacks){
-      cb();
-    }
 }
 
 void OceanGestalt::setUIDelegate() {
   waveUI->updatable = weak_from_this();
 }
 
+void OceanGestalt::runOnce(){
+for(auto const& cb : onReadyCallbacks){
+      cb();
+  }
+  onReadyCallbacks.clear();
+}
+
 void OceanGestalt::loop() {
+  // do anything we need to after everything's setup
+  
   if (wavesNeedUpdate) {
     wavesNeedUpdate = false;
     updateWaves();
@@ -244,9 +249,10 @@ void OceanGestalt::toggleFullscreen(GLFWwindow* window) {
                        windowHeight, GLFW_DONT_CARE);
 }
 
+//does this actually happen
 void OceanGestalt::updateWaves() const {
   for (Model* model : models) {
-    model->updateShaderUniforms();
+    // model->updateShaderUniforms();
   }
 }
 

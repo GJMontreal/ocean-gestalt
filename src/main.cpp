@@ -17,8 +17,10 @@ int main(int argc, const char* argv[]) {
   auto app = std::make_shared<OceanGestalt>();
   auto uniformState = std::make_shared<UniformState>(app->getContext());
   auto api = std::make_shared<OceanApi>(*app,*uniformState);
-
-  app->onRender([&uniformState]{uniformState->renderThreadCallback();}); // who will own the context
+  app->onRender([&uniformState]{uniformState->renderThreadCallback();}); 
+  app->doOnReady([&api,&app]{app->getContext().setInitialUniformState(*api);});
+  // app->getContext().setInitialUniformState(*api);
+  
   auto server = std::make_unique<RestServer>(api);
   server->addHandlers(); // why does this have to explicit
   app->run();

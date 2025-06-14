@@ -47,7 +47,7 @@ class OceanGestalt : public OceanGestaltInterface,
   void setUIDelegate() override;
   void loop() override;
   void processInput(GLFWwindow *window, float deltaTime) override;
-
+  void runOnce() override;
  
  private:
   // for restoring the window from fullscreen

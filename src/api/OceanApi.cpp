@@ -2,7 +2,7 @@
 
 #include "AppContextInterface.hpp"
 #include "OceanGestaltInterface.hpp"
-#include "GetKeys.hpp"
+#include "Utilities.hpp"
 
 #include <iostream>
 #include <string>
@@ -32,7 +32,7 @@ void OceanApi::updateSimulation(std::string path, std::string value) {
   std::cout << "updating " << path << " with " << value << std::endl;
 }
 
-std::optional<ApiValue> OceanApi::setValue(const std::string& path, ApiValue& value){
+std::optional<ApiValue> OceanApi::setValue(const std::string& path, const ApiValue& value) const {
   auto parts = splitPath(path);
   for(auto& handler:pathHandlers){
     if(handler->matches(parts)){
@@ -41,6 +41,16 @@ std::optional<ApiValue> OceanApi::setValue(const std::string& path, ApiValue& va
   }
   return std::nullopt;
 };
+
+std::optional<ApiValue> OceanApi::getValue(const std::string& path) const{
+  auto parts = splitPath(path);
+  for(auto& handler:pathHandlers){
+    if(handler->matches(parts)){
+      return handler->get(parts);
+    }
+  }
+  return std::nullopt;
+}
 
 std::optional<ApiValue> OceanApi::setUniform(
   const std::string& shaderName,
@@ -62,7 +72,7 @@ std::optional<std::any> OceanApi::getUniform(std::string shaderName, std::string
   return std::nullopt;
 }
 
-std::vector<std::string> OceanApi::splitPath(const std::string& input, char delimiter) {
+std::vector<std::string> OceanApi::splitPath(const std::string& input, char delimiter)const {
   std::vector<std::string> parts;
   std::stringstream ss(input);
   std::string part;

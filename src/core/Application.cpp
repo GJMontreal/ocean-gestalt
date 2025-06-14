@@ -131,6 +131,10 @@ float Application::getTime() const {
   return time;
 }
 
+void Application::runOnce(){
+
+}
+
 void Application::run() {
   state = stateRun;
 
@@ -139,6 +143,7 @@ void Application::run() {
 
   setUIDelegate();
   time = (float)glfwGetTime();
+  runOnce();
   registered_loop = [&]() {
     // compute new time and delta time
     auto t = (float)glfwGetTime();

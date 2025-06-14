@@ -33,6 +33,14 @@ std::optional<ApiValue> UniformState::setUniform(
   }
 }
 
+std::optional<ApiValue> UniformState::getUniform(const std::string& shader, const std::string& uniform) {
+  auto it = uniformStates.find(shader + "." + uniform);
+  if( it != uniformStates.end()){
+    return( uniformToApi(it->second));
+  }
+  return std::nullopt;
+}
+
 void UniformState::renderThreadCallback() {
   std::lock_guard lock(updateMutex);
 
@@ -55,7 +63,9 @@ void UniformState::renderThreadCallback() {
       std::visit(dispatcher, u.value);
 
       if(dispatcher.success && !glCheckError(__FILE__, __LINE__)){
-        uniformStates[u.uniform] = u.value;
+        // the key here should be the entire path
+
+        uniformStates[u.shader + "." + u.uniform] = u.value;
         u.ack.set_value(true);
       }else{
         u.ack.set_value(false);

@@ -27,14 +27,12 @@ UniformHandler::UniformHandler(ApiAdapter& api) : PathHandler(api) {
 }
 
 std::optional<std::string> UniformHandler::handleGet(const std::string& path) {
-  if (auto uniform = splitPath(path)) {
-    auto retval = api.getUniform(uniform->shaderName, uniform->uniformName);
-    if(!retval){
-      return std::nullopt;
+    if (auto result = api.getValue(path)) {
+      return std::visit(
+          [](auto&& val) -> std::string { return nlohmann::json(val).dump(); },
+          *result);
     }
-    return std::string("");
-  }
-  return std::nullopt;
+    return std::nullopt;
 }
 
 std::optional<std::string> UniformHandler::handlePost(

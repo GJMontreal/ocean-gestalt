@@ -7,8 +7,6 @@
 #include <future>
 #include <optional>
 
-
-// TODO: we should change this to use a path for the uniform 
 struct PendingUniformUpdate {
     std::string shader;
     std::string uniform;
@@ -23,12 +21,15 @@ class UniformState{
                                   const std::string& uniformName,
                                   ApiValue value);
 
+  std::optional<ApiValue> getUniform(const std::string& shaderName,
+                                     const std::string& uniformName);
+
   void renderThreadCallback();
 
   private:
   AppContextInterface& context;
   std::mutex updateMutex;
   std::unordered_map<std::string, std::vector<PendingUniformUpdate>> pendingUpdates;
-  std::unordered_map<std::string, UniformValue> uniformStates; //we need to store paths in here
+  std::unordered_map<std::string, UniformValue> uniformStates;
   std::unordered_map<std::string, std::shared_ptr<ShaderProgram>> shaderPrograms;
 };

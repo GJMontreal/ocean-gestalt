@@ -99,6 +99,7 @@ class Application: public InputProcessor {
   std::shared_ptr<Light> light;
 
   virtual void loop();
+  virtual void runOnce();
   virtual void setUIDelegate();
   
   void processInput(GLFWwindow *window, float deltaTime) override;

@@ -24,8 +24,9 @@ class Configuration: public AppContextInterface {
   explicit Configuration(const string& environment, 
     const string& shader, 
     const string &generator,
-  const string& api);
+    const string& api);  //why is api a string here?
 
+  void setInitialUniformState(const ApiAdapter& api) override;
   vector<shared_ptr<Wave>> waves;
 
   shared_ptr<Camera> camera;

@@ -1,5 +1,6 @@
 #include "PathHandler.hpp"
 
+
 using json = nlohmann::json;
 
 static const int BUFFER_SIZE = 1024;
@@ -28,20 +29,26 @@ void PathHandler::writeCORSHeaders(struct mg_connection* conn,
             "Access-Control-Max-Age: 86400\r\n");
 };
 
+std::string replaceSeparator(const std::string& input, char oldSep, char newSep) {
+    std::string result = input;
+    std::replace(result.begin(), result.end(), oldSep, newSep);
+    return result;
+}
+
 std::string PathHandler::getSubPath(
     const struct mg_request_info* req_info) const {
   std::string fullPath = req_info->local_uri;
 
-  const std::string prefix(uri());
-  std::string subPath = fullPath.substr(prefix.length() - 1);
+  const std::string prefix("/api/");
+  std::string subPath = fullPath.substr(prefix.length());
   return subPath;
 }
 
 bool PathHandler::handleGet(CivetServer* server, struct mg_connection* conn) {
   const struct mg_request_info* req_info = mg_get_request_info(conn);
 
-  // TODO: use our refactored subfunction
   auto subPath = getSubPath(req_info);
+  subPath = replaceSeparator(subPath, '/', '.');
   auto result = handleGet(subPath);
   if (result) {
     std::string value = *result;

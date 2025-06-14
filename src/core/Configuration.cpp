@@ -2,6 +2,9 @@
 #include "Camera.hpp"
 #include "Serialization.hpp"
 #include "asset.hpp"
+#include "ApiAdapter.hpp"
+#include "UniformValue.hpp"
+#include "Utilities.hpp"
 
 #include <memory.h>
 #include <fstream>
@@ -11,9 +14,6 @@ using nlohmann::json;
 using std::cout;
 using std::endl;
 using std::make_shared;
-
-static const auto SHADERS =
-    vector<string>{"mesh_shader", "wireframe_shader", "normal_shader"};
 
 Configuration::Configuration(const string& environment,
                              const string& shader,
@@ -154,3 +154,23 @@ void Configuration::save(const string& fileName) {
 std::unordered_map<std::string, shared_ptr<ShaderProgram>>& Configuration::getShaders(){
   return shaders;
 };
+
+void Configuration::setInitialUniformState(const ApiAdapter& api){
+  //set all the uniforms
+  // api.setValue("uniforms.mesh_shader.lineColor",  uniformToApi(meshColor));
+  api.setValue("uniforms.wireframe_shader.lineColor", uniformToApi(wireframeColor));
+
+  int i = 0;
+  for( const shared_ptr<Wave> wave: waves){
+    std::string uniformName = string_format("uniforms.waves[%i].amplitude", i);
+    api.setValue(uniformName,uniformToApi(wave->amplitude));
+    
+    uniformName = string_format("uniforms.waves[%i].steepness", i);
+    api.setValue(uniformName,uniformToApi(wave->steepness));
+    uniformName = string_format("uniforms.waves[%i].wavelength", i);
+    api.setValue(uniformName,uniformToApi(wave->wavelength));
+    uniformName = string_format("uniforms.waves[%i].direction", i);
+    api.setValue(uniformName,uniformToApi(wave->direction));
+    i++;
+  }
+}

@@ -42,7 +42,376 @@
             "direction": {
                 "type": "float",
                 "min": 0,
-                "max": 3600,
+                "max": 360,
+                "_meta": {
+                    "display": "Direction",
+                    "control": "slider"
+                }
+            },
+            "steepness": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Steepness",
+                    "control": "slider"
+                }
+            },
+            "wavelength": {
+                "type": "float",
+                "min": 0,
+                "max": 100,
+                "_meta": {
+                    "display": "Wavelength",
+                    "control": "slider"
+                }
+            }
+        },
+                "waves[1]": {
+            "_meta": {
+                "display": "0"
+            },
+            "amplitude": {
+                "type": "float",
+                "min": 0,
+                "max": 40,
+                "_meta": {
+                    "display": "Amplitude",
+                    "control": "slider"
+                }
+            },
+            "direction": {
+                "type": "float",
+                "min": 0,
+                "max": 360,
+                "_meta": {
+                    "display": "Direction",
+                    "control": "slider"
+                }
+            },
+            "steepness": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Steepness",
+                    "control": "slider"
+                }
+            },
+            "wavelength": {
+                "type": "float",
+                "min": 0,
+                "max": 100,
+                "_meta": {
+                    "display": "Wavelength",
+                    "control": "slider"
+                }
+            }
+        },
+                "waves[2]": {
+            "_meta": {
+                "display": "0"
+            },
+            "amplitude": {
+                "type": "float",
+                "min": 0,
+                "max": 40,
+                "_meta": {
+                    "display": "Amplitude",
+                    "control": "slider"
+                }
+            },
+            "direction": {
+                "type": "float",
+                "min": 0,
+                "max": 360,
+                "_meta": {
+                    "display": "Direction",
+                    "control": "slider"
+                }
+            },
+            "steepness": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Steepness",
+                    "control": "slider"
+                }
+            },
+            "wavelength": {
+                "type": "float",
+                "min": 0,
+                "max": 100,
+                "_meta": {
+                    "display": "Wavelength",
+                    "control": "slider"
+                }
+            }
+        },
+                "waves[3]": {
+            "_meta": {
+                "display": "0"
+            },
+            "amplitude": {
+                "type": "float",
+                "min": 0,
+                "max": 40,
+                "_meta": {
+                    "display": "Amplitude",
+                    "control": "slider"
+                }
+            },
+            "direction": {
+                "type": "float",
+                "min": 0,
+                "max": 360,
+                "_meta": {
+                    "display": "Direction",
+                    "control": "slider"
+                }
+            },
+            "steepness": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Steepness",
+                    "control": "slider"
+                }
+            },
+            "wavelength": {
+                "type": "float",
+                "min": 0,
+                "max": 100,
+                "_meta": {
+                    "display": "Wavelength",
+                    "control": "slider"
+                }
+            }
+        },
+                "waves[4]": {
+            "_meta": {
+                "display": "0"
+            },
+            "amplitude": {
+                "type": "float",
+                "min": 0,
+                "max": 40,
+                "_meta": {
+                    "display": "Amplitude",
+                    "control": "slider"
+                }
+            },
+            "direction": {
+                "type": "float",
+                "min": 0,
+                "max": 360,
+                "_meta": {
+                    "display": "Direction",
+                    "control": "slider"
+                }
+            },
+            "steepness": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Steepness",
+                    "control": "slider"
+                }
+            },
+            "wavelength": {
+                "type": "float",
+                "min": 0,
+                "max": 100,
+                "_meta": {
+                    "display": "Wavelength",
+                    "control": "slider"
+                }
+            }
+        },
+                "waves[5]": {
+            "_meta": {
+                "display": "0"
+            },
+            "amplitude": {
+                "type": "float",
+                "min": 0,
+                "max": 40,
+                "_meta": {
+                    "display": "Amplitude",
+                    "control": "slider"
+                }
+            },
+            "direction": {
+                "type": "float",
+                "min": 0,
+                "max": 360,
+                "_meta": {
+                    "display": "Direction",
+                    "control": "slider"
+                }
+            },
+            "steepness": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Steepness",
+                    "control": "slider"
+                }
+            },
+            "wavelength": {
+                "type": "float",
+                "min": 0,
+                "max": 100,
+                "_meta": {
+                    "display": "Wavelength",
+                    "control": "slider"
+                }
+            }
+        },
+                "waves[6]": {
+            "_meta": {
+                "display": "wave[6]"
+            },
+            "amplitude": {
+                "type": "float",
+                "min": 0,
+                "max": 40,
+                "_meta": {
+                    "display": "Amplitude",
+                    "control": "slider"
+                }
+            },
+            "direction": {
+                "type": "float",
+                "min": 0,
+                "max": 360,
+                "_meta": {
+                    "display": "Direction",
+                    "control": "slider"
+                }
+            },
+            "steepness": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Steepness",
+                    "control": "slider"
+                }
+            },
+            "wavelength": {
+                "type": "float",
+                "min": 0,
+                "max": 100,
+                "_meta": {
+                    "display": "Wavelength",
+                    "control": "slider"
+                }
+            }
+        },
+                "waves[7]": {
+            "_meta": {
+                "display": "0"
+            },
+            "amplitude": {
+                "type": "float",
+                "min": 0,
+                "max": 40,
+                "_meta": {
+                    "display": "Amplitude",
+                    "control": "slider"
+                }
+            },
+            "direction": {
+                "type": "float",
+                "min": 0,
+                "max": 360,
+                "_meta": {
+                    "display": "Direction",
+                    "control": "slider"
+                }
+            },
+            "steepness": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Steepness",
+                    "control": "slider"
+                }
+            },
+            "wavelength": {
+                "type": "float",
+                "min": 0,
+                "max": 100,
+                "_meta": {
+                    "display": "Wavelength",
+                    "control": "slider"
+                }
+            }
+        },
+                "waves[8]": {
+            "_meta": {
+                "display": "0"
+            },
+            "amplitude": {
+                "type": "float",
+                "min": 0,
+                "max": 40,
+                "_meta": {
+                    "display": "Amplitude",
+                    "control": "slider"
+                }
+            },
+            "direction": {
+                "type": "float",
+                "min": 0,
+                "max": 360,
+                "_meta": {
+                    "display": "Direction",
+                    "control": "slider"
+                }
+            },
+            "steepness": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Steepness",
+                    "control": "slider"
+                }
+            },
+            "wavelength": {
+                "type": "float",
+                "min": 0,
+                "max": 100,
+                "_meta": {
+                    "display": "Wavelength",
+                    "control": "slider"
+                }
+            }
+        },
+                "waves[9]": {
+            "_meta": {
+                "display": "0"
+            },
+            "amplitude": {
+                "type": "float",
+                "min": 0,
+                "max": 40,
+                "_meta": {
+                    "display": "Amplitude",
+                    "control": "slider"
+                }
+            },
+            "direction": {
+                "type": "float",
+                "min": 0,
+                "max": 360,
                 "_meta": {
                     "display": "Direction",
                     "control": "slider"
