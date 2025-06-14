@@ -98,11 +98,16 @@ ShaderProgram::ShaderProgram() {
     throw std::runtime_error("Impossible to create a new shader program");
 }
 
-ShaderProgram::ShaderProgram(std::initializer_list<Shader> shaderList)
+ShaderProgram::ShaderProgram(const std::string& name, std::initializer_list<Shader> shaderList)
     : ShaderProgram() {
+  this->name = name;
   for (auto& s : shaderList)
     glAttachShader(handle, s.getHandle());
   link();
+}
+
+const std::string& ShaderProgram::getName() {
+  return name;
 }
 
 void ShaderProgram::link() {
@@ -245,6 +250,7 @@ void ShaderProgram::listUniforms() const {
   }
 }
 
+// TODO: get rid of this, we'll rely on our uniform state and that everything passes through the api
 std::optional<std::string> ShaderProgram::getUniform(const std::string& name) const{
   return std::string("0.35"); // till we get this working
 }

@@ -1,11 +1,9 @@
 #pragma once
 
 #include "Shader.hpp"
-#include <memory>
 
 class AppContextInterface{
   public:
-    std::shared_ptr<ShaderProgram> meshShader;  
-    std::shared_ptr<ShaderProgram> wireframeShader;
-    std::shared_ptr<ShaderProgram> normalShader;
+    virtual std::unordered_map<std::string, std::shared_ptr<ShaderProgram>>& getShaders() = 0;
+    virtual ~AppContextInterface() = default;
 };

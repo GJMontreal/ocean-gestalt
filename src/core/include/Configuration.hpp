@@ -32,10 +32,9 @@ class Configuration: public AppContextInterface {
   
   shared_ptr<Light> light;
 
-  // where do these live now? in AppContext?
-  // shared_ptr<ShaderProgram> meshShader;  
-  // shared_ptr<ShaderProgram> wireframeShader;
-  // shared_ptr<ShaderProgram> normalShader;
+  shared_ptr<ShaderProgram> meshShader;  
+  shared_ptr<ShaderProgram> wireframeShader;
+  shared_ptr<ShaderProgram> normalShader;
   
   int meshSize;
   int meshSubdivisions;
@@ -54,6 +53,8 @@ class Configuration: public AppContextInterface {
 
   void save(const string& fileName);
 
+  std::unordered_map<std::string, shared_ptr<ShaderProgram>>& getShaders() override;
+
   private:
   void loadJSON(const string& fileName, json& data)const;
   void loadWaves(const string& fileName);
@@ -65,6 +66,8 @@ class Configuration: public AppContextInterface {
   void loadAPI(const string& fileName);
 
   shared_ptr<ShaderProgram> buildShader(json& j, const string& name, vec4& color);
+
+  std::unordered_map<std::string, shared_ptr<ShaderProgram> > shaders;
 };
 
 #endif

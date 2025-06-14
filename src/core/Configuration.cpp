@@ -68,7 +68,8 @@ void Configuration::loadShaders(const string& fileName) {
 
   meshShader = buildShader(j, "mesh_shader", meshColor);
   wireframeShader = buildShader(j, "wireframe_shader", wireframeColor);
-
+  shaders[meshShader->getName()] = meshShader;
+  shaders[wireframeShader->getName()] = wireframeShader;
   // WEBGL doesn't support geometry shaders
 #ifndef __EMSCRIPTEN__
   normalShader = buildShader(j, "normal_shader", normalColor);
@@ -93,10 +94,10 @@ shared_ptr<ShaderProgram> Configuration::buildShader(json& j,
   if (geometry != nullptr) {
     Shader geometryShader(SHADER_DIR + (string)geometry, GL_GEOMETRY_SHADER);
     program = make_shared<ShaderProgram>(
-        ShaderProgram{vertexShader, fragmentShader, geometryShader});
+        ShaderProgram(name,{vertexShader, fragmentShader, geometryShader}));
   } else {
     program =
-        make_shared<ShaderProgram>(ShaderProgram{vertexShader, fragmentShader});
+        make_shared<ShaderProgram>(ShaderProgram(name,{vertexShader, fragmentShader}));
   }
   return program;
 }
@@ -149,3 +150,7 @@ void Configuration::save(const string& fileName) {
                                 " doesn't exist");
   }
 }
+
+std::unordered_map<std::string, shared_ptr<ShaderProgram>>& Configuration::getShaders(){
+  return shaders;
+};

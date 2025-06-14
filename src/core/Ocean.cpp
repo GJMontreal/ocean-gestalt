@@ -85,6 +85,7 @@ void Ocean::setWaveUniforms(const vector<shared_ptr<Wave>>& waves,
     uniformName = string_format("waves[%i].wavelength", i);
     program->setUniform(uniformName, wave->wavelength);
 
+    //why is this a vec3?
     uniformName = string_format("waves[%i].direction", i);
     program->setUniform(uniformName, glm::vec3(wave->direction, 0));
 

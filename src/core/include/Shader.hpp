@@ -44,7 +44,7 @@ class Shader {
 class ShaderProgram {
  public:
   // constructor
-  ShaderProgram(std::initializer_list<Shader> shaderList);
+  ShaderProgram(const std::string& name, std::initializer_list<Shader> shaderList);
 
   // bind the program
   void activate() const;
@@ -53,6 +53,7 @@ class ShaderProgram {
   // provide the opengl identifiant
   GLuint getHandle() const;
 
+  const std::string& getName();
   // clang-format off
   // provide attributes informations.
   GLint attribute(const std::string& name);
@@ -89,6 +90,7 @@ class ShaderProgram {
 
   std::map<std::string, GLint> uniforms;
   std::map<std::string, GLint> attributes;
+  std::string name;
 
   // opengl id
   GLuint handle;

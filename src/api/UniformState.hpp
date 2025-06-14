@@ -26,8 +26,9 @@ class UniformState{
   void renderThreadCallback();
 
   private:
-  AppContextInterface& context; // is this unowned
+  AppContextInterface& context;
   std::mutex updateMutex;
   std::unordered_map<std::string, std::vector<PendingUniformUpdate>> pendingUpdates;
   std::unordered_map<std::string, UniformValue> uniformStates; //we need to store paths in here
+  std::unordered_map<std::string, std::shared_ptr<ShaderProgram>> shaderPrograms;
 };

@@ -7,6 +7,7 @@
 
 
 class OceanGestaltInterface;
+class AppContextInterface;
 class OceanApi : public ApiAdapter {
 public:
   OceanApi(OceanGestaltInterface& app, UniformState& state);
@@ -18,6 +19,7 @@ public:
   
   std::optional<ApiValue> setValue(const std::string& path, ApiValue& value) override;
   
+  //we're going to deprecate the following
   std::optional<ApiValue> setUniform(const std::string& shaderName,
                                   const std::string& uniformName,
                                   ApiValue value) override;

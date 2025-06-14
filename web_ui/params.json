@@ -21,11 +21,12 @@
             }
         }
     },
-    "waves": {
+    
+    "uniforms": {
         "_meta": {
-            "display": "Waves"
+            "display": "Uniforms"
         },
-        "wave[0]": {
+        "waves[0]": {
             "_meta": {
                 "display": "0"
             },
@@ -59,19 +60,14 @@
             "wavelength": {
                 "type": "float",
                 "min": 0,
-                "max": 3600,
+                "max": 100,
                 "_meta": {
                     "display": "Wavelength",
                     "control": "slider"
                 }
             }
-        }
-    },
-    "uniforms": {
-        "_meta": {
-            "display": "Shaders"
         },
-        "mesh": {
+        "mesh_shader": {
             "_meta": {
                 "display": "Mesh Shader"
             },
@@ -85,7 +81,7 @@
                 }
             }
         },
-        "wireframe": {
+        "wireframe_shader": {
             "_meta": {
                 "display": "Wireframe Shader"
             },

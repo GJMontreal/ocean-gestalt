@@ -2,15 +2,19 @@
 
 #include "AppContextInterface.hpp"
 #include "OceanGestaltInterface.hpp"
-#include "Shader.hpp"
+#include "GetKeys.hpp"
 
 #include <iostream>
 #include <string>
 #include <sstream>
 
 OceanApi::OceanApi(OceanGestaltInterface& app, UniformState& state)
-    : app(app), uniformState(state) {
-  auto uniformPathHandler = std::make_unique<UniformPathHandler>(state);
+    : app(app), uniformState(state){
+  
+  auto& context = app.getContext();
+  auto& shaders = context.getShaders();
+  auto keys = getKeys(shaders);
+  auto uniformPathHandler = std::make_unique<UniformPathHandler>(state,keys);
   pathHandlers.push_back(std::move(uniformPathHandler));
 };
 
@@ -19,6 +23,7 @@ void OceanApi::setupShaderNormalInterface() {
 }
 
 void OceanApi::pauseSimulation(bool pause) {
+
   app.pauseSimulation(pause);
 }
 
@@ -46,14 +51,15 @@ std::optional<ApiValue> OceanApi::setUniform(
 }
 
 std::optional<std::any> OceanApi::getUniform(std::string shaderName, std::string uniformName) {
-  auto configuration = app.getContext();
-  std::shared_ptr<ShaderProgram> program; 
-  if(shaderName == "mesh"){
-    program = configuration.meshShader;
-  }else if (shaderName == "wireframe"){
-    program = configuration.wireframeShader;
-  }
-  return program->getUniform(uniformName);
+  // auto configuration = app.getContext();
+  // std::shared_ptr<ShaderProgram> program; 
+  // if(shaderName == "mesh"){
+  //   program = configuration.meshShader;
+  // }else if (shaderName == "wireframe"){
+  //   program = configuration.wireframeShader;
+  // }
+  // return program->getUniform(uniformName);
+  return std::nullopt;
 }
 
 std::vector<std::string> OceanApi::splitPath(const std::string& input, char delimiter) {

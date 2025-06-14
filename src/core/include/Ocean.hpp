@@ -15,10 +15,6 @@ class Ocean : public Model {
 
   ~Ocean() override = default;
   void draw(Uniforms& uniforms) override;
-
-  void setupWireframeShader();
-  void setupMeshShader();
-
   void updateShaderUniforms() override;
  private:
   float elapsedTime=0;

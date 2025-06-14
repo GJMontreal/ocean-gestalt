@@ -37,13 +37,11 @@ void UniformState::renderThreadCallback() {
   std::lock_guard lock(updateMutex);
 
   for (auto& [shaderName, updates] : pendingUpdates) {
-    // clunky
-    // can we replace the explicit if with a get shader by name?
     ShaderProgram* shader = nullptr;
-    if (shaderName == "mesh") {
-      shader = context.meshShader.get();
-    } else if (shaderName == "wireframe") {
-      shader = context.wireframeShader.get();
+    auto shaders = context.getShaders();
+
+    if(auto it = shaders.find(shaderName); it != shaders.end()){
+      shader = it->second.get();
     }
 
     if(!shader){
