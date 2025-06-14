@@ -1,11 +1,10 @@
 #pragma once
 
 #include "AppContextInterface.hpp"
-#include "UniformValue.hpp"
-#include "ApiValue.hpp"
 
+#include "ApiValue.hpp"
+#include "UniformValue.hpp"
 #include <future>
-#include <map>
 #include <optional>
 
 
@@ -20,9 +19,9 @@ struct PendingUniformUpdate {
 class UniformState{
   public:
   UniformState(AppContextInterface& context) : context(context){};
-  std::optional<UniformValue> setUniform(const std::string& shaderName,
+  std::optional<ApiValue> setUniform(const std::string& shaderName,
                                   const std::string& uniformName,
-                                  UniformValue value);
+                                  ApiValue value);
 
   void renderThreadCallback();
 

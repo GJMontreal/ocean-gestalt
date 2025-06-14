@@ -3,7 +3,7 @@
 #include "PathHandler.hpp"
 #include "ApiAdapter.hpp"
 
-using ApplyFunc = std::function<UniformValue(nlohmann::json::value_type&)>;
+using ApplyFunc = std::function<ApiValue(nlohmann::json::value_type&)>;
 using MatchFunc = std::function<bool(const nlohmann::json::value_type&)>;
 
 struct JsonTypeHandler {

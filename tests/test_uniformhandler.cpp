@@ -9,7 +9,7 @@ public:
     return std::nullopt;
   }
   
-  std::optional<UniformValue> setUniform(const std::string&, const std::string&, UniformValue) override {
+  std::optional<ApiValue> setUniform(const std::string&, const std::string&, ApiValue) override {
     return std::nullopt;
   }
   std::optional<std::any> getUniform(const std::string, const std::string) override {

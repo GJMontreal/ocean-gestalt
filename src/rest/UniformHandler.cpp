@@ -19,9 +19,6 @@ UniformHandler::UniformHandler(ApiAdapter& api) : PathHandler(api) {
          return v.is_array();},
        makeApplyFunc<std::vector<float> >(),
        {"vector<float>"}},
-      {[](auto& v) { return v.is_string(); },
-       makeApplyFunc<std::string>(),
-       {"string"}},
        {[](auto& v) { return v.is_boolean(); },
        makeApplyFunc<bool>(),
        {"boolean"}}

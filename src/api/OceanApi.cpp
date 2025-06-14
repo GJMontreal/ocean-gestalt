@@ -37,10 +37,10 @@ std::optional<ApiValue> OceanApi::setValue(const std::string& path, ApiValue& va
   return std::nullopt;
 };
 
-std::optional<UniformValue> OceanApi::setUniform(
+std::optional<ApiValue> OceanApi::setUniform(
   const std::string& shaderName,
   const std::string& uniformName,
-  UniformValue value) {
+  ApiValue value) {
   
   return uniformState.setUniform(shaderName, uniformName, value);
 }

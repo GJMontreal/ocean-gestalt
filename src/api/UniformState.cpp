@@ -1,16 +1,19 @@
 #include "UniformState.hpp"
+#include "UniformDispatcher.hpp"
 #include "glError.hpp"
 
 #include <iostream>
 
 static const int TIMEOUT = 50;
 
-std::optional<UniformValue> UniformState::setUniform(
+
+std::optional<ApiValue> UniformState::setUniform(
     const std::string& shaderName,
     const std::string& uniformName,
-    UniformValue value) {
+    ApiValue value) {
   
-  PendingUniformUpdate update{shaderName,uniformName,value};
+  UniformValue uniformValue = apiToUniform(value);
+  PendingUniformUpdate update{shaderName,uniformName, uniformValue};
   
   auto fut = update.ack.get_future();
 
@@ -45,28 +48,20 @@ void UniformState::renderThreadCallback() {
 
     if(!shader){
       std::cerr << "No matching shader for: " << shaderName << std::endl;
+      return;
     }
 
     shader->activate();
     for (auto& u : updates) {
-      std::visit(
-          [&](auto&& val) {
-            using T = std::decay_t<decltype(val)>;
-            if constexpr (std::is_same_v<T, std::vector<float>>) {
-              if (val.size() == 4) {
-                auto glmVec = glm::vec4(val[0], val[1], val[2], val[3]);
-                shader->setUniform(u.uniform, glmVec);
-              }
-            }
-          },
-          u.value);
+      UniformDispatcher<ShaderProgram> dispatcher{shader, u.uniform};
+      std::visit(dispatcher, u.value);
 
-          if(!glCheckError(__FILE__, __LINE__)){
-            uniformStates[u.uniform] = u.value;
-            u.ack.set_value(true);
-          }else{
-            u.ack.set_value(false);
-          }
+      if(dispatcher.success && !glCheckError(__FILE__, __LINE__)){
+        uniformStates[u.uniform] = u.value;
+        u.ack.set_value(true);
+      }else{
+        u.ack.set_value(false);
+      }
     }
     shader->deactivate();
   }

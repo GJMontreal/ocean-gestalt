@@ -18,9 +18,9 @@ public:
   
   std::optional<ApiValue> setValue(const std::string& path, ApiValue& value) override;
   
-  std::optional<UniformValue> setUniform(const std::string& shaderName,
+  std::optional<ApiValue> setUniform(const std::string& shaderName,
                                   const std::string& uniformName,
-                                  UniformValue value) override;
+                                  ApiValue value) override;
   
   std::optional<std::any> getUniform(std::string shaderName, std::string uniformName) override;
 
