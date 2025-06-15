@@ -41,7 +41,6 @@ bool UniformPathHandler::matches(const std::vector<std::string>& parts) const{
     } else {
       for (const auto& shader : shaderNames) {
         result = uniformState.setUniform(shader, uniformName, val);
-        break;
       }
     }
      if (convertFromHeading &&
