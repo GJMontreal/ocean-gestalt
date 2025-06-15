@@ -23,23 +23,35 @@ bool UniformPathHandler::matches(const std::vector<std::string>& parts) const{
   std::optional<ApiValue> UniformPathHandler::set(
       const std::vector<std::string>& parts,
       const ApiValue& value) {
+        // we should check the last part to see if it's heading
+        bool convertFromHeading = parts.size() >= 3 && parts[2] == "heading";
+        //this next line isn't quite right
+        //if we query a specific shader for a direction it will fail
+        std::string uniformName = parts[1] + "." + (convertFromHeading ? "direction" : parts[2]);
         ApiValue val = value;
         //convert directions from float to vec3
-        if (parts.size() >= 3 && parts[2] == "heading") {
+        if (convertFromHeading) {
           val = headingToVec3(std::get<float>(value));
         }
-
+    
+        std::optional<ApiValue> result;
+      
     if (std::find(shaderNames.begin(), shaderNames.end(), parts[1]) != shaderNames.end()){
-      return uniformState.setUniform(parts[1], parts[2], val);
+      result = uniformState.setUniform(parts[1], parts[2], val);
     } else {
-      std::optional<ApiValue> result;
-      auto uniformName =
-          parts[1] + "." + parts[2];  // this should properly append any parts
       for (const auto& shader : shaderNames) {
         result = uniformState.setUniform(shader, uniformName, val);
+        break;
       }
-      return result;
     }
+     if (convertFromHeading &&
+        std::holds_alternative<std::vector<float>>(*result)) {
+          const auto& vec = std::get<std::vector<float>>(*result);
+          if(vec.size() >= 3){
+            return vecToHeading(vec[0],vec[1]);
+          }
+    }
+    return result;
   }
 
   std::optional<ApiValue> UniformPathHandler::get(

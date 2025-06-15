@@ -170,7 +170,7 @@ void Configuration::setInitialUniformState(const ApiAdapter& api){
     uniformName = string_format("uniforms.waves[%i].wavelength", i);
     api.setValue(uniformName,uniformToApi(wave->wavelength));
     uniformName = string_format("uniforms.waves[%i].direction", i);
-    api.setValue(uniformName,uniformToApi(wave->direction));
+    api.setValue(uniformName,uniformToApi(glm::vec3(wave->direction,0.0f)));
     i++;
   }
 }
