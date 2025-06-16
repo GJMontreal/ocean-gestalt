@@ -124,8 +124,6 @@ void main(void)
 {   
     vec2 windDirection = normalize(direction.xy);
     vec2 uv = uvLocation(position, windDirection);
-    // vec3 sampledNormal = texture(gustNormalMap, uv).rgb * 2.0 - 1.0;
-    // sampledNormal = vec3(0, 0, 1);
 
     vec3 newPosition = calcNewPosition(position);
     float gust = gustDisplacement(uv);
@@ -135,21 +133,12 @@ void main(void)
 
     vec3 normalFD = calcNormal(position, newPosition, uv, NORMAL_OFFSET, tangent, bitangent);
 
-    // mat3 TBN = mat3(normalize(tangent), normalize(bitangent), normalize(normalFD));
-
     gl_Position = projection * view * model * vec4(newPosition, 1.0) ;
     vs_out.FragPos = vec3(model * vec4(newPosition,1.0));
 
-    // vec3 finalNormal = normalize(mix(normalFD, sampledNormal, gustStrength));
-    // vec3 mappedNormal = normalize(TBN * sampledNormal);
-
     vs_out.Normal = normalize(normalFD);
-    // vs_out.DebugNormal = normalize(mappedNormal);
     vs_out.Color = vec3(color);
     vs_out.Bitangent = bitangent;
     vs_out.Tangent = tangent;
     vs_out.FragUV = uv;
-    //we don't need to use this modelUp since we've corrected our model's coordinate system
-    // vec3 modelUp = normalize(mat3(model) * vec3(0.0, 0.0, 1.0));
-    // vs_out.ModelUp = modelUp;
 }
