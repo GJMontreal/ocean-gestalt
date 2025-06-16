@@ -30,17 +30,17 @@ const float AMBIENT_STRENGTH = 0.9;
 const float SPECULAR_STRENGTH = 0.9;
 const float SHININESS = 8.0;
 
-const float FOAM_SLOPE_MIN = 0.2;
-const float FOAM_SLOPE_MAX = 0.5;
-
-const float CAUSTIC_INTENSITY = 0.425;
-const float CAUSTIC_SCALE = 4.0;
-const float CAUSTIC_SPEED = 0.4;
-
-const float FOAM_BRIGHTNESS_BASE     = 0.2;  // Minimum foam brightness
-const float FOAM_BRIGHTNESS_VARIANCE = 0.1;  // Additional brightness from FBM modulation
+uniform float causticScale;
+uniform float causticSpeed;
+uniform float causticIntensity;
 
 const vec3 CAUSTIC_COLOUR = vec3(1.0, 0.9, 0.7);
+
+uniform float foamScale;
+uniform float foamScrollSpeed;
+uniform float foamSlopeMin;
+uniform float foamSlopeMax;
+uniform float foamSlopeAmplifier;
 
 // Hash and FBM
 float hash(vec2 p) {
@@ -69,6 +69,26 @@ float fbm(vec2 p) {
     }
     return sum;
 }
+
+vec3 calcFoam(vec3 position){
+  
+  float slope = length(vec2(dFdx(fs_in.FragPos.y), dFdy(fs_in.FragPos.y))) * foamSlopeAmplifier;
+// --- Slope direction approximates foam flow ---
+vec2 slopeDir = normalize(vec2(
+    dFdx(position.y),
+    dFdy(position.y)
+));
+
+
+// --- Flowing foam UVs: move along slope direction over time ---
+  vec2 foamUV = position.xz + slopeDir * time * foamScrollSpeed;
+  float foamNoise = fbm(foamUV * foamScale);
+  // --- Modulate foam by surface slope: appears only on steep regions ---
+  float foamMask = smoothstep(foamSlopeMin, foamSlopeMax, slope);
+  float foam = foamNoise * foamMask;
+  return vec3(foam);
+}
+
 
 // Main
 void main() {
@@ -101,25 +121,6 @@ void main() {
     vec3 deepColor = fs_in.Color * vec3(0.1, 0.2, 0.3);
     vec3 shiftedColor = mix(fs_in.Color, deepColor, depthFade);
 
-    // Slope-based foam
-    // float slope = 1.0 - dot(normal, fs_in.ModelUp);
-    // float slopeFoam = smoothstep(FOAM_SLOPE_MIN, FOAM_SLOPE_MAX, slope);
-    // float crestFoam = smoothstep(0.0, 0.5, fs_in.FragPos.y); // adjust thresholds for your wave scale
-    // float foamMask = slopeFoam * crestFoam * fs_in.FoamModulation;
-
-   
-    // // float foamBase = smoothstep(FOAM_SLOPE_MIN, FOAM_SLOPE_MAX, slope);
-
-    // // float foamMask = foamBase * fs_in.FoamModulation;
-    // // vec3 foamColor = vec3(1.0) * (FOAM_BRIGHTNESS_BASE + FOAM_BRIGHTNESS_VARIANCE * fs_in.FoamModulation);
-    
-    // vec2 foamUV = fs_in.FragPos.xz * 1.5 + vec2(time * 0.2, time * 0.15);  // controls scale and animation
-    // float foamNoise = fbm(foamUV);
-    // foamNoise = smoothstep(0.4, 1.0, foamNoise);  // optional to shape distribution
-
-    // vec3 foamColor = mix(vec3(0.8), vec3(1.0), foamNoise);  // subtle noisy foam
-    // foamColor *= (FOAM_BRIGHTNESS_BASE + FOAM_BRIGHTNESS_VARIANCE * fs_in.FoamModulation);
-
     // Caustic flicker in troughs
     float causticStrength = smoothstep(-0.6, 0.1, -fs_in.FragPos.y);
 
@@ -134,28 +135,23 @@ void main() {
     causticFlicker = pow(causticFlicker, 6.0);
     
     float causticMask = 1.0;
-    vec3 causticLight = CAUSTIC_COLOUR * causticFlicker * causticMask * causticStrength * CAUSTIC_INTENSITY;
+    vec3 causticLight = CAUSTIC_COLOUR * causticFlicker * causticMask * causticStrength * causticIntensity;
 
-    // Combine lighting
-    // vec3 baseColor = fs_in.Color * shiftedColor;
-    
     float lightingIntensity = diff + spec + fresnel;
 
     shiftedColor = pow(shiftedColor, vec3(0.45));
-    // shiftedColor = vec3(1.0);
+
     vec3 finalColor =
     ambient  * shiftedColor +
     diffuse * shiftedColor +
     specular * shiftedColor +            // white or lightly tinted
     causticLight; 
 
-     // or length(ambient + diffuse + specular)
     lightingIntensity = clamp(lightingIntensity, 0.0, 1.0);
-    // float litFoamMask = foamMask * lightingIntensity;
-    // finalColor = mix(finalColor, foamColor, litFoamMask);
-
+    
     // Foam blend
-    // finalColor = mix(finalColor, foamColor, foamMask);
+    vec3 foamColor = calcFoam(fs_in.FragPos);
+    finalColor = mix(finalColor, foamColor, foamColor.r);
 
     // Fog
     float fogFactor = clamp(exp(-FOG_DENSITY * depth), 0.0, 1.0);
@@ -163,6 +159,4 @@ void main() {
     vec3 fogged = mix(fogColor, finalColor, fogFactor);
 
     FragColor = vec4(fogged, 1.0);
-    // FragColor = vec4(finalColor, 1.0);
-    // FragColor = vec4(fs_in.Color,1.0);
 }

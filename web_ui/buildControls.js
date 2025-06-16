@@ -145,13 +145,13 @@ function createControl(label, node, path, valueElem) {
       input.type = "range";
       input.min = node.min ?? 0;
       input.max = node.max ?? 1;
-      input.step = 0.01;
+      input.step = 0.001;
       
       wrapper.appendChild(input);
       getValue = () => Number(input.value);
       setValue = (value) => {
         input.value = value;
-        valueElem.textContent = value.toFixed(2);
+        valueElem.textContent = value.toFixed(3);
       }
       break;
 
