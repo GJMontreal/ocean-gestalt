@@ -57,7 +57,7 @@ float gustDisplacement(
     vec3 position, vec2 gustDir) {
     vec2 gustUVOrigin = vec2(-20,-20);
     vec2 gustUVScale = vec2(gustScale,gustScale);
-    vec2 uv = (position.xy - gustUVOrigin) * gustUVScale;
+    vec2 uv = (position.xz - gustUVOrigin) * gustUVScale;
     uv += gustDir * time * gustSpeed;
     float gust = texture(gustNoise, uv).r;
     return (gust - 0.5) * 2.0 * gustStrength;
@@ -70,15 +70,15 @@ vec3 waveOffset(float time, vec3 aPosition, WAVE wave) {
     float w = VELOCITY_SCALE * sqrt(GRAVITY * k); // only frequency is scaled
     vec2 D = normalize(wave.direction.xy);
 
-    float phase = dot(D * k, aPosition.xy) - w * time;
+    float phase = dot(D * k, aPosition.xz) - w * time;
 
     float S = sin(phase);
     float C = cos(phase);
 
-    float z = wave.amplitude * C;
-    vec2 xy = aPosition.xy - D * wave.steepness * S * wave.amplitude;
+    float y = wave.amplitude * C;
+    vec2 xz = aPosition.xz - D * wave.steepness * S * wave.amplitude;
 
-    return vec3(xy, z);
+    return vec3(xz.x, y, xz.y);
 }
 
 
@@ -96,18 +96,18 @@ vec3 calcNormal(vec3 originalPosition,
                 vec3 newPosition,
                 vec2 windDir,
                 float offset) {
-  
-  vec3 someVec =calcNewPosition(vec3(originalPosition.x + offset, originalPosition.y, 0));
-  someVec.z += gustDisplacement(originalPosition, windDir);
+  float gust = gustDisplacement(originalPosition, windDir);
+  vec3 someVec =calcNewPosition(vec3(originalPosition.x + offset, 0,originalPosition.z));
+  someVec.y += gust;
 
   vec3 tangent =  someVec - newPosition;
 
-  vec3 someOtherVec = calcNewPosition(vec3(originalPosition.x, originalPosition.y + offset, 0));
-  someOtherVec.z += gustDisplacement(originalPosition, windDir);
+  vec3 someOtherVec = calcNewPosition(vec3(originalPosition.x, 0,originalPosition.z + offset));
+  someOtherVec.y += gust;
 
   vec3 bitangent =  someOtherVec - newPosition; 
 
-  vec3 normal = normalize(cross(tangent , bitangent)) ;
+  vec3 normal = normalize(cross(bitangent , tangent)) ;
   return normal;
 }
 
@@ -116,7 +116,7 @@ void main(void)
     vec2 windDirection = normalize(direction.xy);
     vec3 newPosition = calcNewPosition(position);
     float gust = gustDisplacement(position, windDirection);
-    newPosition.z += gust;
+    newPosition.y += gust;
     vec3 normalFD = calcNormal(position, newPosition, windDirection, NORMAL_OFFSET);
 
     gl_Position = projection * view * model * vec4(newPosition, 1.0) ;

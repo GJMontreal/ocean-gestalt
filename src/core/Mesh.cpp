@@ -172,7 +172,7 @@ VertexType Mesh::generateVertex(const glm::vec2 position, const glm::vec4& color
 
   VertexType v;
   float h = 0;
-  v.position = glm::vec3(position, h);
+  v.position = glm::vec3(position.x, h,position.y);
 
   // We'll calculate normals once we have our triangles 
   v.normal = glm::vec3(0.0f,0.0f,0.0f);
@@ -219,13 +219,15 @@ std::vector<GLuint> Mesh::generateTriangularIndices(int aSize)const{
     for (int x = 0; x < aSize; ++x) {
       // first triangle
       indices.push_back((x + 0) + (aSize + 1) * (y + 0));
-      indices.push_back((x + 1) + (aSize + 1) * (y + 0));
+
       indices.push_back((x + 1) + (aSize + 1) * (y + 1));
+            indices.push_back((x + 1) + (aSize + 1) * (y + 0));
 
       // second triangle
       indices.push_back((x + 1) + (aSize + 1) * (y + 1));
-      indices.push_back((x + 0) + (aSize + 1) * (y + 1));
+   
       indices.push_back((x + 0) + (aSize + 1) * (y + 0));
+         indices.push_back((x + 0) + (aSize + 1) * (y + 1));
     }
   }
   std::cout << "indices " << indices.size() << std::endl;
