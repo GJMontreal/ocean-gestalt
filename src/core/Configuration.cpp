@@ -165,6 +165,7 @@ void Configuration::setInitialUniformState(const ApiAdapter& api){
     for(auto value: shaders){
       value.second->activate();
       value.second->loadTexture(SHADER_DIR "gust_noise_512.png","gustNoise");
+      value.second->loadTexture(SHADER_DIR "NormalMap.png","gustNormalMap");
       value.second->deactivate();
     }
   

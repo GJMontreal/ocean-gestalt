@@ -4,7 +4,9 @@ in VS_OUT {
     vec3 FragPos;
     vec3 Normal;
     vec3 Color;
-    vec3 ModelUp;
+    vec3 Tangent;
+    vec3 Bitangent;
+    vec2 FragUV;
 } fs_in;
 
 layout(std140) uniform Matrices
@@ -12,6 +14,8 @@ layout(std140) uniform Matrices
     uniform mat4 projection;
     uniform mat4 view;
 };
+
+uniform sampler2D normalMap; 
 
 uniform vec3 lightPos;
 uniform vec3 viewPos;
@@ -69,7 +73,16 @@ float fbm(vec2 p) {
 // Main
 void main() {
   
-    vec3 normal   = normalize(fs_in.Normal);
+    mat3 TBN = mat3(normalize(fs_in.Tangent),
+                normalize(fs_in.Bitangent),
+                normalize(fs_in.Normal));
+    
+
+    vec3 sampledNormal = texture(normalMap, fs_in.FragUV).rgb;
+    sampledNormal = normalize(sampledNormal * 2.0 - 1.0);
+    vec3 normal = normalize(TBN * sampledNormal);
+
+    // vec3 normal   = normalize(fs_in.Normal);
     vec3 lightDir = normalize(lightPos - fs_in.FragPos);
     vec3 viewDir  = normalize(viewPos - fs_in.FragPos);
     vec3 halfway  = normalize(lightDir + viewDir);
