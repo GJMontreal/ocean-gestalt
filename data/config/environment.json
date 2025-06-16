@@ -31,37 +31,37 @@
             "wavelength": 4.0
         },
         {
-            "amplitude": 17.67422103881836,
+            "amplitude": 0,
             "heading": 201.13571166992188,
             "steepness": 1.0,
             "wavelength": 17.67422103881836
         },
         {
-            "amplitude": 40.14812088012695,
+            "amplitude": 0,
             "heading": 234.78387451171875,
             "steepness": 1.0,
             "wavelength": 40.14812088012695
         },
         {
-            "amplitude": 19.851879119873047,
+            "amplitude": 0,
             "heading": 101.6596450805664,
             "steepness": 1.0,
             "wavelength": 19.851879119873047
         },
         {
-            "amplitude": 41.247901916503906,
+            "amplitude": 0,
             "heading": 139.06886291503906,
             "steepness": 1.0,
             "wavelength": 41.247901916503906
         },
         {
-            "amplitude": 18.752099990844727,
+            "amplitude": 0,
             "heading": 150.71759033203125,
             "steepness": 1.0,
             "wavelength": 18.752099990844727
         },
         {
-            "amplitude": 55.096126556396484,
+            "amplitude": 0,
             "heading": 244.50619506835938,
             "steepness": 1.0,
             "wavelength": 55.096126556396484
@@ -73,13 +73,13 @@
             "wavelength": 4.903873443603516
         },
         {
-            "amplitude": 59.777008056640625,
+            "amplitude": 0,
             "heading": 128.22857666015625,
             "steepness": 1.0,
             "wavelength": 59.777008056640625
         },
         {
-            "amplitude": 1.0,
+            "amplitude": 0.0,
             "heading": 93.49227905273438,
             "steepness": 1.0,
             "wavelength": 15.222993850708008

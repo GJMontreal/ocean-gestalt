@@ -98,12 +98,12 @@ vec3 calcNormal(vec3 originalPosition,
                 float offset) {
   
   vec3 someVec =calcNewPosition(vec3(originalPosition.x + offset, originalPosition.y, 0));
-  someVec.z += gustDisplacement(someVec, windDir);
+  someVec.z += gustDisplacement(originalPosition, windDir);
 
   vec3 tangent =  someVec - newPosition;
 
   vec3 someOtherVec = calcNewPosition(vec3(originalPosition.x, originalPosition.y + offset, 0));
-  someOtherVec.z += gustDisplacement(someOtherVec, windDir);
+  someOtherVec.z += gustDisplacement(originalPosition, windDir);
 
   vec3 bitangent =  someOtherVec - newPosition; 
 
@@ -115,7 +115,7 @@ void main(void)
 {
     vec2 windDirection = normalize(direction.xy);
     vec3 newPosition = calcNewPosition(position);
-    float gust = gustDisplacement(newPosition, windDirection);
+    float gust = gustDisplacement(position, windDirection);
     newPosition.z += gust;
     vec3 normalFD = calcNormal(position, newPosition, windDirection, NORMAL_OFFSET);
 

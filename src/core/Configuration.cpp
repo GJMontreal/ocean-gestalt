@@ -162,19 +162,12 @@ void Configuration::setInitialUniformState(const ApiAdapter& api){
   // api.setValue("uniforms.mesh_shader.lineColor",  uniformToApi(meshColor));
     api.setValue("uniforms.wireframe_shader.lineColor", uniformToApi(wireframeColor));
 
-
-    wireframeShader->activate();
-    wireframeShader->loadTexture(SHADER_DIR "gust_noise_512.png", "gustNoise");
-    wireframeShader->deactivate();
-
-    meshShader->activate();
-    meshShader->loadTexture(SHADER_DIR "gust_noise_512.png", "gustNoise");
-    meshShader->deactivate();
-
-    normalShader->activate();
-    normalShader->loadTexture(SHADER_DIR "gust_noise_512.png", "gustNoise");
-    normalShader->deactivate();
-
+    for(auto value: shaders){
+      value.second->activate();
+      value.second->loadTexture(SHADER_DIR "ridged_noise.png","gustNoise");
+      value.second->deactivate();
+    }
+  
     normalShader->activate();
     normalShader->setUniform("lineColor",normalColor);
     normalShader->deactivate();
