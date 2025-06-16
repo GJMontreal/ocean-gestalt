@@ -1,7 +1,7 @@
-#ifndef __LIGHT_HPP
-#define __LIGHT_HPP
+#pragma once
 
 #include "Moveable.hpp"
+// #include "Model.hpp"
 
 #include <glm/glm.hpp>
 #include "glm/detail/type_vec.hpp"
@@ -15,4 +15,3 @@ class Light: public Moveable{
     // vec3 position;
 };
 
-#endif

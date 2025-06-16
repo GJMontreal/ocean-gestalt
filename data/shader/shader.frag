@@ -5,7 +5,6 @@ in VS_OUT {
     vec3 Normal;
     vec3 Color;
     vec3 ModelUp;
-    float FoamModulation;
 } fs_in;
 
 layout(std140) uniform Matrices
@@ -69,6 +68,7 @@ float fbm(vec2 p) {
 
 // Main
 void main() {
+  
     vec3 normal   = normalize(fs_in.Normal);
     vec3 lightDir = normalize(lightPos - fs_in.FragPos);
     vec3 viewDir  = normalize(viewPos - fs_in.FragPos);
@@ -89,23 +89,23 @@ void main() {
     vec3 shiftedColor = mix(fs_in.Color, deepColor, depthFade);
 
     // Slope-based foam
-    float slope = 1.0 - dot(normal, fs_in.ModelUp);
-    float slopeFoam = smoothstep(FOAM_SLOPE_MIN, FOAM_SLOPE_MAX, slope);
-    float crestFoam = smoothstep(0.0, 0.5, fs_in.FragPos.y); // adjust thresholds for your wave scale
-    float foamMask = slopeFoam * crestFoam * fs_in.FoamModulation;
+    // float slope = 1.0 - dot(normal, fs_in.ModelUp);
+    // float slopeFoam = smoothstep(FOAM_SLOPE_MIN, FOAM_SLOPE_MAX, slope);
+    // float crestFoam = smoothstep(0.0, 0.5, fs_in.FragPos.y); // adjust thresholds for your wave scale
+    // float foamMask = slopeFoam * crestFoam * fs_in.FoamModulation;
 
    
-    // float foamBase = smoothstep(FOAM_SLOPE_MIN, FOAM_SLOPE_MAX, slope);
+    // // float foamBase = smoothstep(FOAM_SLOPE_MIN, FOAM_SLOPE_MAX, slope);
 
-    // float foamMask = foamBase * fs_in.FoamModulation;
-    // vec3 foamColor = vec3(1.0) * (FOAM_BRIGHTNESS_BASE + FOAM_BRIGHTNESS_VARIANCE * fs_in.FoamModulation);
+    // // float foamMask = foamBase * fs_in.FoamModulation;
+    // // vec3 foamColor = vec3(1.0) * (FOAM_BRIGHTNESS_BASE + FOAM_BRIGHTNESS_VARIANCE * fs_in.FoamModulation);
     
-    vec2 foamUV = fs_in.FragPos.xz * 1.5 + vec2(time * 0.2, time * 0.15);  // controls scale and animation
-    float foamNoise = fbm(foamUV);
-    foamNoise = smoothstep(0.4, 1.0, foamNoise);  // optional to shape distribution
+    // vec2 foamUV = fs_in.FragPos.xz * 1.5 + vec2(time * 0.2, time * 0.15);  // controls scale and animation
+    // float foamNoise = fbm(foamUV);
+    // foamNoise = smoothstep(0.4, 1.0, foamNoise);  // optional to shape distribution
 
-    vec3 foamColor = mix(vec3(0.8), vec3(1.0), foamNoise);  // subtle noisy foam
-    foamColor *= (FOAM_BRIGHTNESS_BASE + FOAM_BRIGHTNESS_VARIANCE * fs_in.FoamModulation);
+    // vec3 foamColor = mix(vec3(0.8), vec3(1.0), foamNoise);  // subtle noisy foam
+    // foamColor *= (FOAM_BRIGHTNESS_BASE + FOAM_BRIGHTNESS_VARIANCE * fs_in.FoamModulation);
 
     // Caustic flicker in troughs
     float causticStrength = smoothstep(-0.6, 0.1, -fs_in.FragPos.y);
@@ -120,7 +120,7 @@ void main() {
 
     causticFlicker = pow(causticFlicker, 6.0);
     
-    float causticMask = 1.0 - foamMask;
+    float causticMask = 1.0;
     vec3 causticLight = CAUSTIC_COLOUR * causticFlicker * causticMask * causticStrength * CAUSTIC_INTENSITY;
 
     // Combine lighting
@@ -138,17 +138,18 @@ void main() {
 
      // or length(ambient + diffuse + specular)
     lightingIntensity = clamp(lightingIntensity, 0.0, 1.0);
-    float litFoamMask = foamMask * lightingIntensity;
-    finalColor = mix(finalColor, foamColor, litFoamMask);
+    // float litFoamMask = foamMask * lightingIntensity;
+    // finalColor = mix(finalColor, foamColor, litFoamMask);
 
     // Foam blend
-    finalColor = mix(finalColor, foamColor, foamMask);
+    // finalColor = mix(finalColor, foamColor, foamMask);
 
     // Fog
     float fogFactor = clamp(exp(-FOG_DENSITY * depth), 0.0, 1.0);
     vec3 fogColor = vec3(0.4, 0.6, 0.7); // sky-ish blue
     vec3 fogged = mix(fogColor, finalColor, fogFactor);
 
-    // FragColor = vec4(fogged, 1.0);
-    FragColor = vec4(finalColor, 1.0);
+    FragColor = vec4(fogged, 1.0);
+    // FragColor = vec4(finalColor, 1.0);
+    // FragColor = vec4(fs_in.Color,1.0);
 }

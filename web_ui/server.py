@@ -13,9 +13,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
     def do_GET(self):
-        if self.path == "/api/params":
+        requested_path = self.path.lstrip("/")
+        print(requested_path)
+        if requested_path.endswith(".json") and os.path.isfile(requested_path):
             try:
-                with open(PARAMS_FILE, "r") as f:
+                with open(requested_path, "r") as f:
                     data = json.load(f)
                 self._send_json(data)
             except Exception as e:
@@ -24,6 +26,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             # Serve static files
             if self.path == "/":
                 self.path = "/index.html"
+            if self.path == "/gust":
+                self.path = "/gust.html"
             super().do_GET()
 
     def do_POST(self):
@@ -49,6 +53,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 os.chdir(STATIC_DIR)
 
-with socketserver.TCPServer(("", PORT), Handler) as httpd:
-    print(f"Serving UI at http://localhost:{PORT}")
+with socketserver.TCPServer(("0.0.0.0", PORT), Handler) as httpd:
+    print(f"Serving UI at http://0.0.0.0:{PORT}")
     httpd.serve_forever()

@@ -15,6 +15,9 @@
 #include <stdexcept>
 #include <vector>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 using namespace std;
 using namespace glm;
 
@@ -267,4 +270,34 @@ void ShaderProgram::deactivate() const {
 
 GLuint ShaderProgram::getHandle() const {
   return handle;
+}
+
+GLuint ShaderProgram::loadTexture(const std::string& path, const std::string& uniformName, GLuint unit) {
+    GLuint texID;
+    glGenTextures(1, &texID);
+    glActiveTexture(GL_TEXTURE0 + unit);
+    glBindTexture(GL_TEXTURE_2D, texID);
+
+    // Texture settings
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    int width, height, channels;
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 1);
+    if (!data) {
+        throw std::runtime_error("Failed to load texture: " + path);
+    }
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
+
+    // Link texture to shader
+    GLint loc = glGetUniformLocation(getHandle(), uniformName.c_str());
+    glUniform1i(loc, unit);
+
+    return texID;
 }

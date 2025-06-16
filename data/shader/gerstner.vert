@@ -20,6 +20,13 @@ uniform mat4 model;
 
 uniform float time;
 
+uniform sampler2D gustNoise;
+
+uniform vec3 direction;     // normalized wind direction
+uniform float gustSpeed;        // how fast the gust moves
+uniform float gustScale;        // spatial scale of modulation
+uniform float gustStrength;     // vertical amplitude
+
 struct WAVE{  
   vec3 direction;
   float amplitude;
@@ -39,52 +46,21 @@ out VS_OUT {
     vec3 Normal;
     vec3 Color;
     vec3 ModelUp;
-    float FoamModulation;
 } vs_out;
 
 const float PI = 3.14159265358979323;
 const float speedScale = 3.0;
 
-// Fractal Brownian Motion
-const float FBM_SCALE = 0.2;           // spatial frequency
-const float FBM_TIME_SPEED_X = 0.1;    // x scroll speed
-const float FBM_TIME_SPEED_Y = 0.07;   // y scroll speed
-const float FBM_AMPLITUDE = 0.2;      // max vertical displacement
-const float FBM_MODULATION_MIN = 0.0;  // waveHeight threshold low
-const float FBM_MODULATION_MAX = 1.0;  // waveHeight threshold high
-
 const float GRAVITY = 9.81; 
 
-float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-}
-
-float valueNoise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-
-    float a = hash(i);
-    float b = hash(i + vec2(1.0, 0.0));
-    float c = hash(i + vec2(0.0, 1.0));
-    float d = hash(i + vec2(1.0, 1.0));
-
-    vec2 u = f * f * (3.0 - 2.0 * f);  // smoothstep interpolation
-
-    return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
-}
-
-float fbm(vec2 p) {
-    float sum = 0.0;
-    float amplitude = 0.5;
-    float frequency = 1.0;
-
-    for (int i = 0; i < 5; ++i) {
-        sum += amplitude * valueNoise(p * frequency);
-        frequency *= 2.0;
-        amplitude *= 0.5;
-    }
-
-    return sum;
+float gustDisplacement(
+    vec3 position, vec2 gustDir) {
+    vec2 gustUVOrigin = vec2(-20,-20);
+    vec2 gustUVScale = vec2(gustScale,gustScale);
+    vec2 uv = (position.xy - gustUVOrigin) * gustUVScale;
+    uv += gustDir * time * gustSpeed;
+    float gust = texture(gustNoise, uv).r;
+    return (gust - 0.5) * 2.0 * gustStrength;
 }
 
 const float VELOCITY_SCALE = 1.0; // Scale spatial dimensions and wave wavelengths
@@ -106,45 +82,47 @@ vec3 waveOffset(float time, vec3 aPosition, WAVE wave) {
 }
 
 
-vec3 calcNewPosition(vec3 aPosition, out float modulation){
+vec3 calcNewPosition(vec3 aPosition){
   vec3 offset = vec3(0.0);
   for(int i=0; i < NUM_WAVES; i++){
     vec3 newOffset = waveOffset(time, aPosition, waves[i] );
     offset += newOffset;
   }
   offset = aPosition + offset / float(NUM_WAVES);
-
-  vec2 q = offset.xy * FBM_SCALE + vec2(time * FBM_TIME_SPEED_X, time * FBM_TIME_SPEED_Y);
-  float n = fbm(q);
-
-  float waveHeight = offset.z - aPosition.z;
-  modulation = smoothstep(FBM_MODULATION_MIN, FBM_MODULATION_MAX, abs(waveHeight));
-  
-  offset.z += n * FBM_AMPLITUDE * modulation;
-
   return offset;
 }
 
 vec3 calcNormal(vec3 originalPosition,
                 vec3 newPosition,
+                vec2 windDir,
                 float offset) {
-  float foamModulation;
-  vec3 tangent =  calcNewPosition(vec3(originalPosition.x + offset, originalPosition.y, 0), foamModulation) - newPosition; 
-  vec3 bitangent = calcNewPosition(vec3(originalPosition.x, originalPosition.y + offset, 0),foamModulation) - newPosition; 
+  
+  vec3 someVec =calcNewPosition(vec3(originalPosition.x + offset, originalPosition.y, 0));
+  someVec.z += gustDisplacement(someVec, windDir);
+
+  vec3 tangent =  someVec - newPosition;
+
+  vec3 someOtherVec = calcNewPosition(vec3(originalPosition.x, originalPosition.y + offset, 0));
+  someOtherVec.z += gustDisplacement(someOtherVec, windDir);
+
+  vec3 bitangent =  someOtherVec - newPosition; 
+
   vec3 normal = normalize(cross(tangent , bitangent)) ;
   return normal;
 }
 
 void main(void)
 {
-    float foamModulation;
-    vec3 newPosition = calcNewPosition(position, foamModulation);
-    vec3 normalFD = calcNormal(position, newPosition, NORMAL_OFFSET);
+    vec2 windDirection = normalize(direction.xy);
+    vec3 newPosition = calcNewPosition(position);
+    float gust = gustDisplacement(newPosition, windDirection);
+    newPosition.z += gust;
+    vec3 normalFD = calcNormal(position, newPosition, windDirection, NORMAL_OFFSET);
+
     gl_Position = projection * view * model * vec4(newPosition, 1.0) ;
     vs_out.FragPos = vec3(model * vec4(newPosition,1.0));
     vs_out.Normal = normalize(transpose(inverse(mat3(model))) * normalFD);
     vs_out.Color = vec3(color);
     vec3 modelUp = normalize(mat3(model) * vec3(0.0, 0.0, 1.0));
     vs_out.ModelUp = modelUp;
-    vs_out.FoamModulation = foamModulation;
 }

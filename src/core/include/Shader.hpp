@@ -80,8 +80,11 @@ class ShaderProgram {
   void setUniform(const std::string& name, float val);
   void setUniform(const std::string& name, int val);
 
+  // TODO: get rid of these two
   void listUniforms() const;
   std::optional<std::string> getUniform(const std::string& name) const;
+
+  GLuint loadTexture(const std::string& path, const std::string& uniformName, GLuint unit = 0);
 
   ~ShaderProgram();
 

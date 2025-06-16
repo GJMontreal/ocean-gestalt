@@ -70,10 +70,12 @@ void Configuration::loadShaders(const string& fileName) {
   wireframeShader = buildShader(j, "wireframe_shader", wireframeColor);
   shaders[meshShader->getName()] = meshShader;
   shaders[wireframeShader->getName()] = wireframeShader;
+
   // WEBGL doesn't support geometry shaders
 #ifndef __EMSCRIPTEN__
   normalShader = buildShader(j, "normal_shader", normalColor);
 #endif
+  shaders[normalShader->getName()] = normalShader;
 }
 
 shared_ptr<ShaderProgram> Configuration::buildShader(json& j,
@@ -158,8 +160,29 @@ std::unordered_map<std::string, shared_ptr<ShaderProgram>>& Configuration::getSh
 void Configuration::setInitialUniformState(const ApiAdapter& api){
   //set all the uniforms
   // api.setValue("uniforms.mesh_shader.lineColor",  uniformToApi(meshColor));
-  api.setValue("uniforms.wireframe_shader.lineColor", uniformToApi(wireframeColor));
+    api.setValue("uniforms.wireframe_shader.lineColor", uniformToApi(wireframeColor));
 
+
+    wireframeShader->activate();
+    wireframeShader->loadTexture(SHADER_DIR "gust_noise_512.png", "gustNoise");
+    wireframeShader->deactivate();
+
+    meshShader->activate();
+    meshShader->loadTexture(SHADER_DIR "gust_noise_512.png", "gustNoise");
+    meshShader->deactivate();
+
+    normalShader->activate();
+    normalShader->loadTexture(SHADER_DIR "gust_noise_512.png", "gustNoise");
+    normalShader->deactivate();
+
+    normalShader->activate();
+    normalShader->setUniform("lineColor",normalColor);
+    normalShader->deactivate();
+
+    api.setValue("uniforms.direction",uniformToApi(glm::vec3(-1.0,0.3,0.0) ));
+    api.setValue("uniforms.gustStrength",uniformToApi(0.0f));
+    api.setValue("uniforms.gustSpeed",uniformToApi(0.0f));
+    api.setValue("uniforms.gustScale",0.2f);
   int i = 0;
   for( const shared_ptr<Wave> wave: waves){
     std::string uniformName = string_format("uniforms.waves[%i].amplitude", i);
@@ -171,6 +194,7 @@ void Configuration::setInitialUniformState(const ApiAdapter& api){
     api.setValue(uniformName,uniformToApi(wave->wavelength));
     uniformName = string_format("uniforms.waves[%i].direction", i);
     api.setValue(uniformName,uniformToApi(glm::vec3(wave->direction,0.0f)));
+
     i++;
   }
 }

@@ -21,7 +21,7 @@ int main(int argc, const char* argv[]) {
   app->doOnReady([&api,&app]{app->getContext().setInitialUniformState(*api);});
   // app->getContext().setInitialUniformState(*api);
   
-  auto server = std::make_unique<RestServer>(api);
+  auto server = std::make_unique<RestServer>(api,"0.0.0.0:8080");
   server->addHandlers(); // why does this have to explicit
   app->run();
   return 0;

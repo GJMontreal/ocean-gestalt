@@ -34,9 +34,10 @@ class Model {
 
   Mesh* getMesh(int index);
 
-  virtual void updateShaderUniforms() = 0;
-  virtual void setWaveUniforms(const vector<shared_ptr<Wave>>& waves,
-                         shared_ptr<ShaderProgram> program)const = 0;
+  // I think we could get rid of these two
+  // virtual void updateShaderUniforms() = 0;
+  // virtual void setWaveUniforms(const vector<shared_ptr<Wave>>& waves,
+  //                        shared_ptr<ShaderProgram> program)const = 0;
 
 // these could all be public, simplifying things
  private:

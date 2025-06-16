@@ -15,14 +15,14 @@ class Ocean : public Model {
 
   ~Ocean() override = default;
   void draw(Uniforms& uniforms) override;
-  void updateShaderUniforms() override;
+  void updateShaderUniforms();
  private:
   float elapsedTime=0;
   double lastTime;
   std::vector<Wave*> waves; //this is moving to the configuration
 
   void setWaveUniforms(const vector<shared_ptr<Wave>>& waves,
-                         shared_ptr<ShaderProgram> program)const override;
+                         shared_ptr<ShaderProgram> program)const;
 };
 
 #endif

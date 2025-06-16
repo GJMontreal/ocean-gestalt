@@ -1,0 +1,44 @@
+{
+    "port": 8080,
+        "uniforms": {
+        "_meta": {
+            "display": "Gust"
+        },
+        "gustStrength": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Strength",
+                    "control": "slider"
+                }
+            },
+            "gustSpeed": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Speed",
+                    "control": "slider"
+                }
+            },
+            "gustScale": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Scale",
+                    "control": "slider"
+                }
+            },
+            "heading": {
+                "type": "float",
+                "min": 0,
+                "max": 360,
+                "_meta": {
+                    "display": "Heading",
+                    "control": "slider"
+                }
+            }
+      }
+    }

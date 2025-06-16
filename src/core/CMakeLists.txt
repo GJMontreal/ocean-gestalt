@@ -44,4 +44,5 @@ target_include_directories(app-core
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
   PRIVATE ${CMAKE_BINARY_DIR}/src/core
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+  PUBLIC ${CMAKE_SOURCE_DIR}/lib/stb
 )

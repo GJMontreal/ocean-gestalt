@@ -3,7 +3,10 @@ import { buildControls } from './buildControls.js';
 const { host, port } = window.apiConfig;
 const apiBase = `http://${host}:${port}`;
 
-fetch(`http://localhost:8000/api/params`)
+const {host: uiHost, port: uiPort, json: uiJson} = window.uiConfig;
+const uiBase = `http://${uiHost}:${uiPort}`;
+
+fetch(`${uiBase}/${uiJson}`)
   .then(res => res.json())
   .then(data => {
     const container = document.getElementById("controls");

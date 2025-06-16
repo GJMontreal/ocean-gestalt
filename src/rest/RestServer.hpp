@@ -8,7 +8,7 @@
 
 class RestServer{
   public:
-  RestServer(std::shared_ptr<ApiAdapter>&& api, int port = 8080);
+  RestServer(std::shared_ptr<ApiAdapter>&& api, const std::string& portString = "8080");
   ~RestServer() = default;
 
   void addHandlers();

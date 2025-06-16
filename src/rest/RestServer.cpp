@@ -5,15 +5,14 @@
 #include <string>
 #include <iostream>
 
-RestServer::RestServer(std::shared_ptr<ApiAdapter>&& api, int port)
+RestServer::RestServer(std::shared_ptr<ApiAdapter>&& api, const std::string& portString)
     : api(std::move(api)) {
-  std::string portString = std::to_string((port));
   const char* options[] = {
         "listening_ports",portString.c_str(),
         nullptr
     };
 
-  std::cout << "Starting api server at " << port << std::endl;
+  std::cout << "Starting api server at " << portString << std::endl;
   server = std::make_unique<CivetServer>(options);
   addHandlers();
 }
