@@ -88,7 +88,7 @@ shared_ptr<ShaderProgram> Configuration::buildShader(json& j,
   Shader fragmentShader(SHADER_DIR + (string)shaderJSON.at("fragment"),
                         GL_FRAGMENT_SHADER);
 
-  color = shaderJSON.at("color");
+  color = shaderJSON.at("color"); // TODO: I think we should be able to get rid of this with our new uniform system
 
   // optional geometry shader where supported
   auto geometry = shaderJSON["geometry"];

@@ -21,7 +21,7 @@
 #include "WaveUI.hpp"
 #include "Moveable.hpp"
 #include "KeyExecutable.hpp"
-
+#include "SurfAudio.hpp"
 
 using std::unique_ptr;
 using std::string;
@@ -89,6 +89,8 @@ class OceanGestalt : public OceanGestaltInterface,
 
   std::vector<std::function<void()>> onReadyCallbacks;
   std::vector<std::function<void()>> renderThreadCallbacks;
+
+  std::shared_ptr<SurfAudio> surfAudio;
 };
 
 #endif

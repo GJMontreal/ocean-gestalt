@@ -263,7 +263,13 @@ ShaderProgram::~ShaderProgram() {
 
 void ShaderProgram::activate() const {
   glUseProgram(handle);
+
+  // for(auto tex: textures){
+  //   glActiveTexture(GL_TEXTURE + handle);
+  //   glBindTexture(GL_TEXTURE_2D, tex.texID);
+  // }
 }
+
 void ShaderProgram::deactivate() const {
   glUseProgram(0);
 }
@@ -299,5 +305,6 @@ GLuint ShaderProgram::loadTexture(const std::string& path, const std::string& un
     GLint loc = glGetUniformLocation(getHandle(), uniformName.c_str());
     glUniform1i(loc, unit);
 
+    textures.push_back(TexBinding{loc,uniformName});
     return texID;
 }

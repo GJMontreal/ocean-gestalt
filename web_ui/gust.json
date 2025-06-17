@@ -1,46 +1,46 @@
 {
     "port": 8080,
-        "uniforms": {
+    "uniforms": {
         "_meta": {
             "display": "Water Surface"
         },
         "gustStrength": {
-                "type": "float",
-                "min": 0,
-                "max": 1,
-                "_meta": {
-                    "display": "Strength",
-                    "control": "slider"
-                }
-            },
-            "gustSpeed": {
-                "type": "float",
-                "min": 0,
-                "max": 1,
-                "_meta": {
-                    "display": "Speed",
-                    "control": "slider"
-                }
-            },
-            "gustScale": {
-                "type": "float",
-                "min": 0.001,
-                "max": 0.05,
-                "_meta": {
-                    "display": "Scale",
-                    "control": "slider"
-                }
-            },
-            "heading": {
-                "type": "float",
-                "min": 0,
-                "max": 360,
-                "_meta": {
-                    "display": "Heading",
-                    "control": "slider"
-                }
-            },
-                    "mesh_shader": {
+            "type": "float",
+            "min": 0,
+            "max": 1,
+            "_meta": {
+                "display": "Strength",
+                "control": "slider"
+            }
+        },
+        "gustSpeed": {
+            "type": "float",
+            "min": 0,
+            "max": 1,
+            "_meta": {
+                "display": "Speed",
+                "control": "slider"
+            }
+        },
+        "gustScale": {
+            "type": "float",
+            "min": 0.001,
+            "max": 0.05,
+            "_meta": {
+                "display": "Scale",
+                "control": "slider"
+            }
+        },
+        "heading": {
+            "type": "float",
+            "min": 0,
+            "max": 360,
+            "_meta": {
+                "display": "Heading",
+                "control": "slider"
+            }
+        },
+        "mesh_shader": {
             "_meta": {
                 "display": "Complex"
             },
@@ -62,7 +62,7 @@
                     "control": "slider"
                 }
             },
-             "causticIntensity": {
+            "causticIntensity": {
                 "type": "float",
                 "min": 0,
                 "max": 1,
@@ -92,7 +92,7 @@
             "foamSlopeMin": {
                 "type": "float",
                 "min": 0,
-                "max": 10.0,
+                "max": 10,
                 "_meta": {
                     "display": "Foam Slope Min",
                     "control": "slider"
@@ -101,7 +101,7 @@
             "foamSlopeAmplifier": {
                 "type": "float",
                 "min": 0,
-                "max": 1000.0,
+                "max": 1000,
                 "_meta": {
                     "display": "Foam Slope Amplifier",
                     "control": "slider"
@@ -110,12 +110,23 @@
             "foamSlopeMax": {
                 "type": "float",
                 "min": 0,
-                "max": 10.0,
+                "max": 10,
                 "_meta": {
                     "display": "Foam Slope Max",
                     "control": "slider"
                 }
+            },
+            "fogColor": {
+                "type": "vec4",
+                "_meta": {
+                    "display": "Line Colour",
+                    "control": "color",
+                    "range": [
+                        0,
+                        1
+                    ]
+                }
             }
-      }
+        }
     }
-    }
+}

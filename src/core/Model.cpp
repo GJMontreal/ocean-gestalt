@@ -21,6 +21,8 @@ void Model::draw(Uniforms& uniforms) {
   for(Mesh mesh: meshes){
     if(drawWireframe){
       configuration->wireframeShader->activate();
+
+      // be sure to rebind textures
       configuration->wireframeShader->setUniform("time",uniforms.time);
       configuration->wireframeShader->setUniform("model", transform);
 

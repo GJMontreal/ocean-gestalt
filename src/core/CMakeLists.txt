@@ -26,6 +26,8 @@ add_library(app-core STATIC
   Light.cpp
   Moveable.cpp
   KeyExecutable.cpp
+  SurfAudio.cpp
+  FoamRenderPass.cpp
 )
 
 set_property(TARGET app-core PROPERTY CXX_STANDARD 17)
@@ -45,4 +47,5 @@ target_include_directories(app-core
   PRIVATE ${CMAKE_BINARY_DIR}/src/core
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
   PUBLIC ${CMAKE_SOURCE_DIR}/lib/stb
+  PUBLIC ${CMAKE_SOURCE_DIR}/lib/miniaudio
 )

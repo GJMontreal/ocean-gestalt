@@ -42,7 +42,11 @@ OceanGestalt::OceanGestalt() : Application() {
 #ifndef __EMSCRIPTEN__
   initUniformBuffers();
 #endif
+  
+  // surfAudio = std::make_shared<SurfAudio>();
+  // doOnReady([&]{surfAudio->start();});
 
+  // onRender([&]{surfAudio->setFoamLevel(float foam);});
 }
 
 void OceanGestalt::setUIDelegate() {

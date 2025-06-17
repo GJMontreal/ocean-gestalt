@@ -41,6 +41,8 @@ class Shader {
 //
 // This class provide an interface to define the OpenGL uniforms and attributes
 // using GLM objects.
+
+struct TexBinding { GLint texID; std::string uniform; };
 class ShaderProgram {
  public:
   // constructor
@@ -93,6 +95,7 @@ class ShaderProgram {
 
   std::map<std::string, GLint> uniforms;
   std::map<std::string, GLint> attributes;
+  std::vector<TexBinding> textures;
   std::string name;
 
   // opengl id
