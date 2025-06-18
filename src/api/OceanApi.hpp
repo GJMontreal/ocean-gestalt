@@ -10,7 +10,7 @@ class OceanGestaltInterface;
 class AppContextInterface;
 class OceanApi : public ApiAdapter {
 public:
-  OceanApi(std::shared_ptr<OceanGestaltInterface> app, UniformState& state);
+  OceanApi(std::shared_ptr<OceanGestaltInterface> app, std::shared_ptr<UniformState> state);
 
   void setupShaderNormalInterface();
 
@@ -35,7 +35,7 @@ public:
     std::vector<std::string> splitPath(const std::string& input, char delimiter = '.')const;
   private:
   std::weak_ptr<OceanGestaltInterface> app;
-  UniformState& uniformState;
+  std::weak_ptr<UniformState> uniformState;
 
   std::vector<std::unique_ptr<PathHandler>> pathHandlers;
 };

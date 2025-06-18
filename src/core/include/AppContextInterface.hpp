@@ -1,8 +1,11 @@
 #pragma once
-#include "Shader.hpp"
+// #include "Shader.hpp"
+#include <map>
 #include <memory>
 
 class ApiAdapter;
+class ShaderProgram;
+
 class AppContextInterface{
   public:
     virtual std::unordered_map<std::string, std::shared_ptr<ShaderProgram>>& getShaders() = 0;

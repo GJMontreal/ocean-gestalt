@@ -1,7 +1,7 @@
 #include "UniformState.hpp"
 #include "UniformDispatcher.hpp"
 #include "glError.hpp"
-
+#include "Shader.hpp"
 #include <iostream>
 
 static const int TIMEOUT = 50;

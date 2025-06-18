@@ -10,6 +10,7 @@
 #include <fstream>
 #include <iostream>
 #include <thread>
+#include <future>
 
 using nlohmann::json;
 using std::cout;
@@ -190,6 +191,12 @@ std::unordered_map<std::string, shared_ptr<ShaderProgram>>& Configuration::getSh
   return shaders;
 };
 
+
+template <typename F>
+void dispatch_async(F&& task) {
+  std::thread(std::forward<F>(task)).detach();  //fire and forget
+}
+
 void Configuration::setInitialUniformState(const ApiAdapter& api){
   //set all the uniforms
   // api.setValue("uniforms.mesh_shader.lineColor",  uniformToApi(meshColor));
@@ -202,9 +209,10 @@ void Configuration::setInitialUniformState(const ApiAdapter& api){
       value.second->loadTexture(SHADER_DIR "NormalMap.png","gustNormalMap");
       value.second->deactivate();
     }
-    std::thread([*this, &api] {
+    
+    dispatch_async([this, &api] {
       this->setInitialWaveUniforms(api);
-    }).detach();
+    });
 }
 
 void Configuration::setInitialWaveUniforms(const ApiAdapter& api)const{

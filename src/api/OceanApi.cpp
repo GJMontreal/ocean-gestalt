@@ -8,7 +8,7 @@
 #include <string>
 #include <sstream>
 
-OceanApi::OceanApi(std::shared_ptr<OceanGestaltInterface> app, UniformState& state)
+OceanApi::OceanApi(std::shared_ptr<OceanGestaltInterface> app, std::shared_ptr<UniformState> state)
     : app(app), uniformState(state){
   
   auto& context = app->getContext();
@@ -56,12 +56,17 @@ std::optional<ApiValue> OceanApi::setUniform(
   const std::string& shaderName,
   const std::string& uniformName,
   ApiValue value) {
-  
-  return uniformState.setUniform(shaderName, uniformName, value);
+  if(auto locked = uniformState.lock()){
+    return locked->setUniform(shaderName, uniformName, value);
+  }
+  return std::nullopt;
 }
 
 std::unique_ptr<UniformMap> OceanApi::dumpUniforms() {
-  return uniformState.dumpUniforms();
+  if(auto locked = uniformState.lock()){
+    return locked->dumpUniforms();
+  }
+  return std::make_unique<UniformMap>();
 }
 
 std::optional<std::any> OceanApi::getUniform(std::string shaderName, std::string uniformName) {

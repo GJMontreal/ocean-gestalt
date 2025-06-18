@@ -18,8 +18,8 @@ bool UniformPathHandler::matches(const std::vector<std::string>& parts) const{
     return !parts.empty() && parts.size() >= 2 && parts[0] == "uniforms";
   }
 
-  //could this could be improved by returning a pointer
-std::string buildUniformPath(const std ::vector<std::string>& parts) {
+//could this could be improved by returning a pointer
+std::string UniformPathHandler::buildUniformPath(const std ::vector<std::string>& parts) {
     std::string uniformName;
     for (size_t i = 1; i < parts.size(); ++i) {
       if (i > 1)
@@ -52,12 +52,16 @@ std::optional<ApiValue> UniformPathHandler::set(
 
   std::optional<ApiValue> result;
   bool targeted = std::find(shaderNames.begin(), shaderNames.end(), targetShader) != shaderNames.end();
+  auto locked = uniformState.lock();
+  if(!locked){
+    return std::nullopt;
+  }
 
   if (targeted) {
-    result = uniformState.setUniform(targetShader, parts.back(), val);
+    result = locked->setUniform(targetShader, parts.back(), val);
   } else {
     for (const auto& shader : shaderNames) {
-      result = uniformState.setUniform(shader, uniformName, val);
+      result = locked->setUniform(shader, uniformName, val);
     }
   }
 
@@ -73,16 +77,21 @@ std::optional<ApiValue> UniformPathHandler::set(
 
   std::optional<ApiValue> UniformPathHandler::get(
       const std::vector<std::string>& parts) {
+
+        auto locked = uniformState.lock();
+        if(!locked){
+          return std::nullopt;
+        }
     bool convertToHeading = parts.size() >= 3 && parts[2] == "heading";
    auto uniformName = buildUniformPath(parts);
 
     std::optional<ApiValue> result;
     if (std::find(shaderNames.begin(), shaderNames.end(), parts[1]) !=
         shaderNames.end()) {
-      result = uniformState.getUniform(parts[1], parts[2]);
+      result = locked->getUniform(parts[1], parts[2]);
     } else {
       for (const auto& shader : shaderNames) {
-        result = uniformState.getUniform(shader, uniformName);
+        result = locked->getUniform(shader, uniformName);
         if (result)
           break;
       }

@@ -3,8 +3,8 @@
 #include <optional>
 #include <string>
 #include <any>
-#include "ApiValue.hpp"
 
+#include "ApiValue.hpp"
 
 struct ApiAdapter {
   virtual void pauseSimulation(bool pause) = 0;
