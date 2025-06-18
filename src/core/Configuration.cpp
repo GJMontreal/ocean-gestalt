@@ -9,6 +9,7 @@
 #include <memory.h>
 #include <fstream>
 #include <iostream>
+#include <thread>
 
 using nlohmann::json;
 using std::cout;
@@ -194,16 +195,14 @@ void Configuration::setInitialUniformState(const ApiAdapter& api){
   // api.setValue("uniforms.mesh_shader.lineColor",  uniformToApi(meshColor));
     api.setValue("uniforms.wireframe_shader.lineColor", uniformToApi(wireframeColor));
 
+    // these need to be set before the render loop runs
     for(auto value: shaders){
       value.second->activate();
       value.second->loadTexture(SHADER_DIR "gust_noise_512.png","gustNoise");
       value.second->loadTexture(SHADER_DIR "NormalMap.png","gustNormalMap");
       value.second->deactivate();
     }
-  
-    // normalShader->activate();
-    // normalShader->setUniform("lineColor",normalColor);
-    // normalShader->deactivate();
+    std::thread([&] {
 
     api.setValue("uniforms.direction",uniformToApi(glm::vec3(-1.0,0.3,0.0) ));
     api.setValue("uniforms.gustStrength",uniformToApi(0.0f));
@@ -223,4 +222,5 @@ void Configuration::setInitialUniformState(const ApiAdapter& api){
 
     i++;
   }
+}).detach();
 }
