@@ -19,7 +19,7 @@ std::optional<ApiValue> UniformState::setUniform(
 
   {
     std::lock_guard lock(updateMutex);
-    pendingUpdates[shaderName].push_back(std::move(update));
+    pendingUpdatesFront[shaderName].push_back(std::move(update));
   }
   
   if(fut.wait_for(std::chrono::milliseconds(TIMEOUT)) == std::future_status::ready){
@@ -42,9 +42,12 @@ std::optional<ApiValue> UniformState::getUniform(const std::string& shader, cons
 }
 
 void UniformState::renderThreadCallback() {
-  std::lock_guard lock(updateMutex);
+  {
+    std::lock_guard lock(updateMutex);
+    std::swap(pendingUpdatesFront, pendingUpdatesBack);
+  }
 
-  for (auto& [shaderName, updates] : pendingUpdates) {
+  for (auto& [shaderName, updates] : pendingUpdatesBack) {
     ShaderProgram* shader = nullptr;
     auto shaders = context.getShaders();
 
@@ -73,5 +76,13 @@ void UniformState::renderThreadCallback() {
     }
     shader->deactivate();
   }
-  pendingUpdates.clear();
+  pendingUpdatesBack.clear();
+}
+
+std::unique_ptr<UniformMap> UniformState::dumpUniforms() {
+  auto uniformMap = std::make_unique<UniformMap>();
+  for(const auto &[key,value] : uniformStates){
+    (*uniformMap)[key] = uniformToApi(value);
+  }
+  return std::move(uniformMap);
 }

@@ -6,6 +6,7 @@
 #include "Light.hpp"
 #include "Shader.hpp"
 #include "AppContextInterface.hpp"
+#include "ApiValue.hpp"
 
 #include <memory.h>
 #include <nlohmann/json.hpp>
@@ -53,8 +54,12 @@ class Configuration: public AppContextInterface {
   int port;
 
   void save(const string& fileName);
+  void dumpUniforms(const string& fileName);
+  void loadUniforms(const string& fileName);
 
   std::unordered_map<std::string, shared_ptr<ShaderProgram>>& getShaders() override;
+  
+  void setApi(std::shared_ptr<ApiAdapter> api) override;
 
   private:
   void loadJSON(const string& fileName, json& data)const;
@@ -64,8 +69,9 @@ class Configuration: public AppContextInterface {
   void loadLight(const string& fileName);
   void loadMesh(const string& fileName);
   void loadGenerator(const string& fileName);
-  void loadAPI(const string& fileName);
+  void loadAPISettings(const string& fileName);
 
+  std::weak_ptr<ApiAdapter> api;
   shared_ptr<ShaderProgram> buildShader(json& j, const string& name, vec4& color);
 
   std::unordered_map<std::string, shared_ptr<ShaderProgram> > shaders;

@@ -14,7 +14,7 @@
 #include "glm/gtc/type_ptr.hpp"
 
 #include <iostream>
-
+#include <thread>
 #include <memory>
 #include <nlohmann/json.hpp>
 
@@ -167,10 +167,11 @@ void OceanGestalt::toggleDrawLines() {
 }
 
 void OceanGestalt::dumpUniforms() {
-  std::cout << "wireframe shader uniforms" << std::endl;
-  configuration->wireframeShader->listUniforms();
-  std::cout << "mesh shader uniforms" << std::endl;
-  configuration->meshShader->listUniforms();
+  configuration->dumpUniforms(CONFIGURATION_DIR "/uniforms.json");
+  // std::cout << "wireframe shader uniforms" << std::endl;
+  // configuration->wireframeShader->listUniforms();
+  // std::cout << "mesh shader uniforms" << std::endl;
+  // configuration->meshShader->listUniforms();
 }
 
 void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
@@ -192,6 +193,12 @@ void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
     moveable->ProcessKeyboard(Movement::UP, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
     moveable->ProcessKeyboard(Movement::DOWN, deltaTime);
+
+  executeIfPressed(window, GLFW_KEY_G, [this]() {
+    std::thread([this] {
+      configuration->loadUniforms(CONFIGURATION_DIR "uniforms.json");
+    }).detach();
+  });
 
   waveUI->processInput(window, deltaTime);
 

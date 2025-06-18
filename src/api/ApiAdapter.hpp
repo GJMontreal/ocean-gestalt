@@ -20,5 +20,8 @@ struct ApiAdapter {
   virtual std::optional<std::any> getUniform(std::string shaderName,
                                                 std::string uniformName) = 0;
 
+  virtual std::unique_ptr<UniformMap> dumpUniforms() = 0;
+  // virtual void loadUniforms(const std::string&) = 0;
+
   virtual ~ApiAdapter() = default;
 };

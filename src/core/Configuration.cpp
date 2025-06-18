@@ -25,7 +25,11 @@ Configuration::Configuration(const string& environment,
   loadMesh(environment);
   loadShaders(shader);
   loadGenerator(generator);
-  loadAPI(api);
+  loadAPISettings(api);
+}
+
+void Configuration::setApi(std::shared_ptr<ApiAdapter> api) {
+  this->api = api;
 }
 
 void Configuration::loadWaves(const string& fileName) {
@@ -131,18 +135,46 @@ void Configuration::loadGenerator(const string& fileName) {
   stdDeviation = data.at("std_deviation");
 }
 
-void Configuration::loadAPI(const string& fileName) {
+void Configuration::loadAPISettings(const string& fileName) {
   json data;
   loadJSON(fileName, data);
-
   port = data.at("port");
+}
+
+void Configuration::dumpUniforms(const string& fileName) {
+  if (auto locked = api.lock()) {
+    std::ofstream file(fileName);
+    if (file) {
+      auto&& uniforms = locked->dumpUniforms();
+      json data = *uniforms;
+      cout << "Writing uniforms" << endl;
+      file << std::setw(4) << data << endl;
+      file.close();
+    } else {
+      throw std::invalid_argument(string("The file ") + fileName +
+                                  " doesn't exist");
+    }
+  }
+}
+
+void Configuration::loadUniforms(const string& fileName) {
+  if (auto locked = api.lock()) {
+    json j;
+    loadJSON(fileName, j);
+    for (auto it = j.begin(); it != j.end(); ++it) {
+      const std::string& key = "uniforms." + it.key() ;
+      const json& value = it.value();
+      ApiValue apiVal = value.get<ApiValue>();
+      locked->setValue(key, apiVal);
+    }
+  }
 }
 
 void Configuration::save(const string& fileName) {
   std::ofstream file(fileName);
   if (file) {
     cout << "Writing configuration " << endl;
-    json data = *this;
+    json data = *this; // I've already forgotten how this works
     file << std::setw(4) << data << endl;
     cout << std::setw(4) << data
          << endl;  // so we can dump this in the web console
@@ -169,9 +201,9 @@ void Configuration::setInitialUniformState(const ApiAdapter& api){
       value.second->deactivate();
     }
   
-    normalShader->activate();
-    normalShader->setUniform("lineColor",normalColor);
-    normalShader->deactivate();
+    // normalShader->activate();
+    // normalShader->setUniform("lineColor",normalColor);
+    // normalShader->deactivate();
 
     api.setValue("uniforms.direction",uniformToApi(glm::vec3(-1.0,0.3,0.0) ));
     api.setValue("uniforms.gustStrength",uniformToApi(0.0f));

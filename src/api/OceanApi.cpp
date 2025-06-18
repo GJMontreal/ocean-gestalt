@@ -8,10 +8,10 @@
 #include <string>
 #include <sstream>
 
-OceanApi::OceanApi(OceanGestaltInterface& app, UniformState& state)
+OceanApi::OceanApi(std::shared_ptr<OceanGestaltInterface> app, UniformState& state)
     : app(app), uniformState(state){
   
-  auto& context = app.getContext();
+  auto& context = app->getContext();
   auto& shaders = context.getShaders();
   auto keys = getKeys(shaders);
   auto uniformPathHandler = std::make_unique<UniformPathHandler>(state,keys);
@@ -24,7 +24,7 @@ void OceanApi::setupShaderNormalInterface() {
 
 void OceanApi::pauseSimulation(bool pause) {
 
-  app.pauseSimulation(pause);
+  // app.pauseSimulation(pause);
 }
 
 void OceanApi::updateSimulation(std::string path, std::string value) {
@@ -58,6 +58,10 @@ std::optional<ApiValue> OceanApi::setUniform(
   ApiValue value) {
   
   return uniformState.setUniform(shaderName, uniformName, value);
+}
+
+std::unique_ptr<UniformMap> OceanApi::dumpUniforms() {
+  return uniformState.dumpUniforms();
 }
 
 std::optional<std::any> OceanApi::getUniform(std::string shaderName, std::string uniformName) {

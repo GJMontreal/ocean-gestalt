@@ -56,11 +56,6 @@ class OceanGestalt : public OceanGestaltInterface,
   int windowWidth;
   int windowHeight;
 
-  struct PendingUniformUpdate {
-    std::string shader;
-    std::string uniform;
-  };
-
   // shader matrix uniform
   glm::mat4 projection = mat4(1.0);
   glm::mat4 view = mat4(1.0);

@@ -24,12 +24,16 @@ class UniformState{
   std::optional<ApiValue> getUniform(const std::string& shaderName,
                                      const std::string& uniformName);
 
+  std::unique_ptr<UniformMap> dumpUniforms();
+  
   void renderThreadCallback();
 
   private:
   AppContextInterface& context;
   std::mutex updateMutex;
-  std::unordered_map<std::string, std::vector<PendingUniformUpdate>> pendingUpdates;
+  // std::unordered_map<std::string, std::vector<PendingUniformUpdate>> pendingUpdates;
+  std::unordered_map<std::string, std::vector<PendingUniformUpdate>> pendingUpdatesFront;
+  std::unordered_map<std::string, std::vector<PendingUniformUpdate>> pendingUpdatesBack;
   std::unordered_map<std::string, UniformValue> uniformStates;
   std::unordered_map<std::string, std::shared_ptr<ShaderProgram>> shaderPrograms;
 };

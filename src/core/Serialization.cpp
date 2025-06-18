@@ -1,4 +1,7 @@
 #include "Serialization.hpp"
+
+#include "ApiValue.hpp"
+
 #include <iostream>
 
 // Configuration
