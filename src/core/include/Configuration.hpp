@@ -71,6 +71,8 @@ class Configuration: public AppContextInterface {
   void loadGenerator(const string& fileName);
   void loadAPISettings(const string& fileName);
 
+  void setInitialWaveUniforms(const ApiAdapter& api) const;
+
   std::weak_ptr<ApiAdapter> api;
   shared_ptr<ShaderProgram> buildShader(json& j, const string& name, vec4& color);
 
