@@ -20,6 +20,8 @@ public:
     return std::nullopt;
   } 
   
+  std::unique_ptr<UniformMap> dumpUniforms() override { return nullptr;};
+  
   void pauseSimulation(bool) override {}
   void updateSimulation(std::string, std::string) override {}
 };
