@@ -23,10 +23,14 @@ uniform float time;
 uniform sampler2D gustNoise;
 // uniform sampler2D gustNormalMap;
 
-uniform vec3 direction;     // normalized wind direction
-uniform float gustSpeed;        // how fast the gust moves
-uniform float gustScale;        // spatial scale of modulation
-uniform float gustStrength;     // vertical amplitude
+struct GUST{
+  vec3 direction;     // normalized wind direction
+  float speed;        // how fast the gust moves
+  float scale;        // spatial scale of modulation
+  float strength;     // vertical amplitude
+};
+
+uniform GUST gust;
 
 struct WAVE{  
   vec3 direction;
@@ -57,17 +61,19 @@ const float speedScale = 3.0;
 const float GRAVITY = 9.81; 
 
 vec2 uvLocation(vec3 position, vec2 gustDir){
-    vec2 gustUVOrigin = vec2(-20,-20);
-    vec2 gustUVScale = vec2(gustScale,gustScale);
+    vec2 gustUVOrigin = vec2(-60);
+    vec2 gustUVScale = vec2(gust.scale);
+    vec2 gustOffset = normalize(gustDir) * gust.speed * time;
     vec2 uv = (position.xz - gustUVOrigin) * gustUVScale;
-    uv += gustDir * time * gustSpeed;
+    uv += gustOffset;
+    uv = fract(uv);
     return uv;
 }
 
 float gustDisplacement(
     vec2 uv) {
-    float gust = texture(gustNoise, uv).r;
-    return (gust - 0.5) * 2.0 * gustStrength;
+    float gustDis = texture(gustNoise, uv).r;
+    return (gustDis - 0.5) * 2.0 * gust.strength;
 }
 
 const float VELOCITY_SCALE = 1.0; // Scale spatial dimensions and wave wavelengths
@@ -122,7 +128,7 @@ vec3 calcNormal(vec3 originalPosition,
 
 void main(void)
 {   
-    vec2 windDirection = normalize(direction.xy);
+    vec2 windDirection = normalize(gust.direction.xy);
     vec2 uv = uvLocation(position, windDirection);
 
     vec3 newPosition = calcNewPosition(position);
@@ -134,8 +140,8 @@ void main(void)
     vec3 normalFD = calcNormal(position, newPosition, uv, NORMAL_OFFSET, tangent, bitangent);
 
     gl_Position = projection * view * model * vec4(newPosition, 1.0) ;
-    vs_out.FragPos = vec3(model * vec4(newPosition,1.0));
-
+   
+    vs_out.FragPos = newPosition;
     vs_out.Normal = normalize(normalFD);
     vs_out.Color = vec3(color);
     vs_out.Bitangent = bitangent;

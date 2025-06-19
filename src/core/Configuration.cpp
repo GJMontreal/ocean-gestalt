@@ -216,11 +216,11 @@ void Configuration::setInitialUniformState(const ApiAdapter& api){
 }
 
 void Configuration::setInitialWaveUniforms(const ApiAdapter& api)const{
-     api.setValue("uniforms.direction",
+     api.setValue("uniforms.gust.direction",
                    uniformToApi(glm::vec3(-1.0, 0.3, 0.0)));
-      api.setValue("uniforms.gustStrength", uniformToApi(0.0f));
-      api.setValue("uniforms.gustSpeed", uniformToApi(0.0f));
-      api.setValue("uniforms.gustScale", 0.2f);
+      api.setValue("uniforms.gust.strength", uniformToApi(0.0f));
+      api.setValue("uniforms.gust.speed", uniformToApi(0.0f));
+      api.setValue("uniforms.gust.scale", 0.052f);
       int i = 0;
       for (const shared_ptr<Wave> wave : waves) {
         std::string uniformName =

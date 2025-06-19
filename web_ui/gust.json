@@ -4,7 +4,7 @@
         "_meta": {
             "display": "Water Surface"
         },
-        "gustStrength": {
+        "gust.strength": {
             "type": "float",
             "min": 0,
             "max": 1,
@@ -13,25 +13,25 @@
                 "control": "slider"
             }
         },
-        "gustSpeed": {
+        "gust.speed": {
             "type": "float",
             "min": 0,
-            "max": 1,
+            "max": 10,
             "_meta": {
                 "display": "Speed",
                 "control": "slider"
             }
         },
-        "gustScale": {
+        "gust.scale": {
             "type": "float",
-            "min": 0.001,
-            "max": 0.05,
+            "min": 0.05,
+            "max": 0.5,
             "_meta": {
                 "display": "Scale",
                 "control": "slider"
             }
         },
-        "heading": {
+        "gust.heading": {
             "type": "float",
             "min": 0,
             "max": 360,
