@@ -77,7 +77,7 @@ void OceanGestalt::loop() {
     exit();
 
   projection = glm::perspective(glm::radians(getCamera()->Zoom),
-                                getWindowRatio(), 0.1f, 100.f);
+                                getWindowRatio(), 0.1f, 200.f);
 
   view = camera->GetViewMatrix();
 
