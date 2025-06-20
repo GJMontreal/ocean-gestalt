@@ -11,8 +11,6 @@ Model::Model(std::shared_ptr<Configuration> configuration)
     : transform(1.0), meshes({Mesh(configuration->meshSize,configuration->meshSubdivisions,configuration->meshColor)}) {
   this->configuration = configuration;
   transform = glm::mat4(1.0);
-  // transform =
-  //     glm::rotate(transform, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
   calculateNormalMatrix(transform, normalMatrix);
 }
 
