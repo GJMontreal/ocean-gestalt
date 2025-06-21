@@ -16,6 +16,7 @@ class Ocean : public Model {
   ~Ocean() override = default;
   void draw(Uniforms& uniforms) override;
   void updateShaderUniforms();
+
  private:
   float elapsedTime=0;
   double lastTime;

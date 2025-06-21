@@ -12,9 +12,13 @@ OceanApi::OceanApi(std::shared_ptr<OceanGestaltInterface> app, std::shared_ptr<U
     : app(app), uniformState(state){
   
   auto& context = app->getContext();
-  auto& shaders = context.getShaders();
+  auto const& shaders = context.getShaders();
   auto keys = getKeys(shaders);
+  // we could pass the buoy in here
   auto uniformPathHandler = std::make_unique<UniformPathHandler>(state,keys);
+  uniformPathHandler->addListener([&context](const std::string& key, const ApiValue& value){
+    context.setWaveParameter(key, value);
+  });
   pathHandlers.push_back(std::move(uniformPathHandler));
 };
 
@@ -34,12 +38,17 @@ void OceanApi::updateSimulation(std::string path, std::string value) {
 
 std::optional<ApiValue> OceanApi::setValue(const std::string& path, const ApiValue& value) const {
   auto parts = splitPath(path);
+  std::optional<ApiValue> result;
   for(auto& handler:pathHandlers){
+    // how could we handle multiple handlers
     if(handler->matches(parts)){
-      return handler->set(parts, value);
+      auto r = handler->set(parts, value);
+      if(r){
+        result = std::move(r);
+      }
     }
   }
-  return std::nullopt;
+  return result;
 };
 
 std::optional<ApiValue> OceanApi::getValue(const std::string& path) const{

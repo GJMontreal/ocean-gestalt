@@ -1,5 +1,7 @@
 #include "Light.hpp"
 
-Light::Light(vec3 aPosition){
-  position = aPosition;
+#include "Configuration.hpp"
+
+Light::Light(std::shared_ptr<Configuration> config) {
+  this->position = config->lightPosition;
 }

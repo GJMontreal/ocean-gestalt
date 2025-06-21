@@ -1,4 +1,5 @@
 #include "Model.hpp"
+#include "Configuration.hpp"
 #include "Wave.hpp"
 
 #include "asset.hpp"
@@ -8,64 +9,84 @@
 #include <iostream>
 
 Model::Model(std::shared_ptr<Configuration> configuration)
-    : transform(1.0), meshes({Mesh(configuration->meshSize,configuration->meshSubdivisions,configuration->meshColor)}) {
+    : meshes({Mesh(configuration->meshSize,configuration->meshSubdivisions,configuration->meshColor)}) {
   this->configuration = configuration;
-  transform = glm::mat4(1.0);
-  calculateNormalMatrix(transform, normalMatrix);
+  calculateNormalMatrix(getTransform(), normalMatrix);
 }
 
 // specify different shaders for mesh, wireframe, and normals
 void Model::draw(Uniforms& uniforms) {
-  for(Mesh mesh: meshes){
-    if(drawWireframe){
-      configuration->wireframeShader->activate();
+{
+    if (shouldDrawWireframe) {
+      drawWireframe(uniforms);
+    }
 
-      // be sure to rebind textures
-      configuration->wireframeShader->setUniform("time",uniforms.time);
-      configuration->wireframeShader->setUniform("model", transform);
+#ifndef __EMSCRIPTEN__
+    if (shouldDrawNormals) {
+      drawNormals(uniforms);
+    }
+#endif
 
-      #ifdef __EMSCRIPTEN__
-      configuration->wireframeShader->setUniform("projection", uniforms.projection);
-      configuration->wireframeShader->setUniform("view", uniforms.view);
-      #endif
-      glCheckError(__FILE__, __LINE__);
+    if (shouldDrawMesh) {
+      drawMesh(uniforms);
+    }
+  }
+}
+
+void Model::drawNormals(Uniforms& uniforms) {
+  for (Mesh mesh : meshes) {
+    configuration->normalShader->activate();
+    configuration->normalShader->setUniform("time", uniforms.time);
+    configuration->normalShader->setUniform("model", transform);
+    mesh.drawWireframe();
+    configuration->normalShader->deactivate();
+  }
+}
+
+void Model::drawWireframe(Uniforms& uniforms) {
+  for (Mesh mesh : meshes) {
+    configuration->wireframeShader->activate();
+
+    // be sure to rebind textures
+    configuration->wireframeShader->setUniform("time", uniforms.time);
+    configuration->wireframeShader->setUniform("model", transform);
+
+#ifdef __EMSCRIPTEN__
+    configuration->wireframeShader->setUniform("projection",
+                                               uniforms.projection);
+    configuration->wireframeShader->setUniform("view", uniforms.view);
+#endif
+    glCheckError(__FILE__, __LINE__);
+    mesh.drawWireframe();
+    configuration->wireframeShader->deactivate();
+  }
+}
+
+void Model::drawMesh(Uniforms& uniforms) {
+  for (Mesh mesh : meshes) {
+    configuration->meshShader->activate();
+    configuration->meshShader->setUniform("time", uniforms.time);
+
+    // these next three don't need to be set each pass
+    configuration->meshShader->setUniform("model", this->getTransform());
+    configuration->meshShader->setUniform("lightPos",
+                                          configuration->light->position);
+    configuration->meshShader->setUniform("viewPos",
+                                          configuration->camera->position);
+
+#ifdef __EMSCRIPTEN__
+    configuration->meshShader->setUniform("projection", uniforms.projection);
+    configuration->meshShader->setUniform("view", uniforms.view);
+
+#endif
+    glCheckError(__FILE__, __LINE__);
+    if (drawTriangles) {
+      mesh.draw();
+    }
+    if (drawLines) {
       mesh.drawWireframe();
-      configuration->wireframeShader->deactivate();
     }
-
-  #ifndef __EMSCRIPTEN__
-    if(drawNormals){
-      configuration->normalShader->activate();
-      configuration->normalShader->setUniform("time",uniforms.time);
-      configuration->normalShader->setUniform("model", transform);
-      mesh.drawWireframe();
-      configuration->normalShader->deactivate();
-    }
-  #endif
-
-  if(drawMesh){
-      configuration->meshShader->activate();
-      configuration->meshShader->setUniform("time",uniforms.time);
-
-      // these next three don't need to be set each pass
-      configuration->meshShader->setUniform("model", transform);
-      configuration->meshShader->setUniform("lightPos", configuration->light->position);
-      configuration->meshShader->setUniform("viewPos",configuration->camera->position);
-      
-       #ifdef __EMSCRIPTEN__
-      configuration->meshShader->setUniform("projection", uniforms.projection);
-      configuration->meshShader->setUniform("view", uniforms.view);
-      
-      #endif
-      glCheckError(__FILE__, __LINE__);
-      if(drawTriangles){
-        mesh.draw(); 
-      }
-      if(drawLines){
-        mesh.drawWireframe();   
-      }    
-      configuration->meshShader->deactivate();
-    }
+    configuration->meshShader->deactivate();
   }
 }
 
@@ -74,15 +95,15 @@ Mesh* Model::getMesh(int index){
 }
 
 void Model::toggleDrawNormals(){
-  drawNormals = !drawNormals;
+  shouldDrawNormals = !shouldDrawNormals;
 }
 
 void Model::toggleDrawWireframe(){
-  drawWireframe = !drawWireframe;
+  shouldDrawWireframe = !shouldDrawWireframe;
 }
 
 void Model::toggleDrawMesh(){
-  drawMesh = !drawMesh;
+  shouldDrawMesh = !shouldDrawMesh;
 }
 
 void Model::toggleRunning(){

@@ -13,12 +13,16 @@ std::vector<float> headingToVec3(float deg) {
   return {std::cos(rad), std::sin(rad), 0.0f};
 }
 
+void UniformPathHandler::addListener(UniformListener listener){
+  otherListeners.push_back(listener);
+}
+
 
 bool UniformPathHandler::matches(const std::vector<std::string>& parts) const{
     return !parts.empty() && parts.size() >= 2 && parts[0] == "uniforms";
   }
 
-  ParsedUniformPath UniformPathHandler::parseUniformPath(
+ParsedUniformPath UniformPathHandler::parseUniformPath(
       const std::vector<std::string>& parts) {
     ParsedUniformPath result;
 
@@ -83,6 +87,11 @@ std::optional<ApiValue> UniformPathHandler::set(
       result = locked->setUniform(shader, u.internalPath, val);
     }
   }
+
+  // I don't like this idea
+  // for(auto const& listener: otherListeners){
+  //   listener(u.internalPath, val);
+  // }
 
   if (u.convertHeading && result &&
       std::holds_alternative<std::vector<float>>(*result)) {

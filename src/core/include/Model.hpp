@@ -2,18 +2,19 @@
 #define MODEL_HPP
 
 #include <vector>
-#include "Configuration.hpp"
+// #include "Configuration.hpp"
 #include "Mesh.hpp"
 #include "Shader.hpp"
 #include "asset.hpp"
 #include "Camera.hpp"
 #include "Uniforms.hpp"
+#include "Drawable.hpp"
 
 #include <memory>
-
+class Configuration;
 using std::shared_ptr;
 
-class Model {
+class Model : public Drawable{
  public:
   explicit Model(shared_ptr<Configuration> configuration);
 
@@ -21,7 +22,7 @@ class Model {
 
   std::shared_ptr<Configuration> configuration;
   
-  virtual void draw(Uniforms& uniforms);
+  void draw(Uniforms& uniforms) override;
   
   void toggleDrawWireframe();
   void toggleDrawMesh();
@@ -34,25 +35,24 @@ class Model {
 
   Mesh* getMesh(int index);
 
-  // I think we could get rid of these two
-  // virtual void updateShaderUniforms() = 0;
-  // virtual void setWaveUniforms(const vector<shared_ptr<Wave>>& waves,
-  //                        shared_ptr<ShaderProgram> program)const = 0;
+  protected:
+  void drawNormals(Uniforms& uniforms) override;
+  void drawMesh(Uniforms& uniforms) override;
+  void drawWireframe(Uniforms& uniforms);
 
 // these could all be public, simplifying things
  private:
   
-  glm::mat4 transform = glm::mat4(1.0);
   glm::mat3 normalMatrix = glm::mat3(1.0);
   
   void calculateNormalMatrix(const glm::mat4& modelTransform, glm::mat3& aNormalMatrix);
  
   std::vector<Mesh> meshes; //this is going to be only 1 mesh
  
-  bool drawWireframe = true;
-  bool drawNormals = false;
+  bool shouldDrawWireframe = true;
+  bool shouldDrawNormals = false;
+  bool shouldDrawMesh = false;  //it would be nice to specify these in our configuration
   
-  bool drawMesh = false;  //it would be nice to specify these in our configuration
   bool drawTriangles = true;
   bool drawLines = true;
 

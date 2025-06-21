@@ -29,5 +29,27 @@
             "b": 0.25,
             "a": 1
         }
+    },
+    "drawable_normal": {
+        "vertex": "drawable.vert",
+        "geometry": "drawable_normal.gs",
+        "fragment": "drawable.frag",
+        "color": {
+            "r": 0,
+            "g": 1,
+            "b": 1,
+            "a": 1
+        }
+    },
+    "drawable_mesh": {
+        "vertex": "drawable.vert",
+        "fragment": "drawable.frag",
+        "color": {
+            "r": 0,
+            "g": 1,
+            "b": 1,
+            "a": 1
+        }
     }
+
 }

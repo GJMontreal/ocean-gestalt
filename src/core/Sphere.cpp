@@ -71,15 +71,14 @@ glGenBuffers(1, &EBO);
 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
-// layout(location = 0) in vec3 position;
 glEnableVertexAttribArray(0);
-glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)offsetof(VertexType, position));
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexType), (void*)offsetof(VertexType, position));
 
-glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)offsetof(VertexType, normal));
+glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexType), (void*)offsetof(VertexType, normal));
 glEnableVertexAttribArray(1);
 
 glEnableVertexAttribArray(2);
-glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE,sizeof(glm::vec4), (void*)offsetof(VertexType,color));
+glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE,sizeof(VertexType), (void*)offsetof(VertexType,color));
   
 
 glBindVertexArray(0);
@@ -87,19 +86,42 @@ glBindVertexArray(0);
 }
 
 void Sphere::draw(Uniforms& uniforms) {
-  shader->activate();
-  // shader->setUniform("time",uniforms.time);
-   glCheckError(__FILE__, __LINE__);
-  auto model = glm::translate(glm::mat4(1.0f), this->getPosition());
-  shader->setUniform("model", model);
-  glCheckError(__FILE__, __LINE__);
-  glBindVertexArray(VAO);
-  glCheckError(__FILE__, __LINE__);
-  glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-  glCheckError(__FILE__, __LINE__);
-  shader->deactivate();
+  if (shouldDrawMesh) {
+    drawMesh(uniforms);
+  }
+  #ifndef __EMSCRIPTEN__
+  if (shouldDrawNormals){
+    drawNormals(uniforms);
+  }
+  #endif
 }
 
-void Sphere::setShader(shared_ptr<ShaderProgram> shader){
+void Sphere::drawMesh(Uniforms& uniforms) {
+  shader->activate();
+
+  shader->setUniform("model", this->getTransform());
+  glBindVertexArray(VAO);
+  glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+
+  shader->deactivate();
+  glCheckError(__FILE__, __LINE__);
+}
+
+void Sphere::drawNormals(Uniforms& uniforms) {
+  normalShader->activate();
+  
+  shader->setUniform("model", this->getTransform());
+  glBindVertexArray(VAO);
+  glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0);
+
+  normalShader->deactivate();
+  glCheckError(__FILE__, __LINE__);
+}
+
+void Sphere::setShader(shared_ptr<ShaderProgram> shader) {
   this->shader = shader;
+}
+
+void Sphere::setNormalShader(shared_ptr<ShaderProgram> shader) {
+  this->normalShader = shader;
 }

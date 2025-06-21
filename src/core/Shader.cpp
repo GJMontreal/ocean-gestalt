@@ -14,6 +14,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <vector>
+#include "glError.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -262,6 +263,7 @@ ShaderProgram::~ShaderProgram() {
 }
 
 void ShaderProgram::activate() const {
+  glCheckError(__FILE__, __LINE__);
   glUseProgram(handle);
 
   // for(auto tex: textures){

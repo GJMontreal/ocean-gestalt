@@ -6,6 +6,7 @@
 #include "WaveGenerator.hpp"
 #include "asset.hpp"
 #include "glError.hpp"
+#include "Sphere.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -28,10 +29,17 @@ OceanGestalt::OceanGestalt() : Application() {
       CONFIGURATION_DIR "generator.json", CONFIGURATION_DIR "api.json");
   this->camera = config->camera;
   this->moveable = this->camera;
-  this->light = config->light;
-
+  this->light = std::make_shared<Light>(config);//of course we can't get a shared pointer here
+  config->light = light;
   configuration = config;
-  models.push_back(new Ocean(config));
+  auto ocean = std::make_shared<Ocean>(config);
+  models.push_back(ocean.get()); // yeah, we don't want this
+  drawables.push_back(ocean);
+
+  auto sphere = std::make_shared<Sphere>(vec3(0,0,10));
+  sphere->setShader(config->getShaders()["drawable_mesh"]);
+  sphere->setNormalShader(config->getShaders()["drawable_normal"]);
+  drawables.push_back(sphere);
 
   waveUI = unique_ptr<WaveUI>(new WaveUI(config->waves));
 
@@ -61,12 +69,6 @@ for(auto const& cb : onReadyCallbacks){
 }
 
 void OceanGestalt::loop() {
-  // do anything we need to after everything's setup
-  
-  if (wavesNeedUpdate) {
-    wavesNeedUpdate = false;
-    updateWaves();
-  }
 
   for(auto const& cb : renderThreadCallbacks){
       cb();
@@ -93,8 +95,8 @@ void OceanGestalt::loop() {
   glClearColor(0.0f, 0.05f, 0.1f,
                1.0f);  // we should set this in the environment
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  for (Model* model : models) {
-    model->draw(uniforms);
+  for( auto drawable : drawables){
+    drawable->draw(uniforms);
   }
 }
 
@@ -168,10 +170,6 @@ void OceanGestalt::toggleDrawLines() {
 
 void OceanGestalt::dumpUniforms() {
   configuration->dumpUniforms(CONFIGURATION_DIR "/uniforms.json");
-  // std::cout << "wireframe shader uniforms" << std::endl;
-  // configuration->wireframeShader->listUniforms();
-  // std::cout << "mesh shader uniforms" << std::endl;
-  // configuration->meshShader->listUniforms();
 }
 
 void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
@@ -204,7 +202,7 @@ void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
 
   executeIfPressed(window, GLFW_KEY_C, [this]() {
     if (moveable == configuration->camera) {
-      moveable = configuration->light;
+      moveable = light;
       cout << "Activating light" << endl;
     } else {
       moveable = configuration->camera;
@@ -258,13 +256,6 @@ void OceanGestalt::toggleFullscreen(GLFWwindow* window) {
   }
   glfwSetWindowMonitor(window, monitor, windowXPos, windowYPos, windowWidth,
                        windowHeight, GLFW_DONT_CARE);
-}
-
-//does this actually happen
-void OceanGestalt::updateWaves() const {
-  for (Model* model : models) {
-    // model->updateShaderUniforms();
-  }
 }
 
 void OceanGestalt::doOnReady(const std::function<void()>& callback){ 

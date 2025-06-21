@@ -20,18 +20,20 @@ using std::vector;
 using std::string;
 
 
-class Configuration: public AppContextInterface {
+class Configuration: public AppContextInterface, public std::enable_shared_from_this<Configuration> {
  public:
   explicit Configuration(const string& environment, 
     const string& shader, 
     const string &generator,
-    const string& api);  //why is api a string here?
+    const string& apiConfig);  //why is api a string here?
 
   void setInitialUniformState(const ApiAdapter& api) override;
   vector<shared_ptr<Wave>> waves;
 
   shared_ptr<Camera> camera;
   
+  //until we figure out how to handle this circularity
+  vec3 lightPosition;
   shared_ptr<Light> light;
 
   shared_ptr<ShaderProgram> meshShader;  
@@ -58,7 +60,7 @@ class Configuration: public AppContextInterface {
   void loadUniforms(const string& fileName);
 
   std::unordered_map<std::string, shared_ptr<ShaderProgram>>& getShaders() override;
-  
+  void setWaveParameter(const std::string& key, const ApiValue& value) override;
   void setApi(std::shared_ptr<ApiAdapter> api) override;
 
   private:

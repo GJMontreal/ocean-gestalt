@@ -6,7 +6,7 @@
 #include "UniformValue.hpp"
 #include "Utilities.hpp"
 
-#include <memory.h>
+#include <memory>
 #include <fstream>
 #include <iostream>
 #include <thread>
@@ -82,6 +82,13 @@ void Configuration::loadShaders(const string& fileName) {
   normalShader = buildShader(j, "normal_shader", normalColor);
 #endif
   shaders[normalShader->getName()] = normalShader;
+
+  // we should get rid of this colour stuff?
+  vec4 drawableColor;
+  for (auto name : {"drawable_normal", "drawable_mesh"}) {
+    auto shader = buildShader(j, name, drawableColor);
+    shaders[shader->getName()] = shader;
+  }
 }
 
 shared_ptr<ShaderProgram> Configuration::buildShader(json& j,
@@ -95,7 +102,6 @@ shared_ptr<ShaderProgram> Configuration::buildShader(json& j,
                         GL_FRAGMENT_SHADER);
 
   color = shaderJSON.at("color"); // TODO: I think we should be able to get rid of this with our new uniform system
-
   // optional geometry shader where supported
   auto geometry = shaderJSON["geometry"];
   shared_ptr<ShaderProgram> program;
@@ -113,10 +119,8 @@ shared_ptr<ShaderProgram> Configuration::buildShader(json& j,
 void Configuration::loadLight(const string& fileName) {
   json data;
   loadJSON(fileName, data);
-  vec3 lightPosition;
   auto j = data.at("light");
   j.get_to(lightPosition);
-  light = make_shared<Light>(lightPosition);
 }
 
 void Configuration::loadMesh(const string& fileName) {
@@ -191,6 +195,11 @@ std::unordered_map<std::string, shared_ptr<ShaderProgram>>& Configuration::getSh
   return shaders;
 };
 
+void Configuration::setWaveParameter(const std::string& key, const ApiValue& value){
+  std::cout << "set wave parameters" << std::endl;
+  // I wonder what thread we're on here
+  // we'll need a mutex to guard
+}
 
 template <typename F>
 void dispatch_async(F&& task) {
@@ -203,11 +212,11 @@ void Configuration::setInitialUniformState(const ApiAdapter& api){
     api.setValue("uniforms.wireframe_shader.lineColor", uniformToApi(wireframeColor));
 
     // these need to be set before the render loop runs
-    for(auto value: shaders){
-      value.second->activate();
-      value.second->loadTexture(SHADER_DIR "gust_noise_512.png","gustNoise");
-      value.second->loadTexture(SHADER_DIR "NormalMap.png","gustNormalMap");
-      value.second->deactivate();
+    for(auto value: {shaders["mesh_shader"],shaders["wireframe_shader"],shaders["normal_shader"]}){
+      value->activate();
+      value->loadTexture(SHADER_DIR "gust_noise_512.png","gustNoise");
+      value->loadTexture(SHADER_DIR "NormalMap.png","gustNormalMap");
+      value->deactivate();
     }
     
     dispatch_async([this, &api] {
@@ -221,20 +230,23 @@ void Configuration::setInitialWaveUniforms(const ApiAdapter& api)const{
       api.setValue("uniforms.gust.strength", uniformToApi(0.0f));
       api.setValue("uniforms.gust.speed", uniformToApi(0.0f));
       api.setValue("uniforms.gust.scale", 0.052f);
-      int i = 0;
-      for (const shared_ptr<Wave> wave : waves) {
+      
+      for(auto shaderName: {"mesh_shader","wireframe_shader","normal_shader"}){
+     int i = 0;
+        for (const shared_ptr<Wave> wave : waves) {
         std::string uniformName =
-            string_format("uniforms.waves[%i].amplitude", i);
+            string_format("uniforms.%s.waves[%i].amplitude", shaderName, i);
         api.setValue(uniformName, uniformToApi(wave->amplitude));
 
-        uniformName = string_format("uniforms.waves[%i].steepness", i);
+        uniformName = string_format("uniforms.%s.waves[%i].steepness", shaderName,i);
         api.setValue(uniformName, uniformToApi(wave->steepness));
-        uniformName = string_format("uniforms.waves[%i].wavelength", i);
+        uniformName = string_format("uniforms.%s.waves[%i].wavelength", shaderName, i);
         api.setValue(uniformName, uniformToApi(wave->wavelength));
-        uniformName = string_format("uniforms.waves[%i].direction", i);
+        uniformName = string_format("uniforms.%s.waves[%i].direction", shaderName, i);
         api.setValue(uniformName,
                      uniformToApi(glm::vec3(wave->direction, 0.0f)));
 
         i++;
       }
+    }
 }

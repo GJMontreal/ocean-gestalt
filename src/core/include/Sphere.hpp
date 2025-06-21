@@ -9,8 +9,11 @@ class Sphere : public Drawable {
   explicit Sphere(vec3 position);
   void draw(Uniforms& uniforms) override;
   void setShader(shared_ptr<ShaderProgram> shader);
-
+  void setNormalShader(shared_ptr<ShaderProgram> shader);
  protected:
+  void drawNormals(Uniforms& uniforms) override;
+  void drawMesh(Uniforms& uniforms) override;
+
   void generateSphereMesh(std::vector<glm::vec3>& vertices,
                           std::vector<unsigned int>& indices,
                           unsigned int sectorCount = 36,
@@ -19,7 +22,13 @@ class Sphere : public Drawable {
   void bindVertices();
 
  private:
+  bool shouldDrawMesh = true;
+  bool shouldDrawNormals = true;
+  
   std::shared_ptr<ShaderProgram> shader;
+  std::shared_ptr<ShaderProgram> normalShader;
+  
+  glm::mat4 modelTransform;
 
   GLuint VAO;
   GLuint VBO;

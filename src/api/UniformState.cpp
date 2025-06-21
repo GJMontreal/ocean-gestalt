@@ -66,8 +66,6 @@ void UniformState::renderThreadCallback() {
       std::visit(dispatcher, u.value);
 
       if(dispatcher.success && !glCheckError(__FILE__, __LINE__)){
-        // the key here should be the entire path
-
         uniformStates[u.shader + "." + u.uniform] = u.value;
         u.ack.set_value(true);
       }else{

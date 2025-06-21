@@ -66,6 +66,7 @@ class OceanGestalt : public OceanGestaltInterface,
   shared_ptr<Moveable> moveable;
   unique_ptr<WaveUI> waveUI;
   vector<Model*> models;
+  vector<std::shared_ptr<Drawable>> drawables;
 
   void toggleNormalDisplay();
 
@@ -79,8 +80,6 @@ class OceanGestalt : public OceanGestaltInterface,
 
   void initUniformBuffers();
   void setUniformBuffers(mat4& projection, mat4& view) const;
-  
-  void updateWaves() const;
 
   std::vector<std::function<void()>> onReadyCallbacks;
   std::vector<std::function<void()>> renderThreadCallbacks;

@@ -258,7 +258,7 @@ std::vector<GLuint> Mesh::generateWireframeIndices(int aSize)const{
 
 void Mesh::setVertexAttributes()const{
   // position attribute
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)nullptr);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)nullptr); // why 10* sizeof(float)
   glEnableVertexAttribArray(0);
   
   // normal attribute
@@ -267,5 +267,5 @@ void Mesh::setVertexAttributes()const{
 
   // color attribute
   glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)(6 * sizeof(float)));
-  glEnableVertexAttribArray(2);
+  glEnableVertexAttribArray(2); 
 }
