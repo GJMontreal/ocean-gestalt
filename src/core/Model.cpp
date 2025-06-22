@@ -9,7 +9,7 @@
 #include <iostream>
 
 Model::Model(std::shared_ptr<Configuration> configuration)
-    : meshes({Mesh(configuration->meshSize,configuration->meshSubdivisions,configuration->meshColor)}) {
+    : meshes({Mesh(configuration->meshSize,configuration->meshSubdivisions,configuration->meshColor)}), Drawable(configuration) {
   this->configuration = configuration;
   calculateNormalMatrix(getTransform(), normalMatrix);
 }
@@ -37,7 +37,7 @@ void Model::drawNormals(Uniforms& uniforms) {
   for (Mesh mesh : meshes) {
     configuration->normalShader->activate();
     configuration->normalShader->setUniform("time", uniforms.time);
-    configuration->normalShader->setUniform("model", transform);
+    configuration->normalShader->setUniform("model", getTransform());
     mesh.drawWireframe();
     configuration->normalShader->deactivate();
   }
@@ -49,7 +49,7 @@ void Model::drawWireframe(Uniforms& uniforms) {
 
     // be sure to rebind textures
     configuration->wireframeShader->setUniform("time", uniforms.time);
-    configuration->wireframeShader->setUniform("model", transform);
+    configuration->wireframeShader->setUniform("model", getTransform());
 
 #ifdef __EMSCRIPTEN__
     configuration->wireframeShader->setUniform("projection",

@@ -26,14 +26,12 @@ void main(void)
 
   vec3 _ = lightPos; // To keep our uniforms consistent between shaders
   _ = fs_in.Color;
+  
   // fake diffuse shading based on view angle
     float diff = max(dot(norm, lightDir), 0.0);
 
     // ambient + view-aligned diffuse
     float ambientStrength = 0.2;
     vec3 color = (ambientStrength + diff) * lineColor.xyz;
-    // vec3 visual = norm * 0.5 + 0.5;  // map [-1, 1] to [0, 1]
-    // FragColor = vec4(norm,1.0);
     FragColor = vec4(color, 1.0);
-    // FragColor = lineColor; 
 }

@@ -4,8 +4,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-Sphere::Sphere(vec3 position) {
-  this->setPosition(position);
+Sphere::Sphere(vec3 position,std::shared_ptr<Configuration> context):Drawable(context) {
+  this->setOrigin(position);
   generateSphereMesh(vertices, indices);
   bindVertices();
 }
@@ -100,6 +100,8 @@ void Sphere::drawMesh(Uniforms& uniforms) {
   shader->activate();
 
   shader->setUniform("model", this->getTransform());
+  shader->setUniform("viewPos",
+  this->getContext()->camera->position);
   glBindVertexArray(VAO);
   glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 

@@ -28,18 +28,21 @@ OceanGestalt::OceanGestalt() : Application() {
       CONFIGURATION_DIR "environment.json", CONFIGURATION_DIR "shader.json",
       CONFIGURATION_DIR "generator.json", CONFIGURATION_DIR "api.json");
   this->camera = config->camera;
-  this->moveable = this->camera;
+  moveables.push_back(this->camera);
+  // this->currentoveable = this->camera;
   this->light = std::make_shared<Light>(config);//of course we can't get a shared pointer here
   config->light = light;
+  moveables.push_back(this->light);
   configuration = config;
   auto ocean = std::make_shared<Ocean>(config);
   models.push_back(ocean.get()); // yeah, we don't want this
   drawables.push_back(ocean);
 
-  auto sphere = std::make_shared<Sphere>(vec3(0,0,10));
+  auto sphere = std::make_shared<Sphere>(vec3(0,0,10),config);
   sphere->setShader(config->getShaders()["drawable_mesh"]);
   sphere->setNormalShader(config->getShaders()["drawable_normal"]);
   drawables.push_back(sphere);
+  moveables.push_back(sphere->getMoveable());
 
   waveUI = unique_ptr<WaveUI>(new WaveUI(config->waves));
 
@@ -55,6 +58,7 @@ OceanGestalt::OceanGestalt() : Application() {
   // doOnReady([&]{surfAudio->start();});
 
   // onRender([&]{surfAudio->setFoamLevel(float foam);});
+  currentMoveable = moveables.begin();
 }
 
 void OceanGestalt::setUIDelegate() {
@@ -179,18 +183,19 @@ void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
   // TODO:
   // moveable->processInput(window, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    moveable->ProcessKeyboard(Movement::FORWARD, deltaTime);
+    
+    (*currentMoveable)->ProcessKeyboard(Movement::FORWARD, deltaTime);
   }
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    moveable->ProcessKeyboard(Movement::BACKWARD, deltaTime);
+    (*currentMoveable)->ProcessKeyboard(Movement::BACKWARD, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    moveable->ProcessKeyboard(Movement::LEFT, deltaTime);
+    (*currentMoveable)->ProcessKeyboard(Movement::LEFT, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    moveable->ProcessKeyboard(Movement::RIGHT, deltaTime);
+    (*currentMoveable)->ProcessKeyboard(Movement::RIGHT, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-    moveable->ProcessKeyboard(Movement::UP, deltaTime);
+    (*currentMoveable)->ProcessKeyboard(Movement::UP, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-    moveable->ProcessKeyboard(Movement::DOWN, deltaTime);
+    (*currentMoveable)->ProcessKeyboard(Movement::DOWN, deltaTime);
 
   executeIfPressed(window, GLFW_KEY_G, [this]() {
     std::thread([this] {
@@ -201,13 +206,12 @@ void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
   waveUI->processInput(window, deltaTime);
 
   executeIfPressed(window, GLFW_KEY_C, [this]() {
-    if (moveable == configuration->camera) {
-      moveable = light;
-      cout << "Activating light" << endl;
-    } else {
-      moveable = configuration->camera;
-      cout << "Activating camera" << endl;
+   
+    ++currentMoveable;
+    if(currentMoveable == moveables.end()){
+      currentMoveable = moveables.begin();
     }
+    cout << "activating " << (*currentMoveable)->getName() << std::endl;
   });
 
   executeIfPressed(window, GLFW_KEY_N, [this]() { toggleNormalDisplay(); });

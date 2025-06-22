@@ -1,35 +1,42 @@
 #pragma once
 
 #include "Uniforms.hpp"
-
+#include "Moveable.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <memory>
 
 class ShaderProgram;
+class Configuration;
 
 struct DrawableVertex {
   glm::vec3 position;
   glm::vec3 normal;
-  glm::vec4 color; 
+  glm::vec4 color;
 };
 
-class Drawable {
+class Drawable:  {
  public:
-  virtual void draw(Uniforms& uniforms) = 0;
+  Drawable(std::shared_ptr<Configuration>context);
+  virtual void draw(Uniforms& unniforms) = 0;
   virtual ~Drawable() = default;
 
-  inline glm::vec3 getPosition() const { return position;};
-  inline void setPosition(glm::vec3 position) { this->position = position;
-                                                transform = glm::translate(glm::mat4(1.0f), position);};
+  inline void setOrigin(glm::vec3 origin) {
+    transform = glm::translate(glm::mat4(1.0f), origin);
+  };
 
-  inline glm::mat4 getTransform() const { return transform;};
- protected:
-   virtual void drawNormals(Uniforms& uniforms) = 0;
-   virtual void drawMesh(Uniforms& uniforms) = 0;
+  inline glm::mat4 getTransform() const { return transform; };
+  inline std::shared_ptr<Moveable> getMoveable() {return moveable;};
+  inline std::shared_ptr<Configuration> getContext() {return context;};
 
-  glm::mat4 transform = glm::mat4(1.0);  //make this protected once we have it working
+  protected:
+  virtual void drawNormals(Uniforms& uniforms) = 0;
+  virtual void drawMesh(Uniforms& uniforms) = 0;
+
  private:
-  glm::vec3 position;  // is this the centroid?
+  glm::mat4 transform = glm::mat4(1.0);
 
+  std::shared_ptr<Configuration> context;
+
+  std::shared_ptr<Moveable> moveable;
 };

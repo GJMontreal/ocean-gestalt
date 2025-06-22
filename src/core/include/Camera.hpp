@@ -38,12 +38,16 @@ public:
            float pitch = PITCH);
         
   ~Camera() override = default;
+  
+  std::function<void(glm::vec3 up, glm::vec3 forward, glm::vec3 right)> setMovementVector;
 
 // TODO:  make capitalization consistent
     void updateCameraVectors();
     void ProcessMouseScroll(float yoffset);
     void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
     mat4 GetViewMatrix() const;
+
+    std::string getName() const override {return "Camera";};
 };
 
 #endif

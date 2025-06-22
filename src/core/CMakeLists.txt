@@ -29,6 +29,8 @@ add_library(app-core STATIC
   SurfAudio.cpp
   FoamRenderPass.cpp
   Sphere.cpp
+  Identifier.cpp
+  Drawable.cpp
 )
 
 set_property(TARGET app-core PROPERTY CXX_STANDARD 17)

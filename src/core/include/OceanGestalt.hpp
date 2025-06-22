@@ -23,6 +23,8 @@
 #include "KeyExecutable.hpp"
 #include "SurfAudio.hpp"
 
+#include <iterator>
+
 using std::unique_ptr;
 using std::string;
 using std::vector;
@@ -63,10 +65,12 @@ class OceanGestalt : public OceanGestaltInterface,
   GLuint uboMatrices;
 
   shared_ptr<Configuration> configuration;
-  shared_ptr<Moveable> moveable;
+  std::vector<shared_ptr<Moveable>>::iterator currentMoveable;
   unique_ptr<WaveUI> waveUI;
   vector<Model*> models;
+
   vector<std::shared_ptr<Drawable>> drawables;
+  vector<std::shared_ptr<Moveable>> moveables;
 
   void toggleNormalDisplay();
 

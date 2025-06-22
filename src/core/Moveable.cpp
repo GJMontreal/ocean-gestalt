@@ -15,4 +15,10 @@ void Moveable::ProcessKeyboard(Movement direction, float deltaTime) {
     position += moveUp * velocity;
   if (direction == Movement::DOWN)
     position -= moveUp * velocity;
+
+  if(onPositionChanged){
+    onPositionChanged(position);
+  }
 }
+
+Moveable::~Moveable() = default;

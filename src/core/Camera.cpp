@@ -10,10 +10,17 @@ Camera::Camera(vec3 position, vec3 up, float yaw, float pitch)
       MouseSensitivity(SENSITIVITY),
       Zoom(ZOOM) {
   movementSpeed = SPEED;
-  position = position;
+  this->position = position;
   moveUp = up;
   Yaw = yaw;
   Pitch = pitch;
+
+  setMovementVector = [this](glm::vec3 up, vec3 forward, vec3 right){
+      moveForward = forward;
+      moveUp = up;
+      moveRight = right;
+    };
+
   updateCameraVectors();
 }
 
@@ -75,7 +82,12 @@ void Camera::updateCameraVectors() {
   forward.x = cos(radians(Yaw));
   forward.y = sin(radians(0.0f));
   forward.z = sin(radians(Yaw));
-
+    // if we did this with lambda
+    
   moveForward = glm::normalize(forward);
   moveRight = glm::normalize(glm::cross(moveForward, moveUp));
+  if(setMovementVector){
+    setMovementVector(moveUp ,glm::normalize(forward), glm::normalize(glm::cross(moveForward, moveUp)));
+  }
+
 }

@@ -6,7 +6,7 @@
 
 class Sphere : public Drawable {
  public:
-  explicit Sphere(vec3 position);
+  explicit Sphere(vec3 position, std::shared_ptr<Configuration> context);
   void draw(Uniforms& uniforms) override;
   void setShader(shared_ptr<ShaderProgram> shader);
   void setNormalShader(shared_ptr<ShaderProgram> shader);
@@ -24,7 +24,7 @@ class Sphere : public Drawable {
  private:
   bool shouldDrawMesh = true;
   bool shouldDrawNormals = true;
-  
+
   std::shared_ptr<ShaderProgram> shader;
   std::shared_ptr<ShaderProgram> normalShader;
   
