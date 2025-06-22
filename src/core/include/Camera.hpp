@@ -50,9 +50,10 @@ public:
     void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
     mat4 GetViewMatrix() const;
 
-    Moveable moveable;
+
     private:
-      
+        friend class MoveableBase<Camera>;
+        Moveable moveable;
 };
 
 #endif

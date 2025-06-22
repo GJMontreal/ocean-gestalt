@@ -20,5 +20,3 @@ void Moveable::ProcessKeyboard(Movement direction, float deltaTime) {
     onPositionChanged(position);
   }
 }
-
-Moveable::~Moveable() = default;
