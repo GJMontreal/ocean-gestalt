@@ -72,7 +72,7 @@ void Model::drawMesh(Uniforms& uniforms) {
     configuration->meshShader->setUniform("lightPos",
                                           configuration->light->position);
     configuration->meshShader->setUniform("viewPos",
-                                          configuration->camera->position);
+                                          configuration->camera->getPosition());
 
 #ifdef __EMSCRIPTEN__
     configuration->meshShader->setUniform("projection", uniforms.projection);

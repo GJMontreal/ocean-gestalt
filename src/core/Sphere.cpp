@@ -101,7 +101,7 @@ void Sphere::drawMesh(Uniforms& uniforms) {
 
   shader->setUniform("model", this->getTransform());
   shader->setUniform("viewPos",
-  this->getContext()->camera->position);
+  this->getContext()->camera->getPosition());
   glBindVertexArray(VAO);
   glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 

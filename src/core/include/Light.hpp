@@ -15,6 +15,5 @@ using glm::vec3;
 class Light: public Moveable{
   public:
     explicit Light(std::shared_ptr<Configuration> configuration);
-    std::string getName() const override { return "Light";};
 };
 

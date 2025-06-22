@@ -9,16 +9,16 @@ Camera::Camera(vec3 position, vec3 up, float yaw, float pitch)
       
       MouseSensitivity(SENSITIVITY),
       Zoom(ZOOM) {
-  movementSpeed = SPEED;
-  this->position = position;
-  moveUp = up;
+  moveable.movementSpeed = SPEED;
+  this->moveable.position = position;
+  moveable.moveUp = up;
   Yaw = yaw;
   Pitch = pitch;
 
   setMovementVector = [this](glm::vec3 up, vec3 forward, vec3 right){
-      moveForward = forward;
-      moveUp = up;
-      moveRight = right;
+      moveable.moveForward = forward;
+      moveable.moveUp = up;
+      moveable.moveRight = right;
     };
 
   updateCameraVectors();
@@ -27,7 +27,7 @@ Camera::Camera(vec3 position, vec3 up, float yaw, float pitch)
 // returns the view matrix calculated using Euler Angles and the LookAt Matrix
 mat4 Camera::GetViewMatrix() const {
   // if these values aren't changing, then how is the view changing?
-  return glm::lookAt(position, position + Front, Up);
+  return glm::lookAt(moveable.position, moveable.position + Front, Up);
 }
 
 // processes input received from a mouse input system. Expects the offset value
@@ -73,7 +73,7 @@ void Camera::updateCameraVectors() {
 
   // also re-calculate the Right and Up vector
   Right = glm::normalize(glm::cross(
-      Front, moveUp));  // normalize the vectors, because their length gets
+      Front, moveable.moveUp));  // normalize the vectors, because their length gets
                          // closer to 0 the more you look up or down which
                          // results in slower movement.
   Up = glm::normalize(glm::cross(Right, Front));
@@ -84,10 +84,10 @@ void Camera::updateCameraVectors() {
   forward.z = sin(radians(Yaw));
     // if we did this with lambda
     
-  moveForward = glm::normalize(forward);
-  moveRight = glm::normalize(glm::cross(moveForward, moveUp));
+  moveable.moveForward = glm::normalize(forward);
+  moveable.moveRight = glm::normalize(glm::cross(moveable.moveForward, moveable.moveUp));
   if(setMovementVector){
-    setMovementVector(moveUp ,glm::normalize(forward), glm::normalize(glm::cross(moveForward, moveUp)));
+    setMovementVector(moveable.moveUp ,glm::normalize(forward), glm::normalize(glm::cross(moveable.moveForward, moveable.moveUp)));
   }
 
 }

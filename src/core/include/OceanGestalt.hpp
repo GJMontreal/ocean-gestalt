@@ -65,12 +65,12 @@ class OceanGestalt : public OceanGestaltInterface,
   GLuint uboMatrices;
 
   shared_ptr<Configuration> configuration;
-  std::vector<shared_ptr<Moveable>>::iterator currentMoveable;
+  std::vector<shared_ptr<MoveableInterface>>::iterator currentMoveable;
   unique_ptr<WaveUI> waveUI;
   vector<Model*> models;
 
   vector<std::shared_ptr<Drawable>> drawables;
-  vector<std::shared_ptr<Moveable>> moveables;
+  vector<std::shared_ptr<MoveableInterface>> moveables;
 
   void toggleNormalDisplay();
 

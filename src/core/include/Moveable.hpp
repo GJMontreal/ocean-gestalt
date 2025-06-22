@@ -34,7 +34,7 @@ public:
     const Moveable& getMoveable() const override { return static_cast<const Derived&>(*this).moveable; }
 };
 
-class Moveable: public Identifier{
+class Moveable {
   public:
     void ProcessKeyboard(Movement direction, float deltaTime);
     float movementSpeed = 5.0f;
@@ -45,7 +45,4 @@ class Moveable: public Identifier{
     vec3 moveForward{0.0,0.0,-1.0};
     vec3 moveUp{0.0,1.0,0.0};
     vec3 moveRight{1.0,0.0,0.0};
-
-    std::string getName() const override {return "";};
-    ~Moveable()override;
 };

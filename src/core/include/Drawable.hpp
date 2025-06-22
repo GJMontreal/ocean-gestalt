@@ -15,7 +15,7 @@ struct DrawableVertex {
   glm::vec4 color;
 };
 
-class Drawable:  {
+class Drawable  {
  public:
   Drawable(std::shared_ptr<Configuration>context);
   virtual void draw(Uniforms& unniforms) = 0;

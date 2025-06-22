@@ -16,7 +16,7 @@ const float SPEED       =  5.0f;
 const float SENSITIVITY =  0.1f;
 const float ZOOM        =  45.0f;
 
-class Camera: public Moveable{
+class Camera: public MoveableBase<Camera>{
 public:
    //updating these directly won't properly recalculate camera vectors
   // camera Attributes
@@ -39,6 +39,9 @@ public:
         
   ~Camera() override = default;
   
+  glm::vec3& getPosition() {return moveable.position;};
+  const glm::vec3& getPosition() const {return moveable.position;};
+
   std::function<void(glm::vec3 up, glm::vec3 forward, glm::vec3 right)> setMovementVector;
 
 // TODO:  make capitalization consistent
@@ -47,7 +50,9 @@ public:
     void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
     mat4 GetViewMatrix() const;
 
-    std::string getName() const override {return "Camera";};
+    Moveable moveable;
+    private:
+      
 };
 
 #endif
