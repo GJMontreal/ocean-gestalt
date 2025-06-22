@@ -9,16 +9,19 @@ Camera::Camera(vec3 position, vec3 up, float yaw, float pitch)
       
       MouseSensitivity(SENSITIVITY),
       Zoom(ZOOM) {
+  
+  moveable.getMoveDirection = [this]()->MoveDirection&{return this->moveDirection;};
+
   moveable.movementSpeed = SPEED;
   this->moveable.position = position;
-  moveable.moveUp = up;
+  moveDirection.up = up;
   Yaw = yaw;
   Pitch = pitch;
 
   setMovementVector = [this](glm::vec3 up, vec3 forward, vec3 right){
-      moveable.moveForward = forward;
-      moveable.moveUp = up;
-      moveable.moveRight = right;
+      moveDirection.forward = forward;
+      moveDirection.up = up;
+      moveDirection.right = right;
     };
 
   updateCameraVectors();
@@ -73,7 +76,7 @@ void Camera::updateCameraVectors() {
 
   // also re-calculate the Right and Up vector
   Right = glm::normalize(glm::cross(
-      Front, moveable.moveUp));  // normalize the vectors, because their length gets
+      Front, moveDirection.up));  // normalize the vectors, because their length gets
                          // closer to 0 the more you look up or down which
                          // results in slower movement.
   Up = glm::normalize(glm::cross(Right, Front));
@@ -84,10 +87,10 @@ void Camera::updateCameraVectors() {
   forward.z = sin(radians(Yaw));
     // if we did this with lambda
     
-  moveable.moveForward = glm::normalize(forward);
-  moveable.moveRight = glm::normalize(glm::cross(moveable.moveForward, moveable.moveUp));
+  moveDirection.forward = glm::normalize(forward);
+  moveDirection.right = glm::normalize(glm::cross(moveDirection.forward, moveDirection.up));
   if(setMovementVector){
-    setMovementVector(moveable.moveUp ,glm::normalize(forward), glm::normalize(glm::cross(moveable.moveForward, moveable.moveUp)));
+    setMovementVector(moveDirection.up ,glm::normalize(forward), glm::normalize(glm::cross(moveDirection.forward, moveDirection.up)));
   }
 
 }

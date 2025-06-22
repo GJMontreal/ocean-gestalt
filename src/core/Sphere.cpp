@@ -4,8 +4,9 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-Sphere::Sphere(vec3 position,std::shared_ptr<Configuration> context):Drawable(context) {
-  this->setOrigin(position);
+Sphere::Sphere(vec3 origin,std::shared_ptr<Configuration> context):Drawable(origin, context) {
+  // this->setOrigin(origin); //isn't this really the moveables concern
+
   generateSphereMesh(vertices, indices);
   bindVertices();
 }

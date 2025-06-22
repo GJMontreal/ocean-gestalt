@@ -2,19 +2,23 @@
 
 // This could move into the base class once we rename some stuff in the camera
 void Moveable::ProcessKeyboard(Movement direction, float deltaTime) {
+  MoveDirection moveDirection;
+  if(getMoveDirection){
+    moveDirection = getMoveDirection();
+  }
   float velocity = movementSpeed * deltaTime;
   if (direction == Movement::FORWARD)
-    position += moveForward * velocity;
+    position += moveDirection.forward * velocity;
   if (direction == Movement::BACKWARD)
-    position -= moveForward * velocity;
+    position -= moveDirection.forward * velocity;
   if (direction == Movement::LEFT)
-    position -= moveRight * velocity;
+    position -= moveDirection.right * velocity;
   if (direction == Movement::RIGHT)
-    position += moveRight * velocity;
+    position += moveDirection.right * velocity;
   if (direction == Movement::UP)
-    position += moveUp * velocity;
+    position += moveDirection.up * velocity;
   if (direction == Movement::DOWN)
-    position -= moveUp * velocity;
+    position -= moveDirection.up * velocity;
 
   if(onPositionChanged){
     onPositionChanged(position);

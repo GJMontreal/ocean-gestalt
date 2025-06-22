@@ -19,6 +19,12 @@ enum class Movement {
     DOWN
 };
 
+struct MoveDirection{
+  glm::vec3 up;
+  glm::vec3 forward;
+  glm::vec3 right;
+};
+
 class Moveable;
 class MoveableInterface {
 public:
@@ -38,11 +44,20 @@ class Moveable {
   public:
     void ProcessKeyboard(Movement direction, float deltaTime);
     float movementSpeed = 5.0f;
-
+    void setPosition(glm::vec3 position) {
+      this->position = position;
+      if (onPositionChanged) {
+        onPositionChanged(position);
+      };
+    };
     vec3 position;
-    std::function<void(glm::vec3 position)> onPositionChanged;     
+    std::function<void(glm::vec3 position)> onPositionChanged;  
+    
+    std::function<MoveDirection&()> getMoveDirection;
+
     // these should be the camera's front up and right vectors
-    vec3 moveForward{0.0,0.0,-1.0};
-    vec3 moveUp{0.0,1.0,0.0};
-    vec3 moveRight{1.0,0.0,0.0};
+    // MoveDirection moveDirection;
+    // vec3 moveForward{0.0,0.0,-1.0};
+    // vec3 moveUp{0.0,1.0,0.0};
+    // vec3 moveRight{1.0,0.0,0.0};
 };

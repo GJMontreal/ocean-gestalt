@@ -15,9 +15,9 @@ struct DrawableVertex {
   glm::vec4 color;
 };
 
-class Drawable  {
+class Drawable: public MoveableBase<Drawable>  {
  public:
-  Drawable(std::shared_ptr<Configuration>context);
+  Drawable(glm::vec3 origin, std::shared_ptr<Configuration>context);
   virtual void draw(Uniforms& unniforms) = 0;
   virtual ~Drawable() = default;
 
@@ -26,9 +26,14 @@ class Drawable  {
   };
 
   inline glm::mat4 getTransform() const { return transform; };
-  inline std::shared_ptr<Moveable> getMoveable() {return moveable;};
-  inline std::shared_ptr<Configuration> getContext() {return context;};
-
+  // inline std::shared_ptr<Moveable> getMoveable() {return moveable;};
+  inline std::shared_ptr<Configuration> getContext() {
+    if(auto locked = this->context.lock()){
+      return locked;
+    }
+    assert("where'd it go");
+    return nullptr;
+    }
   protected:
   virtual void drawNormals(Uniforms& uniforms) = 0;
   virtual void drawMesh(Uniforms& uniforms) = 0;
@@ -36,7 +41,8 @@ class Drawable  {
  private:
   glm::mat4 transform = glm::mat4(1.0);
 
-  std::shared_ptr<Configuration> context;
+  std::weak_ptr<Configuration> context;
 
-  std::shared_ptr<Moveable> moveable;
+  friend MoveableBase<Drawable>;
+  Moveable moveable;
 };

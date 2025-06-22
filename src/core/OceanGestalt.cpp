@@ -30,7 +30,7 @@ OceanGestalt::OceanGestalt() : Application() {
   this->camera = config->camera;
   moveables.push_back(this->camera);
   // this->currentMoveable = this->camera;
-  this->light = std::make_shared<Light>(config);//of course we can't get a shared pointer here
+  this->light = std::make_shared<Light>(config);
   config->light = light;
   // moveables.push_back(this->light);
   configuration = config;
@@ -42,7 +42,7 @@ OceanGestalt::OceanGestalt() : Application() {
   sphere->setShader(config->getShaders()["drawable_mesh"]);
   sphere->setNormalShader(config->getShaders()["drawable_normal"]);
   drawables.push_back(sphere);
-  // moveables.push_back(sphere->getMoveable());
+  moveables.push_back(sphere);
 
   waveUI = unique_ptr<WaveUI>(new WaveUI(config->waves));
 

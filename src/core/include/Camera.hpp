@@ -6,6 +6,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
+#include <iostream>
 using glm::vec3;
 using glm::mat4;
 
@@ -50,10 +51,17 @@ public:
     void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
     mat4 GetViewMatrix() const;
 
-
+    const MoveDirection& getMoveDirection()const {
+      return moveDirection;};
+    MoveDirection& getMoveDirection(){
+      std::cout << "camera " << this << std::endl;
+      return this->moveDirection;};
+    
     private:
         friend class MoveableBase<Camera>;
         Moveable moveable;
+
+        MoveDirection moveDirection;
 };
 
 #endif
