@@ -3,6 +3,7 @@
 #include "Serialization.hpp"
 #include "asset.hpp"
 #include "ApiAdapter.hpp"
+#include "Shader.hpp"
 #include "UniformValue.hpp"
 #include "Utilities.hpp"
 

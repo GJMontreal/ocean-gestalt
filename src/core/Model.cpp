@@ -1,7 +1,7 @@
 #include "Model.hpp"
 #include "Configuration.hpp"
 #include "Wave.hpp"
-
+#include "Light.hpp"
 #include "asset.hpp"
 #include "glError.hpp"
 #include <GLFW/glfw3.h>
@@ -70,7 +70,7 @@ void Model::drawMesh(Uniforms& uniforms) {
     // these next three don't need to be set each pass
     configuration->meshShader->setUniform("model", this->getTransform());
     configuration->meshShader->setUniform("lightPos",
-                                          configuration->light->position);
+                                          configuration->light->getPosition());
     configuration->meshShader->setUniform("viewPos",
                                           configuration->camera->getPosition());
 

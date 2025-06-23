@@ -1,5 +1,6 @@
 #include "Serialization.hpp"
 
+#include "Light.hpp"
 #include "ApiValue.hpp"
 
 #include <iostream>
@@ -8,7 +9,7 @@
 void to_json(json& j, const Configuration& configuration) {
   j = {   {"camera", *(configuration.camera.get())},
            {"waves", configuration.waves},
-           {"light", configuration.light->position}};
+           {"light", configuration.light->getPosition()}};
 
   j["mesh"] = {{"size",configuration.meshSize},{"subdivisions",configuration.meshSubdivisions}};
 }

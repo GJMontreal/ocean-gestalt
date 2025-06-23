@@ -31,11 +31,13 @@ struct GUST{
 
 uniform GUST gust;
 
-struct NormalMapping{
-  float scale;
-}
+// struct NormalMapping{
+//   float scale;
+//   float speed;
+//   vec3 direction;
+// }
 
-uniform NormalMapping normalMapping;
+// uniform NormalMapping normalMapping;
 
 struct WAVE{  
   vec3 direction;

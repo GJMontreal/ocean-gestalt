@@ -244,8 +244,8 @@ void Application::cursorCallback(GLFWwindow* window,
   lastY = ypos;
 
   camera->ProcessMouseMovement(xoffset, yoffset);
-  light->moveForward = camera->moveForward;
-  light->moveRight = camera->moveRight;
+  // light->moveForward = camera->moveForward;
+  // light->moveRight = camera->moveRight;
 }
 
 // Reset the starting position on a mouse or touch up

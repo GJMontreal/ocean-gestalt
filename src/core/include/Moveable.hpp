@@ -30,6 +30,8 @@ class MoveableInterface {
 public:
     virtual Moveable& getMoveable() = 0;
     virtual const Moveable& getMoveable() const = 0;
+    virtual void activate() = 0;
+    virtual void deactivate() = 0;
     virtual ~MoveableInterface() = default;
 };
 
@@ -38,6 +40,8 @@ class MoveableBase : public MoveableInterface {
 public:
     Moveable& getMoveable() override { return static_cast<Derived&>(*this).moveable; }
     const Moveable& getMoveable() const override { return static_cast<const Derived&>(*this).moveable; }
+    void activate() override { static_cast<Derived&>(*this).activate();};  //implement your own if you'd like 
+    void deactivate() override { static_cast<Derived&>(*this).deactivate();};  //implement your own if you'd like
 };
 
 class Moveable {
@@ -54,10 +58,4 @@ class Moveable {
     std::function<void(glm::vec3 position)> onPositionChanged;  
     
     std::function<MoveDirection&()> getMoveDirection;
-
-    // these should be the camera's front up and right vectors
-    // MoveDirection moveDirection;
-    // vec3 moveForward{0.0,0.0,-1.0};
-    // vec3 moveUp{0.0,1.0,0.0};
-    // vec3 moveRight{1.0,0.0,0.0};
 };

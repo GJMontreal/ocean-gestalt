@@ -20,7 +20,7 @@ class Model : public Drawable{
 
   virtual ~Model() = default;
 
-  std::shared_ptr<Configuration> configuration;
+  std::shared_ptr<Configuration> configuration; // TODO: this needs to be weak
   
   void draw(Uniforms& uniforms) override;
   

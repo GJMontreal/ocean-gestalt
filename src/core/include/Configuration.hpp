@@ -1,13 +1,11 @@
 #ifndef __CONFIGURATION_HPP
 #define __CONFIGURATION_HPP
 
-#include "Wave.hpp"
-#include "Camera.hpp"
-#include "Light.hpp"
-#include "Shader.hpp"
 #include "AppContextInterface.hpp"
 #include "ApiValue.hpp"
 
+#include "glm/glm.hpp"
+#include <GL/glew.h>
 #include <memory.h>
 #include <nlohmann/json.hpp>
 #include <string>
@@ -19,6 +17,14 @@ using std::shared_ptr;
 using std::vector;
 using std::string;
 
+class Light;
+class Wave;
+class Camera;
+class Shader;
+class ShaderProgram;
+
+// This is our application context
+// With the exception of the application, it should be held only weakly by other classes
 
 class Configuration: public AppContextInterface, public std::enable_shared_from_this<Configuration> {
  public:
@@ -34,11 +40,11 @@ class Configuration: public AppContextInterface, public std::enable_shared_from_
   
   //until we figure out how to handle this circularity
   vec3 lightPosition;
-  shared_ptr<Light> light;
+  std::shared_ptr<Light> light;
 
-  shared_ptr<ShaderProgram> meshShader;  
-  shared_ptr<ShaderProgram> wireframeShader;
-  shared_ptr<ShaderProgram> normalShader;
+  std::shared_ptr<ShaderProgram> meshShader;  
+  std::shared_ptr<ShaderProgram> wireframeShader;
+  std::shared_ptr<ShaderProgram> normalShader;
   
   int meshSize;
   int meshSubdivisions;

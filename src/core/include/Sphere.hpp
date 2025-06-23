@@ -8,8 +8,14 @@ class Sphere : public Drawable {
  public:
   explicit Sphere(vec3 position, std::shared_ptr<Configuration> context);
   void draw(Uniforms& uniforms) override;
-  void setShader(shared_ptr<ShaderProgram> shader);
-  void setNormalShader(shared_ptr<ShaderProgram> shader);
+  void setShader(std::shared_ptr<ShaderProgram> shader);
+  void setNormalShader(std::shared_ptr<ShaderProgram> shader);
+  
+  void enableDrawing(bool should) {
+    shouldDrawMesh = should;
+    shouldDrawNormals = should;
+  };
+
  protected:
   void drawNormals(Uniforms& uniforms) override;
   void drawMesh(Uniforms& uniforms) override;
@@ -22,6 +28,7 @@ class Sphere : public Drawable {
   void bindVertices();
 
  private:
+  
   bool shouldDrawMesh = true;
   bool shouldDrawNormals = true;
 

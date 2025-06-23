@@ -29,20 +29,25 @@ OceanGestalt::OceanGestalt() : Application() {
       CONFIGURATION_DIR "generator.json", CONFIGURATION_DIR "api.json");
   this->camera = config->camera;
   moveables.push_back(this->camera);
-  // this->currentMoveable = this->camera;
-  this->light = std::make_shared<Light>(config);
+
+  this->light = std::make_shared<Light>(config->lightPosition, config);
   config->light = light;
-  // moveables.push_back(this->light);
+  moveables.push_back(this->light);
+  auto lightDrawable = this->light->getDrawable();
+  lightDrawable->setShader(config->getShaders()["drawable_mesh"]);
+  lightDrawable->setNormalShader(config->getShaders()["drawable_normal"]);
+  drawables.push_back(this->light->getDrawable());
+
   configuration = config;
   auto ocean = std::make_shared<Ocean>(config);
   models.push_back(ocean.get()); // yeah, we don't want this
   drawables.push_back(ocean);
 
-  auto sphere = std::make_shared<Sphere>(vec3(0,0,10),config);
-  sphere->setShader(config->getShaders()["drawable_mesh"]);
-  sphere->setNormalShader(config->getShaders()["drawable_normal"]);
-  drawables.push_back(sphere);
-  moveables.push_back(sphere);
+  // auto sphere = std::make_shared<Sphere>(vec3(0,0,10),config);
+  // sphere->setShader(config->getShaders()["drawable_mesh"]);
+  // sphere->setNormalShader(config->getShaders()["drawable_normal"]);
+  // drawables.push_back(sphere);
+  // moveables.push_back(sphere);
 
   waveUI = unique_ptr<WaveUI>(new WaveUI(config->waves));
 
@@ -205,11 +210,12 @@ void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
   waveUI->processInput(window, deltaTime);
 
   executeIfPressed(window, GLFW_KEY_C, [this]() {
-   
+    (*currentMoveable)->deactivate();
     ++currentMoveable;
     if(currentMoveable == moveables.end()){
       currentMoveable = moveables.begin();
     }
+    (*currentMoveable)->activate();
     // cout << "activating " << (*currentMoveable)->getName() << std::endl;
   });
 

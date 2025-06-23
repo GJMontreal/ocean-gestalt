@@ -31,10 +31,13 @@ class Drawable: public MoveableBase<Drawable>  {
     if(auto locked = this->context.lock()){
       return locked;
     }
-    assert("where'd it go");
     return nullptr;
     }
+  void activate() override ;
+  void deactivate() override ;
+
   protected:
+
   virtual void drawNormals(Uniforms& uniforms) = 0;
   virtual void drawMesh(Uniforms& uniforms) = 0;
 

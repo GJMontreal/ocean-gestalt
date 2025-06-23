@@ -1,5 +1,8 @@
 #include "Sphere.hpp"
 
+#include "Camera.hpp"
+#include "Shader.hpp"
+#include "Vertex.hpp"
 #include "glError.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>

@@ -54,9 +54,10 @@ public:
     const MoveDirection& getMoveDirection()const {
       return moveDirection;};
     MoveDirection& getMoveDirection(){
-      std::cout << "camera " << this << std::endl;
       return this->moveDirection;};
     
+    void activate() override { /* do nothing */ };
+    void deactivate() override { /* do nothing */}; 
     private:
         friend class MoveableBase<Camera>;
         Moveable moveable;
