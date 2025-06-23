@@ -44,6 +44,19 @@ uniform float foamSlopeMin;
 uniform float foamSlopeMax;
 uniform float foamSlopeAmplifier;
 
+uniform int showNormalMap;
+uniform int showUVs;
+uniform int debugLightPos;
+uniform int debugFragPos;
+uniform int debugDiffuse;
+
+vec3 visualizeLightContribution(vec3 lightPos, vec3 fragPos) {
+    float intensity = 1.0 / distance(lightPos, fragPos); // or squared falloff
+    intensity = clamp(intensity * 0.2, 0.0, 1.0); // optional scale
+    vec3 lightColor = vec3(1.0 - intensity, 0.0, intensity);
+    return lightColor;
+}
+
 // Hash and FBM
 float hash(vec2 p) {
     return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
@@ -95,15 +108,18 @@ vec2 slopeDir = normalize(vec2(
 
 // Main
 void main() {
-  
     mat3 TBN = mat3(normalize(fs_in.Tangent),
                 normalize(fs_in.Bitangent),
                 normalize(fs_in.Normal));
-    
+
+    // float distance = length(lightPos - fs_in.FragPos);
+    // float attenuation = 1.0 / (distance * distance);
 
     vec3 sampledNormal = texture(normalMap, fs_in.FragUV).rgb;
     sampledNormal = normalize(sampledNormal * 2.0 - 1.0);
-    vec3 normal = normalize(TBN * sampledNormal);
+    // vec3 normal = normalize(TBN * sampledNormal);
+    
+    vec3 normal = normalize(fs_in.Normal);
 
     vec3 lightDir = normalize(lightPos - fs_in.FragPos);
     vec3 viewDir  = normalize(viewPos - fs_in.FragPos);
@@ -112,10 +128,13 @@ void main() {
     // Lighting terms
     vec3 ambient  = AMBIENT_STRENGTH * fs_in.Color;
     float diff    = max(dot(normal, lightDir), 0.0);
+ 
     vec3 diffuse  = diff * fs_in.Color;
+
     float spec    = pow(max(dot(normal, halfway), 0.0), SHININESS);
     float fresnel = pow(1.0 - max(dot(viewDir, normal), 0.0), 5.0);
     vec3 specular = vec3(1.0) * spec * fresnel * SPECULAR_STRENGTH;
+ 
 
     // Depth-based colour modulation
     float depth = length(viewPos - fs_in.FragPos);
@@ -159,7 +178,17 @@ void main() {
     // Fog
     float fogFactor = clamp(exp(-FOG_DENSITY * depth), 0.0, 1.0);
     vec3 fogColor = vec3(0.4, 0.6, 0.7); // sky-ish blue
-    vec3 fogged = mix(fogColor, finalColor, fogFactor);
+    finalColor = mix(fogColor, finalColor, fogFactor);
+    
+    finalColor = mix(finalColor, sampledNormal * 0.5 + 0.5, float(showNormalMap));
+    finalColor = mix(finalColor, vec3(fs_in.FragUV,0.0), float(showUVs));
+    finalColor = mix(finalColor, diffuse, float(debugDiffuse));
 
-    FragColor = vec4(fogged, 1.0);
+    vec3 lightViz = visualizeLightContribution(lightPos, fs_in.FragPos);
+    finalColor = mix(finalColor, lightViz, float(debugLightPos));
+
+    vec3 fragViz = normalize(fs_in.FragPos);
+    finalColor = mix(finalColor, fragViz, float(debugFragPos));
+
+    FragColor = vec4(finalColor, 1.0);
 }

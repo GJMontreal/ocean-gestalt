@@ -21,7 +21,6 @@ uniform mat4 model;
 uniform float time;
 
 uniform sampler2D gustNoise;
-// uniform sampler2D gustNormalMap;
 
 struct GUST{
   vec3 direction;     // normalized wind direction
@@ -31,6 +30,12 @@ struct GUST{
 };
 
 uniform GUST gust;
+
+struct NormalMapping{
+  float scale;
+}
+
+uniform NormalMapping normalMapping;
 
 struct WAVE{  
   vec3 direction;
@@ -61,7 +66,7 @@ const float speedScale = 3.0;
 const float GRAVITY = 9.81; 
 
 vec2 uvLocation(vec3 position, vec2 gustDir){
-    vec2 gustUVOrigin = vec2(-60);
+    vec2 gustUVOrigin = vec2(-60);  //this should be a uniform
     vec2 gustUVScale = vec2(gust.scale);
     vec2 gustOffset = normalize(gustDir) * gust.speed * time;
     vec2 uv = (position.xz - gustUVOrigin) * gustUVScale;

@@ -41,5 +41,5 @@ void main() {
     vec3 origin = gs_in[0].FragPos;
     EmitDebugLine(origin, normalize(gs_in[0].Tangent), vec3(1, 0, 0));   // red = Tangent
     EmitDebugLine(origin, normalize(gs_in[0].Bitangent), vec3(0, 1, 0));   // green = Bitangent
-         EmitDebugLine(origin, normalize(gs_in[0].Normal), vec3(1, 1, 0));   // yellow = DebugNormal
+    EmitDebugLine(origin, normalize(gs_in[0].Normal), vec3(1, 1, 0));   // yellow = DebugNormal
 }
