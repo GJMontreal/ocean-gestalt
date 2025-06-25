@@ -3,6 +3,7 @@
 #include "AppContextInterface.hpp"
 #include "OceanGestaltInterface.hpp"
 #include "Utilities.hpp"
+#include "Wave.hpp"
 
 #include <iostream>
 #include <string>
@@ -15,11 +16,14 @@ OceanApi::OceanApi(std::shared_ptr<OceanGestaltInterface> app, std::shared_ptr<U
   auto const& shaders = context.getShaders();
   auto keys = getKeys(shaders);
   // we could pass the buoy in here
-  auto uniformPathHandler = std::make_unique<UniformPathHandler>(state,keys);
-  uniformPathHandler->addListener([&context](const std::string& key, const ApiValue& value){
-    context.setWaveParameter(key, value);
-  });
-  pathHandlers.push_back(std::move(uniformPathHandler));
+  auto waveInterface = context.getWaveInterface();
+  auto waves = context.getWaves();
+
+  auto handler = std::make_unique<UniformPathHandler>(state,keys);
+  handler->syncWaveFunction = [&waveInterface,waves](const std::string& path, const ApiValue& value ){
+    waveInterface->setWaveParameters(waves, path, value);
+  };
+  pathHandlers.push_back(std::move(handler));
 };
 
 void OceanApi::setupShaderNormalInterface() {

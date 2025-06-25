@@ -66,6 +66,9 @@ class Configuration: public AppContextInterface, public std::enable_shared_from_
   void loadUniforms(const string& fileName);
 
   std::unordered_map<std::string, shared_ptr<ShaderProgram>>& getShaders() override;
+  std::shared_ptr<WaveInterface> getWaveInterface() override;
+  std::vector<std::shared_ptr<Wave>> getWaves() override;
+
   void setWaveParameter(const std::string& key, const ApiValue& value) override;
   void setApi(std::shared_ptr<ApiAdapter> api) override;
 

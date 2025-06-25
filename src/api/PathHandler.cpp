@@ -13,15 +13,13 @@ std::vector<float> headingToVec3(float deg) {
   return {std::cos(rad), std::sin(rad), 0.0f};
 }
 
-void UniformPathHandler::addListener(UniformListener listener){
-  otherListeners.push_back(listener);
-}
-
 
 bool UniformPathHandler::matches(const std::vector<std::string>& parts) const{
     return !parts.empty() && parts.size() >= 2 && parts[0] == "uniforms";
   }
 
+
+  // make this a more generic parsePath which can be overriden
 ParsedUniformPath UniformPathHandler::parseUniformPath(
       const std::vector<std::string>& parts) {
     ParsedUniformPath result;
@@ -41,8 +39,18 @@ ParsedUniformPath UniformPathHandler::parseUniformPath(
       ++partIt;  // skip shader name
     }
     bool first = true;
+    bool simRelated = false;
     for (; partIt != partEnd; ++partIt) {
       const bool isLast = (std::next(partIt) == partEnd);
+      
+      // this seems very fragile
+      if (partIt->rfind("waves[",0)==0){
+        simRelated = true;
+      }
+      
+      if(simRelated && result.simulationPath){
+        result.simulationPath = *result.simulationPath + ".";
+      }
 
       if (!first) {
         result.internalPath += ".";
@@ -55,9 +63,15 @@ ParsedUniformPath UniformPathHandler::parseUniformPath(
         result.internalPath += "direction";
         result.externalPath += "heading";
         result.convertHeading = true;
+        if(simRelated){
+          *result.simulationPath += "direction";
+        }
       } else {
         result.internalPath += *partIt;
         result.externalPath += *partIt;
+        if(simRelated){
+          result.simulationPath = *result.simulationPath + *partIt;
+        }
       }
     }
 
@@ -88,10 +102,10 @@ std::optional<ApiValue> UniformPathHandler::set(
     }
   }
 
-  // I don't like this idea
-  // for(auto const& listener: otherListeners){
-  //   listener(u.internalPath, val);
-  // }
+  // pass it on to our shared wave config
+  if(u.simulationPath && syncWaveFunction) {
+    syncWaveFunction(*u.simulationPath, val);
+  }
 
   if (u.convertHeading && result &&
       std::holds_alternative<std::vector<float>>(*result)) {

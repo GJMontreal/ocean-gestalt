@@ -251,3 +251,11 @@ void Configuration::setInitialWaveUniforms(const ApiAdapter& api)const{
       }
     }
 }
+
+std::shared_ptr<WaveInterface> Configuration::getWaveInterface() {
+  return nullptr;
+}
+
+std::vector<std::shared_ptr<Wave>> Configuration::getWaves() {
+  return waves;
+}
