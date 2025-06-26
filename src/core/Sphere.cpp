@@ -1,16 +1,16 @@
 #include "Sphere.hpp"
 
 #include "Camera.hpp"
+#include "Light.hpp"
 #include "Shader.hpp"
 #include "Vertex.hpp"
 #include "glError.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 
-Sphere::Sphere(vec3 origin,std::shared_ptr<Configuration> context):Drawable(origin, context) {
-  // this->setOrigin(origin); //isn't this really the moveables concern
-
-  generateSphereMesh(vertices, indices);
+Sphere::Sphere(glm::vec3 origin, glm::vec4 color, std::shared_ptr<Configuration> context, float radius):
+Drawable(origin, context), color(color) {
+  generateSphereMesh(vertices, indices, radius);
   bindVertices();
 }
 
@@ -18,9 +18,10 @@ Sphere::Sphere(vec3 origin,std::shared_ptr<Configuration> context):Drawable(orig
 void Sphere::generateSphereMesh(
     std::vector<glm::vec3>& vertices,
     std::vector<unsigned int>& indices,
+    float radius,
     unsigned int sectorCount,
-    unsigned int stackCount,
-    float radius)
+    unsigned int stackCount
+   )
 {
     for (unsigned int i = 0; i <= stackCount; ++i) {
         float stackAngle = M_PI / 2 - i * M_PI / stackCount; // from +π/2 to -π/2
@@ -58,7 +59,7 @@ void Sphere::bindVertices(){
 
 std::vector<VertexType> vertexData;
 for (size_t i = 0; i < vertices.size(); ++i) {
-    vertexData.push_back({vertices[i], normals[i],glm::vec4(0.0f,1.0f,1.0f,1.0f)});
+    vertexData.push_back({vertices[i], normals[i],this->color});
 }
 
 // VAO
@@ -90,22 +91,39 @@ glBindVertexArray(0);
 }
 
 void Sphere::draw(Uniforms& uniforms) {
-  if (shouldDrawMesh) {
-    drawMesh(uniforms);
+  if(!shouldDraw){
+    return;
   }
+  
+  auto transform = glm::mat4(1.f);
+  if(preDraw){
+    transform = preDraw(*this, uniforms.time);
+  }
+
+  if (shouldDrawMesh) {
+    drawMesh(uniforms, transform);
+  }
+
   #ifndef __EMSCRIPTEN__
   if (shouldDrawNormals){
-    drawNormals(uniforms);
+    drawNormals(uniforms, transform);
   }
   #endif
+
+  if(postDraw){
+    postDraw(*this);
+  }
 }
 
-void Sphere::drawMesh(Uniforms& uniforms) {
+void Sphere::drawMesh(Uniforms& uniforms, mat4 transform) {
+  assert(shader); // ensure we have assigned a shader
   shader->activate();
 
-  shader->setUniform("model", this->getTransform());
+
+  shader->setUniform("model", this->getTransform() * transform);
   shader->setUniform("viewPos",
   this->getContext()->camera->getPosition());
+  shader->setUniform("lightPos",this->getContext()->light->getPosition());
   glBindVertexArray(VAO);
   glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
@@ -113,10 +131,10 @@ void Sphere::drawMesh(Uniforms& uniforms) {
   glCheckError(__FILE__, __LINE__);
 }
 
-void Sphere::drawNormals(Uniforms& uniforms) {
+void Sphere::drawNormals(Uniforms& uniforms, mat4 transform) {
   normalShader->activate();
   
-  shader->setUniform("model", this->getTransform());
+  shader->setUniform("model", this->getTransform() * transform);
   glBindVertexArray(VAO);
   glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0);
 

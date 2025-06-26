@@ -22,6 +22,7 @@ class Wave;
 class Camera;
 class Shader;
 class ShaderProgram;
+class TextRenderer;
 
 // This is our application context
 // With the exception of the application, it should be held only weakly by other classes
@@ -46,6 +47,8 @@ class Configuration: public AppContextInterface, public std::enable_shared_from_
   std::shared_ptr<ShaderProgram> wireframeShader;
   std::shared_ptr<ShaderProgram> normalShader;
   
+  std::shared_ptr<TextRenderer> textRenderer;
+
   int meshSize;
   int meshSubdivisions;
   

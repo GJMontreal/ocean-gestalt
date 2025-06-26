@@ -49,17 +49,11 @@ void Ocean::updateShaderUniforms(){
 
 void Ocean::draw(Uniforms& uniforms) {
 
+  //we really need to do this only in one place so all uses of time are synched
   // we want to limit how often we draw ie. there's no point in having an excessively high framerate
 
-  // calculate new positions for our particles
-  auto time = float(glfwGetTime());
-  auto interval = time - lastTime;
-  lastTime = time;
-
-  if (isRunning()) {
-    elapsedTime += (float)interval;
-  }
-  uniforms.time = elapsedTime;
+  // calculate new time
+ 
   Model::draw(uniforms);
 }
 

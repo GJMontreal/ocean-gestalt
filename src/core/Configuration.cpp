@@ -6,6 +6,7 @@
 #include "Shader.hpp"
 #include "UniformValue.hpp"
 #include "Utilities.hpp"
+#include "TextRenderer.hpp"
 
 #include <memory>
 #include <fstream>
@@ -29,6 +30,8 @@ Configuration::Configuration(const string& environment,
   loadShaders(shader);
   loadGenerator(generator);
   loadAPISettings(api);
+
+  textRenderer = make_shared<TextRenderer>(FONT_DIR "FiraCode-Regular.ttf", 32);
 }
 
 void Configuration::setApi(std::shared_ptr<ApiAdapter> api) {
@@ -86,7 +89,7 @@ void Configuration::loadShaders(const string& fileName) {
 
   // we should get rid of this colour stuff?
   vec4 drawableColor;
-  for (auto name : {"drawable_normal", "drawable_mesh"}) {
+  for (auto name : {"drawable_normal", "drawable_mesh","buoy_mesh"}) {
     auto shader = buildShader(j, name, drawableColor);
     shaders[shader->getName()] = shader;
   }
@@ -102,7 +105,7 @@ shared_ptr<ShaderProgram> Configuration::buildShader(json& j,
   Shader fragmentShader(SHADER_DIR + (string)shaderJSON.at("fragment"),
                         GL_FRAGMENT_SHADER);
 
-  color = shaderJSON.at("color"); // TODO: I think we should be able to get rid of this with our new uniform system
+  color = shaderJSON.at("color");
   // optional geometry shader where supported
   auto geometry = shaderJSON["geometry"];
   shared_ptr<ShaderProgram> program;

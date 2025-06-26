@@ -23,17 +23,17 @@ void Model::draw(Uniforms& uniforms) {
 
 #ifndef __EMSCRIPTEN__
     if (shouldDrawNormals) {
-      drawNormals(uniforms);
+      drawNormals(uniforms,glm::mat4(1.f));
     }
 #endif
 
     if (shouldDrawMesh) {
-      drawMesh(uniforms);
+      drawMesh(uniforms,glm::mat4(1.f));
     }
   }
 }
 
-void Model::drawNormals(Uniforms& uniforms) {
+void Model::drawNormals(Uniforms& uniforms, glm::mat4 _) {
   for (Mesh mesh : meshes) {
     configuration->normalShader->activate();
     configuration->normalShader->setUniform("time", uniforms.time);
@@ -62,7 +62,7 @@ void Model::drawWireframe(Uniforms& uniforms) {
   }
 }
 
-void Model::drawMesh(Uniforms& uniforms) {
+void Model::drawMesh(Uniforms& uniforms, glm::mat4 _) {
   for (Mesh mesh : meshes) {
     configuration->meshShader->activate();
     configuration->meshShader->setUniform("time", uniforms.time);
@@ -84,6 +84,8 @@ void Model::drawMesh(Uniforms& uniforms) {
       mesh.draw();
     }
     if (drawLines) {
+      //offset the wireframe ever so slightly so it doesn't draw on top of our shaded mesh
+      configuration->meshShader->setUniform("model", glm::translate(this->getTransform(),glm::vec3(0.f,-.1f,0.f)));
       mesh.drawWireframe();
     }
     configuration->meshShader->deactivate();

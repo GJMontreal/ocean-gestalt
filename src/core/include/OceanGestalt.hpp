@@ -72,6 +72,10 @@ class OceanGestalt : public OceanGestaltInterface,
   vector<std::shared_ptr<Drawable>> drawables;
   vector<std::shared_ptr<MoveableInterface>> moveables;
 
+  float elapsedTime=0;
+  double lastTime;
+  bool isRunning = true;
+
   void toggleNormalDisplay();
 
   void toggleWireframe();

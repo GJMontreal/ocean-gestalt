@@ -6,7 +6,8 @@
 #include "WaveGenerator.hpp"
 #include "asset.hpp"
 #include "glError.hpp"
-#include "Sphere.hpp"
+#include "Buoy.hpp"
+#include "TextRenderer.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -34,8 +35,12 @@ OceanGestalt::OceanGestalt() : Application() {
   config->light = light;
   moveables.push_back(this->light);
   auto lightDrawable = this->light->getDrawable();
-  lightDrawable->setShader(config->getShaders()["drawable_mesh"]);
-  lightDrawable->setNormalShader(config->getShaders()["drawable_normal"]);
+
+  auto drawableMeshShader = config->getShaders()["drawable_mesh"];
+  auto drawableNormalShader = config->getShaders()["drawable_normal"];
+  
+  lightDrawable->setShader(drawableMeshShader);
+  lightDrawable->setNormalShader(drawableNormalShader);
   drawables.push_back(this->light->getDrawable());
 
   configuration = config;
@@ -43,11 +48,12 @@ OceanGestalt::OceanGestalt() : Application() {
   models.push_back(ocean.get()); // yeah, we don't want this
   drawables.push_back(ocean);
 
-  // auto sphere = std::make_shared<Sphere>(vec3(0,0,10),config);
-  // sphere->setShader(config->getShaders()["drawable_mesh"]);
-  // sphere->setNormalShader(config->getShaders()["drawable_normal"]);
-  // drawables.push_back(sphere);
-  // moveables.push_back(sphere);
+  auto buoy = std::make_shared<Buoy>(glm::vec3(0.7f,0.f,0.1f),config);
+  auto buoyDrawable = buoy->getDrawable();
+  buoyDrawable->setShader(config->getShaders()["buoy_mesh"]);
+  buoyDrawable->setNormalShader(drawableNormalShader);
+  drawables.push_back(buoyDrawable);
+  moveables.push_back(buoy);
 
   waveUI = unique_ptr<WaveUI>(new WaveUI(config->waves));
 
@@ -104,9 +110,23 @@ void OceanGestalt::loop() {
   glClearColor(0.0f, 0.05f, 0.1f,
                1.0f);  // we should set this in the environment
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  //update our time if the simulation is running
+  auto time = float(glfwGetTime());
+  auto interval = time - lastTime;
+  lastTime = time;
+
+  if (isRunning) {
+    elapsedTime += (float)interval;
+  }
+  uniforms.time = elapsedTime;
+
   for( auto drawable : drawables){
     drawable->draw(uniforms);
   }
+
+  // change the projection
+  // configuration->textRenderer->renderText("Hello", 0.f, 0.f);
 }
 
 void OceanGestalt::initUniformBuffers() {
@@ -139,10 +159,12 @@ void OceanGestalt::toggleNormalDisplay() {
 
 void OceanGestalt::toggleSimulation() {
   std::cout << "Toggle simulation" << std::endl;
-  for (Model* model : models) {
-    model->toggleRunning();
-  }
+  isRunning = !isRunning;
+  // for (Model* model : models) {
+  //   model->toggleRunning();
+  // }
 
+  // why are we doing this following?
   configuration->wireframeShader->activate();
   auto color = glm::vec4(0.5,0.5,0.5,1.0);
   configuration->wireframeShader->setUniform("lineColor",color);

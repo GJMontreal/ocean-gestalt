@@ -32,6 +32,6 @@ void main(void)
 
     // ambient + view-aligned diffuse
     float ambientStrength = 0.2;
-    vec3 color = (ambientStrength + diff) * lineColor.xyz;
+    vec3 color = (ambientStrength + diff) * fs_in.Color;
     FragColor = vec4(color, 1.0);
 }

@@ -36,8 +36,8 @@ class Model : public Drawable{
   Mesh* getMesh(int index);
 
   protected:
-  void drawNormals(Uniforms& uniforms) override;
-  void drawMesh(Uniforms& uniforms) override;
+  void drawNormals(Uniforms& uniforms, glm::mat4 transform) override;
+  void drawMesh(Uniforms& uniforms, glm::mat4 transform) override;
   void drawWireframe(Uniforms& uniforms);
 
 // these could all be public, simplifying things

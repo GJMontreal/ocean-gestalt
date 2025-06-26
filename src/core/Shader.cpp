@@ -136,11 +136,13 @@ GLint ShaderProgram::uniform(const std::string& name) {
   if (it == uniforms.end()) {
     // uniform that is not referenced
     GLint r = glGetUniformLocation(handle, name.c_str());
-    if (r == GL_INVALID_OPERATION || r < 0)
-      cout << "[Error] uniform " << name << " doesn't exist in program" << endl;
-    // add it anyways
-    uniforms[name] = r;
-
+    if (r == GL_INVALID_OPERATION){
+      cout << "[ERROR] GL_INVALID_OPERATION Getting uniform location" << endl;
+    } else if( r < 0) {
+      cout << "[Warning] uniform " << name << " doesn't exist in program" << endl;
+    }else{
+      uniforms[name] = r; // I don't think we should add it if it's not in the program
+    }
     return r;
   } else
     return it->second;

@@ -26,7 +26,7 @@ class Drawable: public MoveableBase<Drawable>  {
   };
 
   inline glm::mat4 getTransform() const { return transform; };
-  // inline std::shared_ptr<Moveable> getMoveable() {return moveable;};
+ 
   inline std::shared_ptr<Configuration> getContext() {
     if(auto locked = this->context.lock()){
       return locked;
@@ -36,10 +36,13 @@ class Drawable: public MoveableBase<Drawable>  {
   void activate() override ;
   void deactivate() override ;
 
+  std::function<glm::mat4(Drawable& drawable, float time)> preDraw;
+  std::function<void(Drawable& drawable)> postDraw;
+  
   protected:
 
-  virtual void drawNormals(Uniforms& uniforms) = 0;
-  virtual void drawMesh(Uniforms& uniforms) = 0;
+  virtual void drawNormals(Uniforms& uniforms, glm::mat4 transform) = 0;
+  virtual void drawMesh(Uniforms& uniforms, glm::mat4 transform) = 0;
 
  private:
   glm::mat4 transform = glm::mat4(1.0);
