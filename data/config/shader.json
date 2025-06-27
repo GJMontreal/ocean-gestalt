@@ -25,7 +25,7 @@
         "fragment": "shader.frag",
         "color": {
             "r": 0.10,
-            "g": 0.22,
+            "g": 0.2,
             "b": 0.25,
             "a": 1
         }
@@ -50,6 +50,25 @@
             "b": 1,
             "a": 1
         }
+    },
+    "buoy_mesh":{
+        "vertex": "drawable.vert",
+        "fragment": "drawable_minimal.frag",
+        "color": {
+            "r": 0,
+            "g": 1,
+            "b": 1,
+            "a": 1
+        }
+    },
+    "text":{
+        "vertex": "text.vert",
+        "fragment": "text.frag",
+        "color": {
+            "r": 0,
+            "g": 1,
+            "b": 1,
+            "a": 1
+        }
     }
-
 }

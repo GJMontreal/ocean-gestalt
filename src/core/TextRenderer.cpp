@@ -1,51 +1,117 @@
 #include "TextRenderer.hpp"
 
+#include "Shader.hpp"
+
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
 
-#include <iostream>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <fstream>
+#include <iostream>
+
 
 TextRenderer::TextRenderer(const std::string& fontPath, int fontSize) {
-    std::ifstream ifs(fontPath, std::ios::binary | std::ios::ate);
-    if (!ifs) {
-        std::cerr << "Failed to load font: " << fontPath << std::endl;
-        return;
-    }
+  if(!loadFont(fontPath, fontSize)){
+    throw std::runtime_error("Failed to load font: " + fontPath);
+  }
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
 
-    auto end = ifs.tellg();
-    ifs.seekg(0, std::ios::beg);
-    fontBuffer.resize(static_cast<size_t>(end));
-    ifs.read(reinterpret_cast<char*>(fontBuffer.data()), fontBuffer.size());
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, nullptr, GL_DYNAMIC_DRAW);
 
-    if (!stbtt_InitFont(&fontInfo, fontBuffer.data(), 0)) {
-        std::cerr << "Failed to initialize font" << std::endl;
-        return;
-    }
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
 
-    scale = stbtt_ScaleForPixelHeight(&fontInfo, static_cast<float>(fontSize));
-    stbtt_GetFontVMetrics(&fontInfo, &ascent, &descent, &lineGap);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
-void TextRenderer::renderText(const std::string& text, float x, float y) {
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+bool TextRenderer::loadFont(const std::string& fontPath, int fontSize){
+       std::ifstream fontFile(fontPath, std::ios::binary | std::ios::ate);
+    if (!fontFile) return false;
 
+    std::streamsize size = fontFile.tellg();
+    fontFile.seekg(0, std::ios::beg);
+    std::vector<unsigned char> fontBuffer(size);
+    if (!fontFile.read(reinterpret_cast<char*>(fontBuffer.data()), size)) return false;
+
+    stbtt_pack_context packContext;
+    const int atlasWidth = 512, atlasHeight = 512;
+    std::vector<unsigned char> atlas(atlasWidth * atlasHeight, 0);
+
+    stbtt_PackBegin(&packContext, atlas.data(), atlasWidth, atlasHeight, 0, 1, nullptr);
+    stbtt_PackSetOversampling(&packContext, 2, 2);
+    stbtt_PackFontRange(&packContext, fontBuffer.data(), 0, fontSize, 32, 96, packedChars);
+    stbtt_PackEnd(&packContext);
+
+    glGenTextures(1, &atlasTex);
+    glBindTexture(GL_TEXTURE_2D, atlasTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, atlasWidth, atlasHeight, 0, GL_RED, GL_UNSIGNED_BYTE, atlas.data());
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    for (int i = 0; i < 96; ++i) {
+        stbtt_packedchar& pc = packedChars[i];
+        Glyph g;
+        g.ax = pc.xadvance;
+        g.bx = pc.xoff;
+        g.by = pc.yoff;
+        g.bw = pc.x1 - pc.x0;
+        g.bh = pc.y1 - pc.y0;
+        g.tx0 = pc.x0 / float(atlasWidth);
+        g.ty0 = pc.y0 / float(atlasHeight);
+        g.tx1 = pc.x1 / float(atlasWidth);
+        g.ty1 = pc.y1 / float(atlasHeight);
+        glyphs[i + 32] = g;
+    }
+
+    return true;
+}
+
+void TextRenderer::renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& projection) {
+    shader->activate();
+
+    glUniformMatrix4fv(glGetUniformLocation(shader->getHandle(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    glUniform3fv(glGetUniformLocation(shader->getHandle(), "textColor"), 1, glm::value_ptr(color));
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, atlasTex);
+
+    glBindVertexArray(vao);
+    
     for (char c : text) {
-        int ax, lsb;
-        stbtt_GetCodepointHMetrics(&fontInfo, c, &ax, &lsb);
+        if (glyphs.find(static_cast<unsigned char>(c)) == glyphs.end()) continue;
+        const Glyph& g = glyphs.at(static_cast<unsigned char>(c));
 
-        int x0, y0, x1, y1;
-        stbtt_GetCodepointBitmapBox(&fontInfo, c, scale, scale, &x0, &y0, &x1, &y1);
+        float xpos = x + g.bx * scale;
+        float ypos = y - g.by * scale;
+        float w = g.bw * scale;
+        float h = g.bh * scale;
 
-        int w = x1 - x0;
-        int h = y1 - y0;
-        std::vector<unsigned char> bitmap(w * h);
+        float vertices[6][4] = {
+            { xpos,     ypos + h, g.tx0, g.ty1 },
+            { xpos,     ypos,     g.tx0, g.ty0 },
+            { xpos + w, ypos,     g.tx1, g.ty0 },
+            { xpos,     ypos + h, g.tx0, g.ty1 },
+            { xpos + w, ypos,     g.tx1, g.ty0 },
+            { xpos + w, ypos + h, g.tx1, g.ty1 },
+        };
 
-        stbtt_MakeCodepointBitmap(&fontInfo, bitmap.data(), w, h, w, scale, scale, c);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        glRasterPos2f(x + x0, y - y0);
-        glDrawPixels(w, h, GL_LUMINANCE, GL_UNSIGNED_BYTE, bitmap.data());
-
-        x += ax * scale;
+        x += g.ax * scale;
     }
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    shader->deactivate();
 }
+

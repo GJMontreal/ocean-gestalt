@@ -89,7 +89,9 @@ void Configuration::loadShaders(const string& fileName) {
 
   // we should get rid of this colour stuff?
   vec4 drawableColor;
-  for (auto name : {"drawable_normal", "drawable_mesh","buoy_mesh"}) {
+  // couldn't this be simplified to just build any shaders that are listed in our json
+  // filter out shaders which list the key "geometry" if we're using emscripten
+  for (auto name : {"drawable_normal", "drawable_mesh","buoy_mesh","text"}) {
     auto shader = buildShader(j, name, drawableColor);
     shaders[shader->getName()] = shader;
   }

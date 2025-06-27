@@ -8,6 +8,7 @@
 #include "glError.hpp"
 #include "Buoy.hpp"
 #include "TextRenderer.hpp"
+#include "GerstnerWave.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -65,6 +66,10 @@ OceanGestalt::OceanGestalt() : Application() {
   initUniformBuffers();
 #endif
   
+  auto textRenderer = std::make_shared<TextRenderer>(FONT_DIR 
+  "FiraCode-Regular.ttf", 16);
+  config->textRenderer = textRenderer;
+  textRenderer->setShader(config->getShaders()["text"]);
   // surfAudio = std::make_shared<SurfAudio>();
   // doOnReady([&]{surfAudio->start();});
 
@@ -93,12 +98,26 @@ void OceanGestalt::loop() {
   if (glfwWindowShouldClose(getWindow()))
     exit();
 
+  auto time = float(glfwGetTime());
+  auto interval = time - lastTime;
+  lastTime = time;
+
+  //update our time if the simulation is running
+  if (isRunning) {
+    elapsedTime += (float)interval;
+  }
+
   projection = glm::perspective(glm::radians(getCamera()->Zoom),
                                 getWindowRatio(), 0.1f, 200.f);
+  // view = camera->GetViewMatrix();
+ 
 
-  view = camera->GetViewMatrix();
-
-  Uniforms uniforms{.projection = projection, .view = view};
+  // if we want to have the camera floating
+  auto position = camera->getPosition();
+  auto waveOffset = evaluateGerstnerWaves(configuration->getWaves(), glm::vec2(position.x,position.z),elapsedTime);
+  view = glm::lookAt(position + waveOffset, position + waveOffset + camera->Front, camera->Up);
+  
+  Uniforms uniforms{.projection = projection, .view = view, .time = elapsedTime};
 
 #ifndef __EMSCRIPTEN__
   setUniformBuffers(projection, view);
@@ -110,16 +129,6 @@ void OceanGestalt::loop() {
   glClearColor(0.0f, 0.05f, 0.1f,
                1.0f);  // we should set this in the environment
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  //update our time if the simulation is running
-  auto time = float(glfwGetTime());
-  auto interval = time - lastTime;
-  lastTime = time;
-
-  if (isRunning) {
-    elapsedTime += (float)interval;
-  }
-  uniforms.time = elapsedTime;
 
   for( auto drawable : drawables){
     drawable->draw(uniforms);
