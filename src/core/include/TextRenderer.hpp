@@ -54,6 +54,8 @@ private:
     std::vector<stbtt_packedchar> packedChars;
     std::vector<stbtt_aligned_quad> alignedQuads; 
 
+    std::vector<unsigned char> atlas;
+    
     GLuint vao = 0;
     GLuint vbo = 0;
 

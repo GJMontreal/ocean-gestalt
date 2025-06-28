@@ -67,7 +67,7 @@ OceanGestalt::OceanGestalt() : Application() {
 #endif
   
   auto textRenderer = std::make_shared<TextRenderer>(FONT_DIR 
-  "FiraCode-Regular.ttf", 96);
+  "FiraCode-Regular.ttf", 90);
   config->textRenderer = textRenderer;
   textRenderer->setShader(config->getShaders()["text"]);
   // textRenderer->setProjection(glm::ortho(0.0f, static_cast<float>(getWidth()),static_cast<float>(getHeight()),0.0f )); 

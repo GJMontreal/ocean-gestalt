@@ -2,11 +2,11 @@
  * Shader.hpp
  * Contributors:
  *      * Arthur Sonzogni (author)
+ *      * Geoffrey Jones
  * Licence:
  *      * MIT
  */
-#ifndef OPENGL_CMAKE_SKELETON_SHADER_HPP
-#define OPENGL_CMAKE_SKELETON_SHADER_HPP
+#pragma once
 
 #define GLM_FORCE_RADIANS
 #include <GL/glew.h>
@@ -42,7 +42,7 @@ class Shader {
 // This class provide an interface to define the OpenGL uniforms and attributes
 // using GLM objects.
 
-struct TexBinding { GLint texID; std::string uniform; };
+struct TexBinding { GLuint texID; std::string uniform; };
 class ShaderProgram {
  public:
   // constructor
@@ -104,4 +104,15 @@ class ShaderProgram {
   void link();
 };
 
-#endif  // OPENGL_CMAKE_SKELETON_SHADER_HPP
+
+class ShaderScope {
+public:
+    explicit ShaderScope(std::shared_ptr<ShaderProgram>& s) : shader(s) {
+        shader->activate();
+    }
+    ~ShaderScope() {
+        shader->deactivate();
+    }
+private:
+    std::shared_ptr<ShaderProgram>& shader;
+};

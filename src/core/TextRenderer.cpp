@@ -1,8 +1,12 @@
+// adapted from
+// https://github.com/shreyaspranav/stb-truetype-example/
+// 
+
 #include "TextRenderer.hpp"
 
+#include "Shader.hpp"
 #include "asset.hpp"
 #include "glError.hpp"
-#include "Shader.hpp"
 
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
@@ -16,241 +20,235 @@
 #include <fstream>
 #include <iostream>
 
-static const int VERTICES_PER_QUAD = 6;  //two triangles
+#define DEBUG_GL
+
+static const int VERTICES_PER_QUAD = 6;  // two triangles
 static const int MAX_CHARACTERS = 10000;
-static const size_t VBO_SIZE =  MAX_CHARACTERS * VERTICES_PER_QUAD * sizeof(TextVertex); 
+static const unsigned long VBO_SIZE =
+    MAX_CHARACTERS * VERTICES_PER_QUAD * sizeof(TextVertex);
 
 static const int FIRST_CHAR = 32;
-static const int NUM_CHARS = 96;
+static const int NUM_CHARS = 95;
 
-TextRenderer::TextRenderer(const std::string& fontPath, int fontSize) :fontSize(fontSize) {
+const int ATLAS_WIDTH = 512;
+const int ATLAS_HEIGHT = 512;
+
+static bool isRenderable(char ch){
+  return ch >= FIRST_CHAR &&
+        ch < FIRST_CHAR + NUM_CHARS;
+}
+
+TextRenderer::TextRenderer(const std::string& fontPath, int fontSize)
+    : fontSize(fontSize) {
   packedChars.resize(NUM_CHARS);
   alignedQuads.resize(NUM_CHARS);
 
-  if(!loadFont(fontPath, fontSize)){
+  if (!loadFont(fontPath, fontSize)) {
     throw std::runtime_error("Failed to load font: " + fontPath);
   }
   setupBuffers();
 }
 
 void TextRenderer::setupBuffers() {
-    // Setting up the VAO and VBO: -----------------------
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, VBO_SIZE, nullptr, GL_DYNAMIC_DRAW);
+  // Setting up the VAO and VBO: -----------------------
+  glGenBuffers(1, &vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, VBO_SIZE, nullptr, GL_DYNAMIC_DRAW);
 
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(TextVertex), (void*)offsetof(TextVertex, position));
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(TextVertex),
+                        (void*)offsetof(TextVertex, position));
 
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(TextVertex), (void*)offsetof(TextVertex, color));
-    
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(TextVertex), (void*)offsetof(TextVertex, texCoord));
-    
-    glBindVertexArray(0);
-    glCheckError(__FILE__, __LINE__);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(TextVertex),
+                        (void*)offsetof(TextVertex, color));
+
+  glEnableVertexAttribArray(2);
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(TextVertex),
+                        (void*)offsetof(TextVertex, texCoord));
+
+  glBindVertexArray(0);
+  glCheckError(__FILE__, __LINE__);
 }
 
-bool TextRenderer::loadFont(const std::string& fontPath, int fontSize){
-       std::ifstream fontFile(fontPath, std::ios::binary | std::ios::ate);
-    if (!fontFile) return false;
+bool TextRenderer::loadFont(const std::string& fontPath, int fontSize) {
+  std::ifstream fontFile(fontPath, std::ios::binary | std::ios::ate);
+  if (!fontFile)
+    return false;
 
-    std::streamsize size = fontFile.tellg();
-    fontFile.seekg(0, std::ios::beg);
-    std::vector<unsigned char> fontBuffer(size);
-    if (!fontFile.read(reinterpret_cast<char*>(fontBuffer.data()), size)) return false;
+  std::streamsize size = fontFile.tellg();
+  fontFile.seekg(0, std::ios::beg);
+  std::vector<unsigned char> fontBuffer(size);
+  if (!fontFile.read(reinterpret_cast<char*>(fontBuffer.data()), size))
+    return false;
 
-    stbtt_pack_context packContext;
-    const int atlasWidth = 512, atlasHeight = 512;
-    std::vector<unsigned char> atlas(atlasWidth * atlasHeight, 0);  //our actual bitmap
+  stbtt_pack_context packContext;
 
-    stbtt_PackBegin(&packContext, atlas.data(), atlasWidth, atlasHeight, 0, 1,
-                    nullptr);
-    // stbtt_PackSetOversampling(&packContext, 2, 2); // not sure we need this
+  atlas.resize(ATLAS_WIDTH * ATLAS_HEIGHT, 0);
+  stbtt_PackBegin(&packContext, atlas.data(), ATLAS_WIDTH, ATLAS_HEIGHT, 0, 1,
+                  nullptr);
 
-    bool ok = stbtt_PackFontRange(&packContext, fontBuffer.data(), 0, int(fontSize),
-                                  FIRST_CHAR, NUM_CHARS, packedChars.data());
-    // if(!ok){
-    //   std::cerr << "packing failed" << std::endl;
-    //   return false;
-    // }
-
-    stbtt_PackEnd(&packContext);
-
-    
-    glGenTextures(1, &atlasTex);
-    glBindTexture(GL_TEXTURE_2D, atlasTex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, atlasWidth, atlasHeight, 0, GL_RED, GL_UNSIGNED_BYTE, atlas.data());
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_RED);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_RED);
-
+  
+  bool ok = stbtt_PackFontRange(&packContext, fontBuffer.data(), 0, int(fontSize),
+                          FIRST_CHAR, NUM_CHARS, packedChars.data());
+  if (! ok) {
     for (int i = 0; i < NUM_CHARS; ++i) {
-      float unusedX;
-      float unusedY;
-      stbtt_GetPackedQuad(packedChars.data(), atlasWidth, atlasHeight, i, &unusedX, &unusedY, &alignedQuads[i], 0);
-
+      const auto& pc = packedChars[i];
+      if (pc.x0 == 0 && pc.x1 == 0 && pc.y0 == 0 && pc.y1 == 0) {
+        std::cout << "Glyph " << (FIRST_CHAR + i) << " failed to pack.\n";
+      }
     }
-    //for debugging
-    stbi_write_png(FONT_DIR "FontAtlas.png", atlasWidth,atlasHeight, 1, atlas.data(),atlasWidth);
-    return true;
+    return false;
+  }
+
+  stbtt_PackEnd(&packContext);
+
+  for (int i = 0; i < NUM_CHARS; ++i) {
+    float unusedX;
+    float unusedY;
+    stbtt_GetPackedQuad(packedChars.data(), ATLAS_WIDTH, ATLAS_HEIGHT, i,
+                        &unusedX, &unusedY, &alignedQuads[i], 0);
+  }
+#ifdef DEBUG_GL
+  stbi_write_png(FONT_DIR "FontAtlas.png", ATLAS_WIDTH, ATLAS_HEIGHT, 1,
+                 atlas.data(), ATLAS_WIDTH);
+#endif
+
+  return true;
 }
 
 void TextRenderer::setShader(std::shared_ptr<ShaderProgram> shader) {
-    this->shader = shader;
-    shader->activate();
-    glActiveTexture(GL_TEXTURE0);
+  this->shader = shader;
+  auto _guard = ShaderScope(shader);
+  glGenTextures(1, &atlasTex);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, atlasTex);
 
-    glBindTexture(GL_TEXTURE_2D, atlasTex);
-    GLint loc = glGetUniformLocation(shader->getHandle(), "textAtlas");
-    glUniform1i(loc, 0);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    this->shader->deactivate();
-
-    glBindTexture(GL_TEXTURE_2D,0);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, ATLAS_WIDTH, ATLAS_HEIGHT, 0, GL_RED,
+               GL_UNSIGNED_BYTE, atlas.data());
+#ifdef DEBUG_GL
+  glCheckError(__FILE__, __LINE__);
+#endif
 }
 
-void TextRenderer::render(){
+void TextRenderer::render() {
   render(this->vertices);
 }
 
-void TextRenderer::render(std::vector<TextVertex>& vertices){
-  // TODO: fix the problems with our textures
-    GLint prevProgram, prevVAO, prevTex;
-    glGetIntegerv(GL_CURRENT_PROGRAM, &prevProgram);
-    glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &prevVAO);
-    glGetIntegerv(GL_TEXTURE_BINDING_2D, &prevTex);
+void TextRenderer::render(std::vector<TextVertex>& vertices) {
+  auto _guard = ShaderScope(shader);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, atlasTex);
+  GLint loc = glGetUniformLocation(shader->getHandle(), "textAtlas");
+  glUniform1i(loc, 0);
 
-    shader->activate();
-    glActiveTexture(GL_TEXTURE0);
+  int uniformLocation =
+        glGetUniformLocation(shader->getHandle(), "projection");
+    glUniformMatrix4fv(
+        uniformLocation, 1, GL_FALSE,
+        glm::value_ptr(projection));  
 
-    glBindTexture(GL_TEXTURE_2D, atlasTex);
-    GLint loc = glGetUniformLocation(shader->getHandle(), "textAtlas");
-    glUniform1i(loc, 0);
-
-    // The vertex buffer need to be divided into chunks of size 'VBO_SIZE',
-    // Upload them to the VBO and render
-    // This is repeated for every divided chunk of the vertex buffer.
-
-    size_t sizeOfVertices = vertices.size() * sizeof(TextVertex);
-    uint32_t drawCallCount = (sizeOfVertices / VBO_SIZE) + 1; // aka number of chunks.
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    
+    const size_t maxVerticesPerBatch = VBO_SIZE / sizeof(TextVertex);
 
     // Render each chunk of vertex data.
-    for(int i = 0; i < drawCallCount; i++)
-    {
-        const TextVertex* data = vertices.data() + i * VBO_SIZE;
-        
-        uint32_t vertexCount = 
-            i == drawCallCount - 1 ? 
-            (sizeOfVertices % VBO_SIZE) / sizeof(TextVertex): 
-            VBO_SIZE / (sizeof(TextVertex) * 6);
+    for (size_t offset = 0; offset < vertices.size();
+         offset += maxVerticesPerBatch) {
+      size_t batchVertexCount =
+          std::min(maxVerticesPerBatch, vertices.size() - offset);
+      const TextVertex* data = vertices.data() + offset;
 
-        int uniformLocation = glGetUniformLocation(shader->getHandle(), "projection");
-        glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(projection));  // not certain about the value for transpose based on our src
-  
-        glBindVertexArray(vao);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferSubData(GL_ARRAY_BUFFER, 
-            0, 
-            i == drawCallCount - 1 ? sizeOfVertices % VBO_SIZE : VBO_SIZE,
-            data);
-
-        glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+      glBufferSubData(GL_ARRAY_BUFFER, 0, batchVertexCount * sizeof(TextVertex),
+                      data);
+      glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(batchVertexCount));
     }
-    
+
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    shader->deactivate();
 
-    glUseProgram(prevProgram);
-    glBindVertexArray(prevVAO);
-    glBindTexture(GL_TEXTURE_2D, prevTex);
-    glDisable(GL_BLEND);
+    // shader->deactivate();
+
+#ifdef DEBUG_GL
+  glCheckError(__FILE__, __LINE__);
+#endif
 }
 
 // we'll do multiple drawText, then renderText
-void TextRenderer::drawText(const std::string& text, glm::vec3 position, const glm::vec4& color, float size) {
+void TextRenderer::drawText(const std::string& text,
+                            glm::vec3 position,
+                            const glm::vec4& color,
+                            float size) {
+  const auto vertexOrder = std::vector<int>{0, 1, 2, 0, 2, 3};
+  float pixelScale = 2.0f / screenHeight;
 
-    const auto vertexOrder = std::vector<int>{ 0, 1, 2, 0, 2, 3 }; 
-    float pixelScale = 2.0f / screenHeight;
+  glm::vec3 localPosition = position;
+  vertices.resize(vertices.size() + text.length() * VERTICES_PER_QUAD);
+  for (char ch : text) {
+    // Check if the charecter glyph is in the font atlas.
+    if (isRenderable(ch))
+    {
+      // Retrieve the data that is used to render a glyph of charecter 'ch'
+      stbtt_packedchar packedChar = packedChars[ch - FIRST_CHAR];
+      stbtt_aligned_quad alignedQuad = alignedQuads[ch - FIRST_CHAR];
 
-    glm::vec3 localPosition = position;
+      // The units of the fields of the above structs are in pixels,
+      // convert them to a unit of what we want be multilplying to pixelScale
+      glm::vec2 glyphSize = {
+          (packedChar.x1 - packedChar.x0) * pixelScale * size,
+          (packedChar.y1 - packedChar.y0) * pixelScale * size};
 
-    for (char ch : text) {
-        // Check if the charecter glyph is in the font atlas.
-        if(ch >= FIRST_CHAR  && ch <= FIRST_CHAR + NUM_CHARS)  // not sure about this comparison
-        {
-            if(vertices.size() <= vertexIndex){
-                vertices.resize(vertices.size() + VERTICES_PER_QUAD);  //add space for an additional quad
-            }
+      glm::vec2 glyphBoundingBoxBottomLeft = {
+          localPosition.x + (packedChar.xoff * pixelScale * size),
+          localPosition.y - (packedChar.yoff + packedChar.y1 - packedChar.y0) *
+                                pixelScale * size};
 
-            // Retrive the data that is used to render a glyph of charecter 'ch'
-            stbtt_packedchar packedChar = packedChars[ch- FIRST_CHAR];
-            stbtt_aligned_quad alignedQuad = alignedQuads[ch - FIRST_CHAR];
-            
-            // The units of the fields of the above structs are in pixels, 
-            // convert them to a unit of what we want be multilplying to pixelScale  
-            glm::vec2 glyphSize = 
-            {
-                (packedChar.x1 - packedChar.x0) * pixelScale * size,
-                (packedChar.y1 - packedChar.y0) * pixelScale * size
-            };
+      // The order of vertices of a quad goes top-right, top-left, bottom-left,
+      // bottom-right
+      auto glyphVertices = std::vector<glm::vec2>{
+          {glyphBoundingBoxBottomLeft.x + glyphSize.x,
+           glyphBoundingBoxBottomLeft.y + glyphSize.y},
+          {glyphBoundingBoxBottomLeft.x,
+           glyphBoundingBoxBottomLeft.y + glyphSize.y},
+          {glyphBoundingBoxBottomLeft.x, glyphBoundingBoxBottomLeft.y},
+          {glyphBoundingBoxBottomLeft.x + glyphSize.x,
+           glyphBoundingBoxBottomLeft.y},
+      };
 
-            glm::vec2 glyphBoundingBoxBottomLeft = 
-            {
-                localPosition.x + (packedChar.xoff * pixelScale * size),
-                localPosition.y - (packedChar.yoff + packedChar.y1 - packedChar.y0) * pixelScale * size
-            };
+      auto glyphTextureCoords = std::vector<glm::vec2>{
+          {alignedQuad.s1, alignedQuad.t0},
+          {alignedQuad.s0, alignedQuad.t0},
+          {alignedQuad.s0, alignedQuad.t1},
+          {alignedQuad.s1, alignedQuad.t1},
+      };
 
-            // The order of vertices of a quad goes top-right, top-left, bottom-left, bottom-right
-            auto glyphVertices = std::vector<glm::vec2> 
-            {
-                { glyphBoundingBoxBottomLeft.x + glyphSize.x, glyphBoundingBoxBottomLeft.y + glyphSize.y },
-                { glyphBoundingBoxBottomLeft.x, glyphBoundingBoxBottomLeft.y + glyphSize.y },
-                { glyphBoundingBoxBottomLeft.x, glyphBoundingBoxBottomLeft.y },
-                { glyphBoundingBoxBottomLeft.x + glyphSize.x, glyphBoundingBoxBottomLeft.y },
-            };
+      // We need to fill the vertex buffer by 6 vertices to render a quad as we
+      // are rendering a quad as 2 triangles The order used is in the 'order'
+      // array order = [0, 1, 2, 0, 2, 3] is meant to represent 2 triangles: one
+      // by glyphVertices[0], glyphVertices[1], glyphVertices[2] and one by
+      // glyphVertices[0], glyphVertices[2], glyphVertices[3]
+      for (int i = 0; i < 6; i++) {
+        vertices[vertexIndex + i].position =
+            glm::vec3(glyphVertices[vertexOrder[i]], position.z);
+        vertices[vertexIndex + i].color = color;
+        vertices[vertexIndex + i].texCoord = glyphTextureCoords[vertexOrder[i]];
+      }
 
-            auto glyphTextureCoords = std::vector<glm::vec2> 
-            {
-                { alignedQuad.s1, alignedQuad.t0 },
-                { alignedQuad.s0, alignedQuad.t0 },
-                { alignedQuad.s0, alignedQuad.t1 },
-                { alignedQuad.s1, alignedQuad.t1 },
-            };
+      vertexIndex += 6;
 
-            // We need to fill the vertex buffer by 6 vertices to render a quad as we are rendering a quad as 2 triangles
-            // The order used is in the 'order' array
-            // order = [0, 1, 2, 0, 2, 3] is meant to represent 2 triangles: 
-            // one by glyphVertices[0], glyphVertices[1], glyphVertices[2] and one by glyphVertices[0], glyphVertices[2], glyphVertices[3]
-            for(int i = 0; i < 6; i++)
-            {
-                vertices[vertexIndex + i].position = glm::vec3(glyphVertices[vertexOrder[i]], position.z);
-                vertices[vertexIndex + i].color = color;
-                vertices[vertexIndex + i].texCoord = glyphTextureCoords[vertexOrder[i]];
-            }
-
-            vertexIndex += 6;
-
-            // Update the position to render the next glyph specified by packedChar->xadvance.
-            localPosition.x += packedChar.xadvance * pixelScale * size;
-        }
-        else if(ch == '\n'){
-          localPosition.y -= fontSize * pixelScale * size;
-          localPosition.x = position.x;
-        }
+      localPosition.x += packedChar.xadvance * pixelScale * size;
+    } else if (ch == '\n') {
+      localPosition.y -= fontSize * pixelScale * size;
+      localPosition.x = position.x;
     }
+  }
 }
-

@@ -42,7 +42,7 @@ float Wave::getVelocity() const {
   void WaveInterface::setWaveParameters(std::vector<std::shared_ptr<Wave>> waves,
                                       const std::string& path,
                                       const ApiValue& value) {
-    std::cout << "Wave Interface " << path << std::endl;
+
 
     // Tokenize by '.'
     std::vector<std::string> parts;

@@ -35,7 +35,9 @@ void Mesh::drawWireframe()const{
                  nullptr              // element array buffer offset
   );
 
+  #ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);
+  #endif
 
   glBindVertexArray(0);
 }
@@ -49,7 +51,9 @@ void Mesh::draw() const {
                  nullptr           // element array buffer offset
   );
 
+  #ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);
+  #endif
 
   glBindVertexArray(0);
 }
@@ -62,8 +66,11 @@ void Mesh::drawNormals()const{
                  GL_UNSIGNED_INT,  // type
                  nullptr              // element array buffer offset
   );
+  
+  #ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);
-
+  #endif
+  
   glBindVertexArray(0);
 }
 

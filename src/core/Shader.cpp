@@ -256,22 +256,22 @@ void ShaderProgram::listUniforms() const {
   }
 }
 
-// TODO: get rid of this, we'll rely on our uniform state and that everything passes through the api
-std::optional<std::string> ShaderProgram::getUniform(const std::string& name) const{
-  return std::string("0.35"); // till we get this working
-}
 ShaderProgram::~ShaderProgram() {
   // glDeleteProgram(handle);
 }
 
 void ShaderProgram::activate() const {
-  glCheckError(__FILE__, __LINE__);
   glUseProgram(handle);
 
-  // for(auto tex: textures){
-  //   glActiveTexture(GL_TEXTURE + handle);
-  //   glBindTexture(GL_TEXTURE_2D, tex.texID);
-  // }
+  for(auto tex: textures){
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex.texID);
+    GLint loc = glGetUniformLocation(getHandle(), tex.uniform.c_str());
+    glUniform1i(loc, 0);
+  }
+  #ifdef DEBUG_GL
+  glCheckError(__FILE__, __LINE__);
+  #endif
 }
 
 void ShaderProgram::deactivate() const {
@@ -305,10 +305,6 @@ GLuint ShaderProgram::loadTexture(const std::string& path, const std::string& un
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
 
-    // Link texture to shader
-    GLint loc = glGetUniformLocation(getHandle(), uniformName.c_str());
-    glUniform1i(loc, unit);
-
-    textures.push_back(TexBinding{loc,uniformName});
+    textures.push_back(TexBinding{texID,uniformName});
     return texID;
 }

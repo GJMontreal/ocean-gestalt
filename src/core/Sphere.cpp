@@ -69,25 +69,29 @@ glBindVertexArray(VAO);
 // VBO
 glGenBuffers(1, &VBO);
 glBindBuffer(GL_ARRAY_BUFFER, VBO);
-glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(VertexType), vertexData.data(), GL_STATIC_DRAW);
+glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(VertexType),
+             vertexData.data(), GL_STATIC_DRAW);
 
 // EBO
 glGenBuffers(1, &EBO);
 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
+             indices.data(), GL_STATIC_DRAW);
 
 glEnableVertexAttribArray(0);
-glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexType), (void*)offsetof(VertexType, position));
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexType),
+                      (void*)offsetof(VertexType, position));
 
-glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexType), (void*)offsetof(VertexType, normal));
+glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexType),
+                      (void*)offsetof(VertexType, normal));
 glEnableVertexAttribArray(1);
 
 glEnableVertexAttribArray(2);
-glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE,sizeof(VertexType), (void*)offsetof(VertexType,color));
-  
+glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(VertexType),
+                      (void*)offsetof(VertexType, color));
 
 glBindVertexArray(0);
-  glCheckError(__FILE__, __LINE__);
+glCheckError(__FILE__, __LINE__);
 }
 
 void Sphere::draw(Uniforms& uniforms) {
@@ -128,7 +132,9 @@ void Sphere::drawMesh(Uniforms& uniforms, mat4 transform) {
   glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
   shader->deactivate();
+#ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);
+#endif  
 }
 
 void Sphere::drawNormals(Uniforms& uniforms, mat4 transform) {
@@ -139,7 +145,9 @@ void Sphere::drawNormals(Uniforms& uniforms, mat4 transform) {
   glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0);
 
   normalShader->deactivate();
+#ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);
+#endif
 }
 
 void Sphere::setShader(shared_ptr<ShaderProgram> shader) {

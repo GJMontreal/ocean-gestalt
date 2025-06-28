@@ -56,7 +56,10 @@ void Model::drawWireframe(Uniforms& uniforms) {
                                                uniforms.projection);
     configuration->wireframeShader->setUniform("view", uniforms.view);
 #endif
+
+#ifdef DEBUG_GL
     glCheckError(__FILE__, __LINE__);
+#endif
     mesh.drawWireframe();
     configuration->wireframeShader->deactivate();
   }
@@ -79,7 +82,11 @@ void Model::drawMesh(Uniforms& uniforms, glm::mat4 _) {
     configuration->meshShader->setUniform("view", uniforms.view);
 
 #endif
+
+#ifdef DEBUG_GL
     glCheckError(__FILE__, __LINE__);
+#endif
+  
     if (drawTriangles) {
       mesh.draw();
     }
