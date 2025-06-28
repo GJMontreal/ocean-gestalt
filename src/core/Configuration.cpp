@@ -31,7 +31,7 @@ Configuration::Configuration(const string& environment,
   loadGenerator(generator);
   loadAPISettings(api);
 
-  textRenderer = make_shared<TextRenderer>(FONT_DIR "FiraCode-Regular.ttf", 32);
+  // textRenderer = make_shared<TextRenderer>(FONT_DIR "FiraCode-Regular.ttf", 32);
 }
 
 void Configuration::setApi(std::shared_ptr<ApiAdapter> api) {

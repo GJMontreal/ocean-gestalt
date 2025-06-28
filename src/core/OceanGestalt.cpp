@@ -58,7 +58,7 @@ OceanGestalt::OceanGestalt() : Application() {
 
   waveUI = unique_ptr<WaveUI>(new WaveUI(config->waves));
 
-  glEnable(GL_BLEND);
+  // glEnable(GL_BLEND);
   // glBlendFunc(GL_ONE, GL_ONE);  // Not certain what our blend mode should be?
 
 // Uniform buffers aren't supported by GLES
@@ -67,9 +67,12 @@ OceanGestalt::OceanGestalt() : Application() {
 #endif
   
   auto textRenderer = std::make_shared<TextRenderer>(FONT_DIR 
-  "FiraCode-Regular.ttf", 16);
+  "FiraCode-Regular.ttf", 96);
   config->textRenderer = textRenderer;
   textRenderer->setShader(config->getShaders()["text"]);
+  // textRenderer->setProjection(glm::ortho(0.0f, static_cast<float>(getWidth()),static_cast<float>(getHeight()),0.0f )); 
+  textRenderer->setScreenHeight(static_cast<float>(getHeight()));
+  textRenderer->setProjection(glm::ortho(0.0f, static_cast<float>(getWidth()),0.0f,static_cast<float>(getHeight()) ));
   // surfAudio = std::make_shared<SurfAudio>();
   // doOnReady([&]{surfAudio->start();});
 
@@ -130,12 +133,24 @@ void OceanGestalt::loop() {
                1.0f);  // we should set this in the environment
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+  // just until we get our text rendering working
   for( auto drawable : drawables){
     drawable->draw(uniforms);
   }
 
-  // change the projection
-  // configuration->textRenderer->renderText("Hello", 0.f, 0.f);
+  glDisable(GL_DEPTH_TEST);
+glDepthMask(GL_FALSE);
+glEnable(GL_BLEND);
+glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//just until we get this working
+configuration->textRenderer->drawBegin();
+configuration->textRenderer->drawText("Hello there\nDo we get a newline?",glm::vec3(10.f,100.f,0.f),glm::vec4(1.0f,1.f,0.f,1.f), 64.f); //I think this size is in pixels
+configuration->textRenderer->drawText("this should be a different color",glm::vec3(10.f,200.f,0.f),glm::vec4(0.f,1.f,0.f,1.f), 64.f);
+configuration->textRenderer->render();
+
+glEnable(GL_DEPTH_TEST);
+glDepthMask(GL_TRUE);
 }
 
 void OceanGestalt::initUniformBuffers() {

@@ -72,7 +72,7 @@ void Model::drawMesh(Uniforms& uniforms, glm::mat4 _) {
     configuration->meshShader->setUniform("lightPos",
                                           configuration->light->getPosition());
     configuration->meshShader->setUniform("viewPos",
-                                          configuration->camera->getPosition());
+                                          configuration->camera->getPosition()); //this will be wrong if the camera is moving up and down with the waves
 
 #ifdef __EMSCRIPTEN__
     configuration->meshShader->setUniform("projection", uniforms.projection);
