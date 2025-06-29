@@ -4,12 +4,12 @@
 #include "Configuration.hpp"
 #include "glError.hpp"
 #include "Shader.hpp"
-#include <glm/gtx/string_cast.hpp>
+// #include <glm/gtx/string_cast.hpp>
 
 
 LDOSurface::LDOSurface(glm::vec3 origin, std::shared_ptr<Configuration> context)
     : Drawable(origin, context) {
-      generateMesh(vertices, indices, 128);
+      generateMesh(vertices, indices, 60);
       bindVertices();
     }
 
@@ -23,12 +23,26 @@ void LDOSurface::drawNormals(Uniforms& uniforms, glm::mat4 transform) {}
 void LDOSurface::drawMesh(Uniforms& uniforms, glm::mat4 transform) {
   assert(shader); // ensure we have assigned a shader
   auto _guard = ShaderScope(shader);
-  glDisable(GL_CULL_FACE);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+  glm::vec4 clipNear = glm::vec4(0.0f, 0.0f, -1.0f, 1.0f);
+glm::vec4 clipFar  = glm::vec4(0.0f, 0.0f,  1.0f, 1.0f);
+
+glm::mat4 invViewProjection = glm::inverse(uniforms.projection * uniforms.view);
+glm::vec3 worldNear = glm::vec3(invViewProjection * clipNear);
+glm::vec3 worldFar  = glm::vec3(invViewProjection * clipFar);
+
+glm::vec3 rayDir = glm::normalize(worldFar - worldNear);
+float t = (0.0f - worldNear.y) / rayDir.y;
+glm::vec3 centerRayHit = worldNear + rayDir * t;
+glm::vec3 desiredPatchCenter = glm::vec3(0.0f, 0.0f, 0.0f); // or wherever you want it
+glm::vec3 patchOffset = desiredPatchCenter - centerRayHit;
+shader->setUniform("patchOffset",patchOffset);
+glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+glDisable(GL_CULL_FACE);
 glCheckError(__FILE__, __LINE__);
 // shader->setUniform("viewPos", this->getContext()->camera->getPosition());
 
-glm::mat4 invViewProjection = glm::inverse(uniforms.projection * uniforms.view);
+// glm::mat4 invViewProjection = glm::inverse(uniforms.projection * uniforms.view);
 
 shader->setUniform("invViewProjection", invViewProjection);
 
@@ -39,7 +53,8 @@ shader->setUniform("invViewProjection", invViewProjection);
 glCheckError(__FILE__, __LINE__);
   glBindVertexArray(vao);
   glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-glCheckError(__FILE__, __LINE__);
+
+  glCheckError(__FILE__, __LINE__);
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 #ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);

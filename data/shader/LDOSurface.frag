@@ -1,5 +1,5 @@
 out vec4 FragColor;
-
+in vec3 Color;
 void main() {
-    FragColor = vec4(0.8, 0.2, 0.5, 1.0); // solid debug colour
+    FragColor = vec4(Color, 1.0); // solid debug colour
 }
