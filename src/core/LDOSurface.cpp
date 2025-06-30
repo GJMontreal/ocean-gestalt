@@ -9,7 +9,7 @@
 
 LDOSurface::LDOSurface(glm::vec3 origin, std::shared_ptr<Configuration> context)
     : Drawable(origin, context) {
-      generateMesh(vertices, indices, 60);
+      generateMesh(vertices, indices, 61);
       bindVertices();
     }
 
@@ -24,31 +24,16 @@ void LDOSurface::drawMesh(Uniforms& uniforms, glm::mat4 transform) {
   assert(shader); // ensure we have assigned a shader
   auto _guard = ShaderScope(shader);
 
-  glm::vec4 clipNear = glm::vec4(0.0f, 0.0f, -1.0f, 1.0f);
-glm::vec4 clipFar  = glm::vec4(0.0f, 0.0f,  1.0f, 1.0f);
-
-glm::mat4 invViewProjection = glm::inverse(uniforms.projection * uniforms.view);
-glm::vec3 worldNear = glm::vec3(invViewProjection * clipNear);
-glm::vec3 worldFar  = glm::vec3(invViewProjection * clipFar);
-
-glm::vec3 rayDir = glm::normalize(worldFar - worldNear);
-float t = (0.0f - worldNear.y) / rayDir.y;
-glm::vec3 centerRayHit = worldNear + rayDir * t;
-glm::vec3 desiredPatchCenter = glm::vec3(0.0f, 0.0f, 0.0f); // or wherever you want it
-glm::vec3 patchOffset = desiredPatchCenter - centerRayHit;
-shader->setUniform("patchOffset",patchOffset);
 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 glDisable(GL_CULL_FACE);
 glCheckError(__FILE__, __LINE__);
-// shader->setUniform("viewPos", this->getContext()->camera->getPosition());
-
+auto camera = getContext()->camera;
 // glm::mat4 invViewProjection = glm::inverse(uniforms.projection * uniforms.view);
+// shader->setUniform("invViewProjection", invViewProjection);
 
-shader->setUniform("invViewProjection", invViewProjection);
-
-// std::cout << "projection:\n" << glm::to_string(uniforms.projection) << std::endl;
-// std::cout << "view:\n" << glm::to_string(uniforms.view) << std::endl;
-// std::cout << "invViewProj:\n" << glm::to_string(invViewProjection) << std::endl;
+shader->setUniform("cameraPos",camera->getPosition());
+shader->setUniform("fovYRadians",glm::radians(camera->Zoom));
+shader->setUniform("aspect",2.0f);
 
 glCheckError(__FILE__, __LINE__);
   glBindVertexArray(vao);
