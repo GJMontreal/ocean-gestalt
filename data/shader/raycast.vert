@@ -1,14 +1,19 @@
 layout(location = 0) in vec2 ndcCoord;
 
-layout(std140) uniform Matrices {
+
+layout(std140) uniform Matrices
+{
     uniform mat4 projection;
     uniform mat4 view;
 };
 
+
 uniform vec3 cameraPos;
 uniform float fovYRadians;
 uniform float aspect;
+
 uniform float ndcScale;
+
 const float planeY = 0.0;
 
 out vec3 Color;
@@ -20,9 +25,9 @@ vec3 intersectRayWithPlane(vec3 origin, vec3 dir, float yPlane) {
 }
 
 void main() {
-    vec2 scaledNDC = ndcCoord * ndcScale;
+    // vec2 scaledNDC = ndcCoord * ndcScale;
     float tanHalfFovY = tan(0.5 * fovYRadians);
-    vec2 uv = ndcCoord; // assumed in [-1, 1]
+    vec2 uv = vec2(ndcScale) * ndcCoord; // assumed in [-1, 1]
 
     vec3 rayView = vec3(
         uv.x * aspect * tanHalfFovY,
@@ -36,17 +41,13 @@ void main() {
 
     vec3 hit = intersectRayWithPlane(rayOrigin, rayDir, planeY);
     
-    hit = hit * ndcScale;
-
     vec4 projectedOrigin = projection * view * vec4(rayOrigin, 1.0);
+    
     if (gl_VertexID % 2 == 0) {
-        gl_Position = projectedOrigin; // purely in clip space
-        // gl_Position = vec4(ndcCoord,0.0,1.0);
-         Color = vec3(0.0, 1.0, 0.0);
+        gl_Position = vec4(uv,0.0,1.0);
+        Color = vec3(1.0, 1.0, 1.0);
     } else {
-        // gl_Position = projection * view * vec4(10.0,0.0,10.0,1.0); // world-space projected point
-        vec3 safeHit = vec3(clamp(hit.x, -100.0, 100.0), clamp(hit.y, -100.0, 100.0), clamp(hit.z, -100.0, 100.0));
-         gl_Position = projection * view * vec4(hit,1.0); // world-space projected point
-        Color = vec3(1.0, 0.0, 0.0);
+        gl_Position = vec4(uv,0.0,1.0);
+        Color = vec3(0.0, 0.0, 0.0);
     }
 }
