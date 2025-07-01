@@ -35,18 +35,18 @@ void main() {
     vec3 rayDir = normalize(viewRot * rayView);
 
     vec3 hit = intersectRayWithPlane(rayOrigin, rayDir, planeY);
+    
+    hit = hit * ndcScale;
 
     vec4 projectedOrigin = projection * view * vec4(rayOrigin, 1.0);
     if (gl_VertexID % 2 == 0) {
-        // gl_Position = projectedOrigin; // purely in clip space
-        gl_Position = vec4(ndcCoord,0.0,1.0);
+        gl_Position = projectedOrigin; // purely in clip space
+        // gl_Position = vec4(ndcCoord,0.0,1.0);
          Color = vec3(0.0, 1.0, 0.0);
     } else {
-        gl_Position = projection * view * vec4(10.0,0.0,10.0,1.0); // world-space projected point
+        // gl_Position = projection * view * vec4(10.0,0.0,10.0,1.0); // world-space projected point
+        vec3 safeHit = vec3(clamp(hit.x, -100.0, 100.0), clamp(hit.y, -100.0, 100.0), clamp(hit.z, -100.0, 100.0));
+         gl_Position = projection * view * vec4(hit,1.0); // world-space projected point
         Color = vec3(1.0, 0.0, 0.0);
     }
-
 }
-
-
-        // gl_Position = projection * view * vec4(ndcCoord.x,0.0,ndcCoord.y,1.0);
