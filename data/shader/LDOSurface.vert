@@ -8,14 +8,12 @@ layout(std140) uniform Matrices
              
 out vec3 Color;
 
-const float EPSILON = 1e-5;
-
 uniform vec3 cameraPos;
 uniform float fovYRadians;
 uniform float aspect;
 
 uniform float planeY = 0.0;
-uniform float ndcScale;
+uniform float ndcScale = 1.0; // default values might not work across platforms
 const vec2 clipMin = vec2(-60.0,-60.0); // e.g., vec2(-10.0, -5.0)
 const vec2 clipMax = vec2(60.0,60.0); // e.g., vec2(10.0, 5.0)
 
@@ -29,20 +27,19 @@ void main() {
     // Step 1: Build ray direction in view space
     float tanHalfFovY = tan(0.5 * fovYRadians);
 
-    vec2 scaledNDC = ndcCoord * ndcScale;
+    vec2 uv = ndcCoord * ndcScale;
 
-    vec3 rayViewDir = normalize(vec3(
-        scaledNDC.x * aspect * tanHalfFovY,
-        scaledNDC.y * tanHalfFovY,
-        -1.0 // into screen
-    ));
+    vec3 rayView = vec3(
+        uv.x * aspect * tanHalfFovY,
+        uv.y * tanHalfFovY,
+        -1.0
+    );
 
-    // Step 2: Rotate to world space using view matrix inverse
-    mat3 viewRot = mat3(transpose(view)); // inverse of rotation-only view
-    vec3 rayWorldDir = viewRot * rayViewDir;
+    mat3 viewRot = inverse(mat3(view));
+    vec3 rayOrigin = cameraPos + (viewRot * rayView);
+    vec3 rayDir = normalize(viewRot * rayView);
 
-    // Step 3: Raycast to ground
-    vec3 hit = intersectRayWithPlane(cameraPos, rayWorldDir, planeY);
+    vec3 hit = intersectRayWithPlane(rayOrigin, rayDir, planeY);
 
  // Step 4: Apply world-space rectangle clipping
     vec2 posXZ = hit.xz;
