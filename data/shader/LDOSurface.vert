@@ -14,7 +14,10 @@ uniform float aspect;
 
 uniform float planeY = 0.0;
 uniform float ndcScale = 1.0; // default values might not work across platforms
-const vec2 clipMin = vec2(-60.0,-60.0); // e.g., vec2(-10.0, -5.0)
+
+uniform int showMesh = 1;
+
+const vec2 clipMin = vec2(-60.0,-60.0); // e.g., vec2(-10.0, -5.0) these should be passed in 
 const vec2 clipMax = vec2(60.0,60.0); // e.g., vec2(10.0, 5.0)
 
 
@@ -44,12 +47,16 @@ void main() {
  // Step 4: Apply world-space rectangle clipping
     vec2 posXZ = hit.xz;
 
+// It would be great if we could clip using mix or something similar
     if (any(lessThan(posXZ, clipMin)) || any(greaterThan(posXZ, clipMax))) {
         gl_Position = vec4(0.0/0.0); // OpenGl says we need NaN in order to cull
         return;
     }
 
     // Step 4: Project to screen
-    gl_Position = projection * view * vec4(hit, 1.0);
+    vec4 projectedPosition = projection * view * vec4(hit, 1.0);
+    vec4 offscreen = vec4(2.0, 2.0, 2.0, 1.0);
+    gl_Position = mix(offscreen, projectedPosition, float(showMesh));
+
     Color = vec3(1.0);
 }
