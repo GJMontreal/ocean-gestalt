@@ -17,7 +17,7 @@ uniform float ndcScale = 1.0; // default values might not work across platforms
 
 uniform int showMesh = 1;
 
-const vec2 clipMin = vec2(-60.0,-60.0); // e.g., vec2(-10.0, -5.0) these should be passed in 
+const vec2 clipMin = vec2(-60.0,-60.0); // TODO: these should be passed in 
 const vec2 clipMax = vec2(60.0,60.0); // e.g., vec2(10.0, 5.0)
 
 
@@ -27,7 +27,7 @@ vec3 intersectRayWithPlane(vec3 origin, vec3 dir, float yPlane) {
 }
 
 void main() {
-    // Step 1: Build ray direction in view space
+// Build ray direction in view space
     float tanHalfFovY = tan(0.5 * fovYRadians);
 
     vec2 uv = ndcCoord * ndcScale;
@@ -42,21 +42,22 @@ void main() {
     vec3 rayOrigin = cameraPos + (viewRot * rayView);
     vec3 rayDir = normalize(viewRot * rayView);
 
+// Find the intersection
     vec3 hit = intersectRayWithPlane(rayOrigin, rayDir, planeY);
 
- // Step 4: Apply world-space rectangle clipping
+// Test against bounds
     vec2 posXZ = hit.xz;
 
-// It would be great if we could clip using mix or something similar
-    if (any(lessThan(posXZ, clipMin)) || any(greaterThan(posXZ, clipMax))) {
-        gl_Position = vec4(0.0/0.0); // OpenGl says we need NaN in order to cull
-        return;
-    }
-
-    // Step 4: Project to screen
+    vec2 minMask = step(clipMin, posXZ);     // 1.0 if posXZ ≥ clipMin
+    vec2 maxMask = step(posXZ, clipMax);     // 1.0 if posXZ ≤ clipMax
+    float inside = min(min(minMask.x, minMask.y), min(maxMask.x, maxMask.y));  // 1.0 if inside both bounds
+    
+// Project to screen and optionally hide
     vec4 projectedPosition = projection * view * vec4(hit, 1.0);
     vec4 offscreen = vec4(2.0, 2.0, 2.0, 1.0);
-    gl_Position = mix(offscreen, projectedPosition, float(showMesh));
+    vec4 finalPosition = mix(offscreen, projectedPosition, inside);
 
+    finalPosition = mix(offscreen, finalPosition, float(showMesh));
+    gl_Position = finalPosition;
     Color = vec3(1.0);
 }
