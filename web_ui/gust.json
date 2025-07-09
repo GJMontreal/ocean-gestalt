@@ -16,7 +16,7 @@
         "gust.speed": {
             "type": "float",
             "min": 0,
-            "max": 10,
+            "max": 0.5,
             "_meta": {
                 "display": "Speed",
                 "control": "slider"
@@ -24,7 +24,7 @@
         },
         "gust.scale": {
             "type": "float",
-            "min": 0.05,
+            "min": 0.0,
             "max": 0.5,
             "_meta": {
                 "display": "Scale",
@@ -40,10 +40,7 @@
                 "control": "slider"
             }
         },
-        "mesh_shader": {
-            "_meta": {
-                "display": "Complex"
-            },
+       
             "causticScale": {
                 "type": "float",
                 "min": 0,
@@ -126,7 +123,58 @@
                         1
                     ]
                 }
+            },
+            "showNormalMap": {
+                "type": "bool",
+                "_meta": {
+                    "display": "Show Normal Map",
+                    "control": "toggle"
+                }
+            },
+            "showUVs": {
+                "type": "bool",
+                "_meta": {
+                    "display": "Show UVs",
+                    "control": "toggle"
+                }
+            },
+            "debugLightPos": {
+                "type": "bool",
+                "_meta": {
+                    "display": "Debug Light Position",
+                    "control": "toggle"
+                }
+            },
+            "debugFragPos": {
+                "type": "bool",
+                "_meta": {
+                    "display": "Debug Fragment Position",
+                    "control": "toggle"
+                }
+            },
+            "debugDiffuse": {
+                "type": "bool",
+                "_meta": {
+                    "display": "Debug Diffuse",
+                    "control": "toggle"
+                }
             }
-        }
+        },
+        
+        "_meta": {
+            "display": "Light"
+        },            "lineColor": {
+                "type": "vec4",
+                "_meta": {
+                    "display": "Colour",
+                    "control": "color",
+                    "range": [
+                        0,
+                        1
+                    ]
+                }
+            }
+          
     }
-}
+
+

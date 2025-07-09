@@ -23,6 +23,9 @@
 #include "KeyExecutable.hpp"
 #include "SurfAudio.hpp"
 
+#include "FPSCounter.hpp"
+#include "FrameLimiter.hpp"
+
 #include <iterator>
 
 using std::unique_ptr;
@@ -75,6 +78,9 @@ class OceanGestalt : public OceanGestaltInterface,
   float elapsedTime=0;
   double lastTime;
   bool isRunning = true;
+
+  bool floatingCamera = false;
+  FPSCounter fps;
 
   void toggleNormalDisplay();
 

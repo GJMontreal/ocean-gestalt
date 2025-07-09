@@ -40,7 +40,11 @@ public:
     void setProjection(const glm::mat4& proj) { projection = proj;};
     void setScreenHeight(float height) { screenHeight = height;};
 
-    void drawBegin() { vertexIndex = 0;};
+    void drawBegin() {
+      vertexIndex = 0;
+      vertices.clear();
+    };
+    
     void drawText(const std::string& text, glm::vec3 position, const glm::vec4& color, float size );
     void render();
     
@@ -55,7 +59,7 @@ private:
     std::vector<stbtt_aligned_quad> alignedQuads; 
 
     std::vector<unsigned char> atlas;
-    
+
     GLuint vao = 0;
     GLuint vbo = 0;
 

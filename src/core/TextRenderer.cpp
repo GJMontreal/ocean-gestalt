@@ -20,7 +20,7 @@
 #include <fstream>
 #include <iostream>
 
-#define DEBUG_GL
+
 
 static const int VERTICES_PER_QUAD = 6;  // two triangles
 static const int MAX_CHARACTERS = 10000;

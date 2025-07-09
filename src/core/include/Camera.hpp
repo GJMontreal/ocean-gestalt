@@ -49,7 +49,7 @@ public:
     void updateCameraVectors();
     void ProcessMouseScroll(float yoffset);
     void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
-    mat4 GetViewMatrix() const;
+    mat4 GetViewMatrix() const;  //TODO: fix capitalization
 
     const MoveDirection& getMoveDirection()const {
       return moveDirection;};

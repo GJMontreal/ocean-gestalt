@@ -20,18 +20,14 @@ Buoy::Buoy(glm::vec3 origin, std::shared_ptr<Configuration> context) : context(c
   };
 
   sphere->preDraw = [this](Drawable& drawable, float time)->glm::mat4{
-  auto offset = calcGerstnerPosition(this->getContext()->getWaves(), time);
+  auto offset = calcGerstnerDisplacement(this->getContext()->getWaves(), time);
   auto transform = glm::translate(glm::mat4(1.f),offset);
   return transform;
   };
 }
 
-glm::vec3 Buoy::calcGerstnerPosition(std::vector<std::shared_ptr<Wave>> waves, float time) {
-  // use only the xz components
-  // we need uniform.time
-  auto positionXZ = glm::vec2(moveable.position.x,moveable.position.z);
+glm::vec3 Buoy::calcGerstnerDisplacement(std::vector<std::shared_ptr<Wave>> waves, float time) {
+  auto positionXZ = glm::vec2(getMoveable().position.x, getMoveable().position.z); 
   auto displacement = evaluateGerstnerWaves(waves, positionXZ, time);
-  auto newPosition = moveable.position + displacement;
-  // now displace
-  return newPosition;
+  return displacement;
 }

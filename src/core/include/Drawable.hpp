@@ -3,6 +3,7 @@
 #include "Uniforms.hpp"
 #include "Moveable.hpp"
 
+#include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <memory>
 
@@ -18,7 +19,7 @@ struct DrawableVertex {
 class Drawable: public MoveableBase<Drawable>  {
  public:
   Drawable(glm::vec3 origin, std::shared_ptr<Configuration>context);
-  virtual void draw(Uniforms& unniforms) = 0;
+  virtual void draw(Uniforms& uniforms) = 0;
   virtual ~Drawable() = default;
 
   inline void setOrigin(glm::vec3 origin) {

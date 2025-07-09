@@ -16,7 +16,7 @@ class Buoy: public MoveableBase<Buoy> {
     void activate() override { /* disconnect from simulation */};
     void deactivate() override { /* reconnect to simulation */};
 
-    glm::vec3 calcGerstnerPosition(std::vector<std::shared_ptr<Wave>> waves, float time);
+    glm::vec3 calcGerstnerDisplacement(std::vector<std::shared_ptr<Wave>> waves, float time);
     
     private:
     friend MoveableBase<Buoy>;

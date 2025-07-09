@@ -1,6 +1,7 @@
 #include "OceanGestalt.hpp"
 
 #include "Configuration.hpp"
+#include "LODSurface.hpp"
 #include "Ocean.hpp"
 #include "Uniforms.hpp"
 #include "WaveGenerator.hpp"
@@ -30,6 +31,7 @@ OceanGestalt::OceanGestalt() : Application() {
       CONFIGURATION_DIR "environment.json", CONFIGURATION_DIR "shader.json",
       CONFIGURATION_DIR "generator.json", CONFIGURATION_DIR "api.json");
   this->camera = config->camera;
+  this->camera->getMoveable().movementSpeed = 10.f;
   moveables.push_back(this->camera);
 
   this->light = std::make_shared<Light>(config->lightPosition, config);
@@ -37,8 +39,8 @@ OceanGestalt::OceanGestalt() : Application() {
   moveables.push_back(this->light);
   auto lightDrawable = this->light->getDrawable();
 
-  auto drawableMeshShader = config->getShaders()["drawable_mesh"];
-  auto drawableNormalShader = config->getShaders()["drawable_normal"];
+  auto drawableMeshShader = config->getShader("drawable_mesh");
+  auto drawableNormalShader = config->getShader("drawable_normal");
   
   lightDrawable->setShader(drawableMeshShader);
   lightDrawable->setNormalShader(drawableNormalShader);
@@ -49,17 +51,24 @@ OceanGestalt::OceanGestalt() : Application() {
   models.push_back(ocean.get()); // yeah, we don't want this
   drawables.push_back(ocean);
 
-  auto buoy = std::make_shared<Buoy>(glm::vec3(0.7f,0.f,0.1f),config);
+  auto buoy = std::make_shared<Buoy>(glm::vec3(5.0f,0.f,5.0f),config);
   auto buoyDrawable = buoy->getDrawable();
-  buoyDrawable->setShader(config->getShaders()["buoy_mesh"]);
+  buoyDrawable->setShader(config->getShader("buoy_mesh"));
   buoyDrawable->setNormalShader(drawableNormalShader);
   drawables.push_back(buoyDrawable);
   moveables.push_back(buoy);
 
-  waveUI = unique_ptr<WaveUI>(new WaveUI(config->waves));
+  auto lodSurface = std::make_shared<LODSurface>(glm::vec3(0.f),config);
+  lodSurface->setProjectionShader(config->getShader("LODSurfaceProjection"));
+  lodSurface->setRayShader(config->getShader("LODSurfaceRay"));
+  lodSurface->setShader(config->getShader("LODSurface"));
+  drawables.push_back(lodSurface);
 
-  // glEnable(GL_BLEND);
-  // glBlendFunc(GL_ONE, GL_ONE);  // Not certain what our blend mode should be?
+
+  waveUI = unique_ptr<WaveUI>(new WaveUI(config->waves)); //I don't think we need this anymore - or at least it's not working properly
+
+  glEnable(GL_BLEND); 
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 // Uniform buffers aren't supported by GLES
 #ifndef __EMSCRIPTEN__
@@ -70,7 +79,6 @@ OceanGestalt::OceanGestalt() : Application() {
   "FiraCode-Regular.ttf", 90);
   config->textRenderer = textRenderer;
   textRenderer->setShader(config->getShaders()["text"]);
-  // textRenderer->setProjection(glm::ortho(0.0f, static_cast<float>(getWidth()),static_cast<float>(getHeight()),0.0f )); 
   textRenderer->setScreenHeight(static_cast<float>(getHeight()));
   textRenderer->setProjection(glm::ortho(0.0f, static_cast<float>(getWidth()),0.0f,static_cast<float>(getHeight()) ));
   // surfAudio = std::make_shared<SurfAudio>();
@@ -92,15 +100,14 @@ for(auto const& cb : onReadyCallbacks){
 }
 
 void OceanGestalt::loop() {
-
-  for(auto const& cb : renderThreadCallbacks){
-      cb();
-  }
-
   // exit on window close button pressed
   if (glfwWindowShouldClose(getWindow()))
     exit();
 
+  fps.update();
+  for(auto const& cb : renderThreadCallbacks){
+      cb();
+  }
   auto time = float(glfwGetTime());
   auto interval = time - lastTime;
   lastTime = time;
@@ -112,14 +119,17 @@ void OceanGestalt::loop() {
 
   projection = glm::perspective(glm::radians(getCamera()->Zoom),
                                 getWindowRatio(), 0.1f, 200.f);
-  // view = camera->GetViewMatrix();
- 
 
-  // if we want to have the camera floating
-  auto position = camera->getPosition();
-  auto waveOffset = evaluateGerstnerWaves(configuration->getWaves(), glm::vec2(position.x,position.z),elapsedTime);
-  view = glm::lookAt(position + waveOffset, position + waveOffset + camera->Front, camera->Up);
   
+  //TODO: move this into the camera
+  if(floatingCamera){
+    auto position = camera->getPosition();
+    auto waveOffset = evaluateGerstnerWaves(configuration->getWaves(), glm::vec2(position.x,position.z),elapsedTime);
+    view = glm::lookAt(position + waveOffset, position + waveOffset + camera->Front, camera->Up);
+  } else {
+    view = camera->GetViewMatrix();
+  }
+
   Uniforms uniforms{.projection = projection, .view = view, .time = elapsedTime};
 
 #ifndef __EMSCRIPTEN__
@@ -139,18 +149,9 @@ void OceanGestalt::loop() {
     drawable->draw(uniforms);
   }
 
-  glDisable(GL_DEPTH_TEST);
-glDepthMask(GL_FALSE);
-glEnable(GL_BLEND);
-glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//just until we get this working
 configuration->textRenderer->drawBegin();
-configuration->textRenderer->drawText("Hello there\nDo we get a newline?",glm::vec3(10.f,100.f,0.f),glm::vec4(1.0f,1.f,0.f,1.f), 64.f); //I think this size is in pixels
-configuration->textRenderer->drawText("this should be a different color",glm::vec3(10.f,200.f,0.f),glm::vec4(0.f,1.f,0.f,1.f), 64.f);
+configuration->textRenderer->drawText(fps.getFPSString(), {10.0f, 10.0f, 0.0f}, {1.f, 0.f, 0.f, 1.f}, 100.0f);
 configuration->textRenderer->render();
-
-glEnable(GL_DEPTH_TEST);
-glDepthMask(GL_TRUE);
 }
 
 void OceanGestalt::initUniformBuffers() {
@@ -184,15 +185,13 @@ void OceanGestalt::toggleNormalDisplay() {
 void OceanGestalt::toggleSimulation() {
   std::cout << "Toggle simulation" << std::endl;
   isRunning = !isRunning;
-  // for (Model* model : models) {
-  //   model->toggleRunning();
-  // }
 
-  // why are we doing this following?
-  configuration->wireframeShader->activate();
+  // TODO: why are we doing this following?
+  auto shader = configuration->getShader("wireframe_shader");
+  auto _guard = ShaderScope(shader);
+  shader->activate();
   auto color = glm::vec4(0.5,0.5,0.5,1.0);
-  configuration->wireframeShader->setUniform("lineColor",color);
-  configuration->wireframeShader->deactivate();
+  shader->setUniform("lineColor",color);
 }
 
 void OceanGestalt::toggleWireframe() {
@@ -233,6 +232,7 @@ void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
 
   // TODO:
   // moveable->processInput(window, deltaTime);
+
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
     (*currentMoveable)->getMoveable().ProcessKeyboard(Movement::FORWARD, deltaTime);
   }
@@ -252,8 +252,6 @@ void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
       configuration->loadUniforms(CONFIGURATION_DIR "uniforms.json");
     }).detach();
   });
-
-  waveUI->processInput(window, deltaTime);
 
   executeIfPressed(window, GLFW_KEY_C, [this]() {
     (*currentMoveable)->deactivate();
@@ -288,6 +286,10 @@ void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
                   configuration->medianWavelength,
                   configuration->medianAmplitude);
     wavesNeedUpdate = true;
+  });
+
+  executeIfPressed(window, GLFW_KEY_T,[this]{
+    this->floatingCamera = ! this->floatingCamera;
   });
 
 #ifndef __EMSCRIPTEN__

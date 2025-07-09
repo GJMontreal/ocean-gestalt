@@ -38,6 +38,7 @@ uniform GUST gust;
 // }
 
 // uniform NormalMapping normalMapping;
+uniform int showMesh = 1;
 
 struct WAVE{  
   vec3 direction;
@@ -86,7 +87,8 @@ float gustDisplacement(
 const float VELOCITY_SCALE = 1.0; // Scale spatial dimensions and wave wavelengths
 
 vec3 waveOffset(float time, vec3 aPosition, WAVE wave) {
-    float k = 2.0 * PI / wave.wavelength;
+    float safeWavelength = max(wave.wavelength, 0.01);
+    float k = 2.0 * PI / safeWavelength; //what happens when wavelength is zero?
     float w = VELOCITY_SCALE * sqrt(GRAVITY * k); // only frequency is scaled
     vec2 D = normalize(wave.direction.xy);
 
@@ -96,7 +98,8 @@ vec3 waveOffset(float time, vec3 aPosition, WAVE wave) {
     float C = cos(phase);
 
     float y = wave.amplitude * C;
-    vec2 xz = aPosition.xz - D * wave.steepness * S * wave.amplitude;
+
+    vec2 xz = -wave.steepness *  D * S * wave.amplitude;
 
     return vec3(xz.x, y, xz.y);
 }
@@ -108,7 +111,7 @@ vec3 calcNewPosition(vec3 aPosition){
     vec3 newOffset = waveOffset(time, aPosition, waves[i] );
     offset += newOffset;
   }
-  offset = aPosition + offset / float(NUM_WAVES);
+  offset = aPosition + offset;
   return offset;
 }
 
@@ -135,6 +138,7 @@ vec3 calcNormal(vec3 originalPosition,
 
 void main(void)
 {   
+    mat4 _ = model; //for consistency
     vec2 windDirection = normalize(gust.direction.xy);
     vec2 uv = uvLocation(position, windDirection);
 
@@ -146,7 +150,11 @@ void main(void)
 
     vec3 normalFD = calcNormal(position, newPosition, uv, NORMAL_OFFSET, tangent, bitangent);
 
-    gl_Position = projection * view * model * vec4(newPosition, 1.0) ;
+    vec4 projectedPosition = projection * view * vec4(newPosition, 1.0);
+    vec4 offscreen = vec4(2.0, 2.0, 2.0, 1.0);
+    vec4 finalPosition = mix(offscreen, projectedPosition, float(showMesh));
+
+    gl_Position = finalPosition;
    
     vs_out.FragPos = newPosition;
     vs_out.Normal = normalize(normalFD);

@@ -1,30 +1,8 @@
 {
     "port": 8080,
-    "simulation": {
-        "_meta": {
-            "display": "Simulation"
-        },
-        "pause": {
-            "type": "bool",
-            "_meta": {
-                "display": "Paused",
-                "control": "toggle"
-            }
-        },
-        "wave_speed": {
-            "type": "float",
-            "min": 0,
-            "max": 10,
-            "_meta": {
-                "display": "Wave Speed",
-                "control": "slider"
-            }
-        }
-    },
-    
     "uniforms": {
         "_meta": {
-            "display": "Uniforms"
+            "display": "Waves"
         },
         "waves[0]": {
             "_meta": {
@@ -67,9 +45,9 @@
                 }
             }
         },
-                "waves[1]": {
+        "waves[1]": {
             "_meta": {
-                "display": "0"
+                "display": "1"
             },
             "amplitude": {
                 "type": "float",
@@ -108,9 +86,9 @@
                 }
             }
         },
-                "waves[2]": {
+        "waves[2]": {
             "_meta": {
-                "display": "0"
+                "display": "2"
             },
             "amplitude": {
                 "type": "float",
@@ -149,9 +127,9 @@
                 }
             }
         },
-                "waves[3]": {
+        "waves[3]": {
             "_meta": {
-                "display": "0"
+                "display": "3"
             },
             "amplitude": {
                 "type": "float",
@@ -190,9 +168,9 @@
                 }
             }
         },
-                "waves[4]": {
+        "waves[4]": {
             "_meta": {
-                "display": "0"
+                "display": "4"
             },
             "amplitude": {
                 "type": "float",
@@ -231,9 +209,9 @@
                 }
             }
         },
-                "waves[5]": {
+        "waves[5]": {
             "_meta": {
-                "display": "0"
+                "display": "5"
             },
             "amplitude": {
                 "type": "float",
@@ -272,9 +250,9 @@
                 }
             }
         },
-                "waves[6]": {
+        "waves[6]": {
             "_meta": {
-                "display": "wave[6]"
+                "display": "6"
             },
             "amplitude": {
                 "type": "float",
@@ -313,9 +291,9 @@
                 }
             }
         },
-                "waves[7]": {
+        "waves[7]": {
             "_meta": {
-                "display": "0"
+                "display": "7"
             },
             "amplitude": {
                 "type": "float",
@@ -354,9 +332,9 @@
                 }
             }
         },
-                "waves[8]": {
+        "waves[8]": {
             "_meta": {
-                "display": "0"
+                "display": "8"
             },
             "amplitude": {
                 "type": "float",
@@ -395,9 +373,9 @@
                 }
             }
         },
-                "waves[9]": {
+        "waves[9]": {
             "_meta": {
-                "display": "0"
+                "display": "9"
             },
             "amplitude": {
                 "type": "float",
@@ -433,47 +411,6 @@
                 "_meta": {
                     "display": "Wavelength",
                     "control": "slider"
-                }
-            }
-        },
-         "gustStrength": {
-                "type": "float",
-                "min": 0,
-                "max": 10,
-                "_meta": {
-                    "display": "Gust Strength",
-                    "control": "slider"
-                }
-            },
-            "gustSpeed": {
-                "type": "float",
-                "min": 0,
-                "max": 20,
-                "_meta": {
-                    "display": "Gust Speed",
-                    "control": "slider"
-                }
-            },
-        "wireframe_shader": {
-            "_meta": {
-                "display": "Wireframe Shader"
-            },
-            "lineColor": {
-                "type": "vec4",
-                "_meta": {
-                    "display": "Line Colour",
-                    "control": "color",
-                    "range": [
-                        0,
-                        1
-                    ]
-                }
-            },
-            "normals": {
-                "type": "bool",
-                "_meta": {
-                    "display": "Show Normals",
-                    "control": "toggle"
                 }
             }
         }

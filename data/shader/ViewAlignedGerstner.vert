@@ -18,6 +18,7 @@ layout(std140) uniform Matrices
 uniform float time;
 
 uniform sampler2D gustNoise;
+uniform vec4 color;
 
 struct GUST{
   vec3 direction;     // normalized wind direction
@@ -45,13 +46,14 @@ uniform vec3 cameraPos;
 uniform float fovYRadians;
 uniform float aspect;
 
-// uniform mat4 invViewProjection;
-
 const float planeY = 0.0;
-uniform float ndcScale;
-const vec2 clipMin = vec2(-30.0,-30.0); // e.g., vec2(-10.0, -5.0)
-const vec2 clipMax = vec2(30.0,30.0); // e.g., vec2(10.0, 5.0)
+uniform float ndcScale = 1.0;
 
+uniform int showMesh = 0;
+uniform int showDisplaced = 1;
+
+const vec2 clipMin = vec2(-60.0,-60.0); // e.g., vec2(-10.0, -5.0) these should be passed in 
+const vec2 clipMax = vec2(60.0,60.0); // e.g., vec2(10.0, 5.0)
 //TO DO: make capitalization consistent throughout
 out VS_OUT {
     vec3 FragPos;
@@ -64,12 +66,14 @@ out VS_OUT {
     
 // out vec3 Color;
 const float PI = 3.14159265358979323;
-const float speedScale = 3.0;
+// const float speedScale = 3.0;
 
 const float GRAVITY = 9.81; 
 
+// rather than relying on a minslope here, we should limit the camera angle, otherwise all the rays will collapse to a point
 vec3 intersectRayWithPlane(vec3 origin, vec3 dir, float yPlane) {
-    float safeY = sign(dir.y) * max(abs(dir.y), 1e-5);
+    float minSlope = 1e-5; // just to prevent divide by zero errors
+    float safeY = max(abs(dir.y), minSlope) * sign(dir.y);
     float t = (yPlane - origin.y) / safeY;
     return origin + dir * t;
 }
@@ -104,7 +108,7 @@ vec3 waveOffset(float time, vec3 aPosition, WAVE wave) {
     float C = cos(phase);
 
     float y = wave.amplitude * C;
-    vec2 xz = aPosition.xz - D * wave.steepness * S * wave.amplitude;
+    vec2 xz = -wave.steepness * D *  S * wave.amplitude;
 
     return vec3(xz.x, y, xz.y);
 }
@@ -116,7 +120,7 @@ vec3 calcNewPosition(vec3 aPosition){
     vec3 newOffset = waveOffset(time, aPosition, waves[i] );
     offset += newOffset;
   }
-  offset = aPosition + offset / float(NUM_WAVES);
+  offset = aPosition + offset;
   return offset;
 }
 
@@ -144,45 +148,43 @@ vec3 calcNormal(vec3 originalPosition,
 bool isFinite(vec3 v) {
     return !any(isnan(v)) && !any(isinf(v));
 }
+mat3 clampViewRot(mat3 rotation){
+  vec3 forward = rotation * vec3(0.0, 0.0, -1.0); // camera forward in world space
 
+  // Ensure projection direction has a minimum vertical component
+  float minY = 0.2; // adjust to taste; 0.0 = no clamp, 1.0 = straight down
+  float signY = sign(forward.y);
+  forward.y = clamp(forward.y, signY * minY, 1.0);
+
+  // Renormalize after clamping
+  forward = normalize(forward);
+
+  vec3 worldUp = vec3(0.0, 1.0, 0.0);
+  vec3 right = normalize(cross(worldUp, forward));
+  vec3 up = cross(forward, right);
+  mat3 safeViewRot = mat3(right, up, -forward); // columns
+  return safeViewRot;
+}
 
 void main(void)
 {   
-      // Step 1: Build ray direction in view space
     float tanHalfFovY = tan(0.5 * fovYRadians);
 
-    vec2 scaledNDC = ndcCoord * ndcScale;
+    vec2 projectionUV = ndcCoord * ndcScale;
 
-    vec3 rayViewDir = normalize(vec3(
-        ndcCoord.x * aspect * tanHalfFovY,
-        ndcCoord.y * tanHalfFovY,
-        -1.0 // into screen
-    ));
+    vec3 rayView = vec3(
+        projectionUV.x * aspect * tanHalfFovY,
+        projectionUV.y * tanHalfFovY,
+        -1.0
+    );
 
-    //     vec3 rayViewDir = normalize(vec3(
-    //     ndcCoord.x,
-    //     ndcCoord.y,
-    //     -1.0 // into screen
-    // ));
+    mat3 viewRot = inverse(mat3(view));
+    // viewRot = clampViewRot(viewRot);
+    vec3 rayOrigin = cameraPos + (viewRot * rayView);
+    vec3 rayDir = normalize(viewRot * rayView);
 
-    // I don't know that this is correct
+    vec3 position = intersectRayWithPlane(rayOrigin, rayDir, planeY);
 
-    // Step 2: Rotate to world space using view matrix inverse
-    mat3 viewRot = mat3(inverse(view)); // inverse of rotation-only view
-    vec3 rayWorldDir = viewRot * rayViewDir;
-
-    // Step 3: Raycast to ground
-    vec3 position = intersectRayWithPlane(cameraPos, rayWorldDir, planeY);
-
-    position = position * ndcScale;
- // Step 4: Apply world-space rectangle clipping
-    vec2 posXZ = position.xz;
-
-    // if (any(lessThan(posXZ, clipMin)) || any(greaterThan(posXZ, clipMax))) {
-    //     gl_Position = vec4(0.0/0.0); // OpenGl says we need NaN in order to cull
-    //     return;
-    // }
-   
     vec2 windDirection = normalize(gust.direction.xy);
     vec2 uv = uvLocation(position, windDirection);
 
@@ -193,17 +195,29 @@ void main(void)
     vec3 bitangent;
 
     vec3 normalFD = calcNormal(position, newPosition, uv, NORMAL_OFFSET, tangent, bitangent);
-    // gl_Position = vec4(scaledNDC.x,scaledNDC.y,0.0, 1.0);  //isn't this camera space?
-    gl_Position = projection * view  * vec4(newPosition, 1.0) ;
-    
-    if (!isFinite(newPosition)) {
-      vs_out.Color = vec3(1.0, 0.0, 0.0);
-      return;
-    }
+
+    // Project to screen and optionally hide
+    vec4 projectedPosition = projection * view * vec4(newPosition, 1.0);
+    vec4 projectedOriginal = projection * view * vec4(position, 1.0);
+    vec4 offscreen = vec4(2.0, 2.0, 2.0, 1.0);
+
+     // Step 4: Apply world-space rectangle clipping
+    vec2 posXZ = newPosition.xz;
+
+    vec2 minMask = step(clipMin, posXZ);     // 1.0 if posXZ ≥ clipMin
+    vec2 maxMask = step(posXZ, clipMax);     // 1.0 if posXZ ≤ clipMax
+    // float inside = min(min(minMask.x, minMask.y), min(maxMask.x, maxMask.y));  // 1.0 if inside both bounds
+    float inside = 1.0;
+
+    vec4 finalPosition = mix(offscreen, projectedPosition, inside);
+    finalPosition = mix(projectedOriginal, finalPosition, float(showDisplaced));
+
+    finalPosition = mix(offscreen, finalPosition, float(showMesh));
+    gl_Position = finalPosition;
 
     vs_out.FragPos = newPosition;
     vs_out.Normal = normalize(normalFD);
-    vs_out.Color = vec3(0.10,0.2,0.25);
+    vs_out.Color = vec3(color);
     vs_out.Bitangent = bitangent;
     vs_out.Tangent = tangent;
     vs_out.FragUV = uv;

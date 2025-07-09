@@ -74,25 +74,20 @@ void Configuration::loadShaders(const string& fileName) {
   json j;
   loadJSON(fileName, j);
 
-  meshShader = buildShader(j, "mesh_shader", meshColor);
-  wireframeShader = buildShader(j, "wireframe_shader", wireframeColor);
-  shaders[meshShader->getName()] = meshShader;
-  shaders[wireframeShader->getName()] = wireframeShader;
-
-  // WEBGL doesn't support geometry shaders
-#ifndef __EMSCRIPTEN__
-  normalShader = buildShader(j, "normal_shader", normalColor);
-#endif
-  shaders[normalShader->getName()] = normalShader;
-
-  // we should get rid of this colour stuff?
-  vec4 drawableColor;
-  // couldn't this be simplified to just build any shaders that are listed in our json
-  // filter out shaders which list the key "geometry" if we're using emscripten
-  for (auto name : {"drawable_normal", "drawable_mesh","buoy_mesh","text"}) {
-    auto shader = buildShader(j, name, drawableColor);
-    shaders[shader->getName()] = shader;
+  // the top level keys should be shaderNames
+  for(auto& [shaderName,value] : j.items()){
+  #ifdef __EMSCRIPTEN__
+    if(value.contains("geometry")){
+      continue;
+    }
+  #endif
+    //build each shader
+    vec4 color;  //TODO: Change the way this works
+    auto shader = buildShader(j, shaderName, color);
+    shaders[shaderName] = shader;
   }
+  //TODO: Find a better way to handle the colors
+  meshColor = glm::vec4(0.10, 0.2, 0.25, 1);
 }
 
 shared_ptr<ShaderProgram> Configuration::buildShader(json& j,
@@ -105,7 +100,13 @@ shared_ptr<ShaderProgram> Configuration::buildShader(json& j,
   Shader fragmentShader(SHADER_DIR + (string)shaderJSON.at("fragment"),
                         GL_FRAGMENT_SHADER);
 
-  color = shaderJSON.at("color");
+  // are colors associated with shaders, or models - models I think
+  //TODO: decide what to do here with the color
+  // color should be optional
+  if (shaderJSON.contains("color")) {
+    color = shaderJSON.at("color");
+  }
+
   // optional geometry shader where supported
   auto geometry = shaderJSON["geometry"];
   shared_ptr<ShaderProgram> program;
@@ -199,6 +200,11 @@ std::unordered_map<std::string, shared_ptr<ShaderProgram>>& Configuration::getSh
   return shaders;
 };
 
+std::shared_ptr<ShaderProgram> Configuration::getShader(const std::string& shaderName) {
+  //TODO: what do we do in the case the shader doesn't exist?
+  return getShaders()[shaderName];
+}
+
 void Configuration::setWaveParameter(const std::string& key, const ApiValue& value){
   std::cout << "set wave parameters" << std::endl;
   // I wonder what thread we're on here
@@ -216,13 +222,13 @@ void Configuration::setInitialUniformState(const ApiAdapter& api){
     api.setValue("uniforms.wireframe_shader.lineColor", uniformToApi(wireframeColor));
 
     // these need to be set before the render loop runs
-    for(auto value: {shaders["mesh_shader"],shaders["wireframe_shader"],shaders["normal_shader"]}){
-      value->activate();
-      value->loadTexture(SHADER_DIR "gust_noise_512.png","gustNoise");
-      value->loadTexture(SHADER_DIR "NormalMap.png","gustNormalMap");
-      value->deactivate();
+    for (auto shader : {shaders["mesh_shader"], shaders["wireframe_shader"],
+                        shaders["normal_shader"], shaders["LODSurface"]}) {
+      auto _guard = ShaderScope(shader);
+      shader->loadTexture(SHADER_DIR "ridged_noise.png","gustNoise");
+      shader->loadTexture(SHADER_DIR "NormalMap.png","gustNormalMap");
     }
-    
+
     dispatch_async([this, &api] {
       this->setInitialWaveUniforms(api);
     });
@@ -234,8 +240,8 @@ void Configuration::setInitialWaveUniforms(const ApiAdapter& api)const{
       api.setValue("uniforms.gust.strength", uniformToApi(0.0f));
       api.setValue("uniforms.gust.speed", uniformToApi(0.0f));
       api.setValue("uniforms.gust.scale", 0.052f);
-      
-      for(auto shaderName: {"mesh_shader","wireframe_shader","normal_shader"}){
+      //TODO: this should somehow be a key in our shader json
+      for(auto shaderName: {"mesh_shader","wireframe_shader","normal_shader","LODSurface"}){
      int i = 0;
         for (const shared_ptr<Wave> wave : waves) {
         std::string uniformName =

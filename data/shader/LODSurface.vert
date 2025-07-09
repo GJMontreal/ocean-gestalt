@@ -15,14 +15,16 @@ uniform float aspect;
 uniform float planeY = 0.0;
 uniform float ndcScale = 1.0; // default values might not work across platforms
 
-uniform int showMesh = 1;
+uniform int showMesh = 0;
 
 const vec2 clipMin = vec2(-60.0,-60.0); // TODO: these should be passed in 
 const vec2 clipMax = vec2(60.0,60.0); // e.g., vec2(10.0, 5.0)
 
 
 vec3 intersectRayWithPlane(vec3 origin, vec3 dir, float yPlane) {
-    float t = (yPlane - origin.y) / dir.y;
+    float minSlope = 1e-1;
+    float safeY = max(abs(dir.y), minSlope) * sign(dir.y);
+    float t = (yPlane - origin.y) / safeY;
     return origin + dir * t;
 }
 

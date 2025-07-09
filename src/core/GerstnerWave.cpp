@@ -1,6 +1,5 @@
 #include "GerstnerWave.hpp"
 
-
 // Represents a single Gerstner wave
 struct GerstnerWave {
     float amplitude;
@@ -18,24 +17,25 @@ glm::vec3 computeGerstnerDisplacement(std::shared_ptr<Wave> wave, const glm::vec
     if(wave->amplitude == 0 || wave->wavelength == 0){
       return glm::vec3(0.f,0.f,0.f);
     }
-    float k = 2.0f * PI / wave->wavelength;
+    float safeWavelength = glm::max(wave->wavelength, 0.01f);
+    float k = 2.0f * PI / safeWavelength;
     float omega = sqrt(GRAVITY * k);  // Deep water dispersion relation (optional: override with wave.speed)
+    
     auto direction = glm::normalize(wave->direction); // this could be done once in the wave
-    float phase = k * glm::dot(direction, positionXZ) - omega * time;
+    
+    float phase = glm::dot(direction * k, positionXZ) - omega * time;
 
-    float Q = wave->steepness / (k * wave->amplitude);  // optional clamp if needed
-
-    float cosPhase = cos(phase);
     float sinPhase = sin(phase);
+    float cosPhase = cos(phase);
 
     // Displacement
     glm::vec3 displacement;
 
-    //  vec2 xz = aPosition.xz - D * wave.steepness * S * wave.amplitude;
-    displacement.x = wave->direction.x - direction.x * wave->steepness * wave->amplitude * sinPhase;
-    displacement.z = wave->direction.y - direction.y * wave->steepness * wave->amplitude * sinPhase;
     displacement.y = wave->amplitude * cosPhase;
 
+    displacement.x =  -1.0 * wave->steepness * direction.x  * sinPhase * wave->amplitude;
+    displacement.z = -1.0 * wave->steepness * direction.y * sinPhase * wave->amplitude;
+ 
     return displacement;
 }
 
@@ -45,7 +45,7 @@ glm::vec3 evaluateGerstnerWaves(const std::vector<std::shared_ptr<Wave>> waves, 
     for (const auto& wave : waves) {
         totalDisplacement += computeGerstnerDisplacement(wave, positionXZ, time);
     }
-    return totalDisplacement / glm::vec3(waves.size());
+    return totalDisplacement;// / glm::vec3(waves.size());
 }
 
 /*

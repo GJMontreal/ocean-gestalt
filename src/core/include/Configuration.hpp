@@ -1,6 +1,8 @@
 #ifndef __CONFIGURATION_HPP
 #define __CONFIGURATION_HPP
 
+#define DEBUG_GL
+
 #include "AppContextInterface.hpp"
 #include "ApiValue.hpp"
 
@@ -42,10 +44,6 @@ class Configuration: public AppContextInterface, public std::enable_shared_from_
   //until we figure out how to handle this circularity
   vec3 lightPosition;
   std::shared_ptr<Light> light;
-
-  std::shared_ptr<ShaderProgram> meshShader;  
-  std::shared_ptr<ShaderProgram> wireframeShader;
-  std::shared_ptr<ShaderProgram> normalShader;
   
   std::shared_ptr<TextRenderer> textRenderer;
 
@@ -69,8 +67,10 @@ class Configuration: public AppContextInterface, public std::enable_shared_from_
   void loadUniforms(const string& fileName);
 
   std::unordered_map<std::string, shared_ptr<ShaderProgram>>& getShaders() override;
+  std::shared_ptr<ShaderProgram> getShader(const std::string& shaderName) override;
   std::shared_ptr<WaveInterface> getWaveInterface() override;
   std::vector<std::shared_ptr<Wave>> getWaves() override;
+
 
   void setWaveParameter(const std::string& key, const ApiValue& value) override;
   void setApi(std::shared_ptr<ApiAdapter> api) override;

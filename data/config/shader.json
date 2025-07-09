@@ -53,22 +53,22 @@
     },
     "buoy_mesh":{
         "vertex": "drawable.vert",
-        "fragment": "drawable_minimal.frag",
-        "color": {
-            "r": 0,
-            "g": 1,
-            "b": 1,
-            "a": 1
-        }
+        "fragment": "drawable_minimal.frag"
     },
     "text":{
         "vertex": "text.vert",
-        "fragment": "text.frag",
-        "color": {
-            "r": 0,
-            "g": 1,
-            "b": 1,
-            "a": 1
-        }
+        "fragment": "text.frag"
+    },
+    "LODSurfaceProjection":{
+        "vertex": "LODSurface.vert",
+        "fragment": "raycast.frag"
+    },
+    "LODSurfaceRay":{
+      "vertex":"raycast.vert",
+      "fragment":"raycast.frag"
+    },
+    "LODSurface":{
+      "vertex":"ViewAlignedGerstner.vert",
+      "fragment":"shader.frag"
     }
 }
