@@ -14,7 +14,7 @@
 
 using namespace std;
 
-bool glCheckError(const char* file, unsigned int line) {
+bool glCheckError(const char* file, unsigned int line, const char* info ) {
   bool error = false;
   GLenum errorCode = glGetError();
 
@@ -35,8 +35,41 @@ bool glCheckError(const char* file, unsigned int line) {
     // clang-format on
 
     cerr << "OpenglError : file=" << file << " line=" << line
-         << " error:" << error << endl;
+         << " error:" << error << " " << info <<  endl;
     errorCode = glGetError();
   }
   return error;
+}
+
+ void glCheckBoundTexture(){
+  GLint boundTexture = 0;
+  glGetIntegerv(GL_TEXTURE_BINDING_CUBE_MAP, &boundTexture);
+  std::cout << "Bound cube map ID: " << boundTexture << std::endl;
+ }
+
+ void glDumpTextureBindings() {
+    GLint maxUnits = 0;
+    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxUnits);
+
+    GLint activeProgram = 0;
+    glGetIntegerv(GL_CURRENT_PROGRAM, &activeProgram);
+
+    std::cout << "Current GL Program: " << activeProgram << "\n";
+
+    for (int unit = 0; unit < maxUnits; ++unit) {
+        glActiveTexture(GL_TEXTURE0 + unit);
+
+        GLint bound2D = 0, boundCube = 0;
+        glGetIntegerv(GL_TEXTURE_BINDING_2D, &bound2D);
+        glGetIntegerv(GL_TEXTURE_BINDING_CUBE_MAP, &boundCube);
+
+        std::cout << "Texture Unit " << unit << ": ";
+        if (bound2D)
+            std::cout << "2D = " << bound2D << " ";
+        if (boundCube)
+            std::cout << "CubeMap = " << boundCube << " ";
+        if (!bound2D && !boundCube)
+            std::cout << "(unbound)";
+        std::cout << "\n";
+    }
 }

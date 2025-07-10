@@ -15,6 +15,17 @@
 #include <map>
 #include <string>
 
+enum class TextureType{
+  TEXTURE,
+  CUBEMAP
+};
+struct TextureBinding{
+  GLuint textureID;
+  GLuint unit;
+  TextureType textureType;
+  std::string uniform;
+};
+
 class Shader;
 class ShaderProgram;
 
@@ -88,6 +99,8 @@ class ShaderProgram {
 
   GLuint loadTexture(const std::string& path, const std::string& uniformName, GLuint unit = 0);
 
+  GLuint loadCubemap(const std::string& path, const std::string& uniformName, GLuint unit = 1);
+
   ~ShaderProgram();
 
  private:
@@ -95,9 +108,14 @@ class ShaderProgram {
 
   std::map<std::string, GLint> uniforms;
   std::map<std::string, GLint> attributes;
-  std::vector<TexBinding> textures;
+  
+  std::vector<TextureBinding> textures;
   std::string name;
 
+  void bindTexture( TextureBinding& binding) const;
+  void bind2DTexture( TextureBinding& binding) const;
+  void bind3DTexture( TextureBinding& binding) const;
+  
   // opengl id
   GLuint handle;
 

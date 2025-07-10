@@ -25,6 +25,7 @@
 using std::cout;
 using std::endl;
 
+
 // our application should keep a reference to the OceanApi
 OceanGestalt::OceanGestalt() : Application() {
   auto config = std::make_shared<Configuration>(
@@ -58,11 +59,11 @@ OceanGestalt::OceanGestalt() : Application() {
   drawables.push_back(buoyDrawable);
   moveables.push_back(buoy);
 
-  auto lodSurface = std::make_shared<LODSurface>(glm::vec3(0.f),config);
-  lodSurface->setProjectionShader(config->getShader("LODSurfaceProjection"));
-  lodSurface->setRayShader(config->getShader("LODSurfaceRay"));
-  lodSurface->setShader(config->getShader("LODSurface"));
-  drawables.push_back(lodSurface);
+  // auto lodSurface = std::make_shared<LODSurface>(glm::vec3(0.f),config);
+  // lodSurface->setProjectionShader(config->getShader("LODSurfaceProjection"));
+  // lodSurface->setRayShader(config->getShader("LODSurfaceRay"));
+  // lodSurface->setShader(config->getShader("LODSurface"));
+  // drawables.push_back(lodSurface);
 
 
   waveUI = unique_ptr<WaveUI>(new WaveUI(config->waves)); //I don't think we need this anymore - or at least it's not working properly
@@ -86,6 +87,10 @@ OceanGestalt::OceanGestalt() : Application() {
 
   // onRender([&]{surfAudio->setFoamLevel(float foam);});
   currentMoveable = moveables.begin();
+
+#ifdef DEBUG_GL
+  glDumpTextureBindings();
+#endif
 }
 
 void OceanGestalt::setUIDelegate() {

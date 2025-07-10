@@ -49,12 +49,12 @@ class Model : public Drawable{
  
   std::vector<Mesh> meshes; //this is going to be only 1 mesh
  
-  bool shouldDrawWireframe = true;
+  bool shouldDrawWireframe = false;
   bool shouldDrawNormals = false;
   bool shouldDrawMesh = false;  //it would be nice to specify these in our configuration
   
   bool drawTriangles = true;
-  bool drawLines = true;
+  bool drawLines = false;
 
   bool running = true;
 

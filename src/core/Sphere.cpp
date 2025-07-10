@@ -123,8 +123,7 @@ void Sphere::drawMesh(Uniforms& uniforms, mat4 transform) {
   assert(shader); // ensure we have assigned a shader
   shader->activate();
 
-
-  shader->setUniform("model", this->getTransform() * transform);
+  shader->setUniform("model", transform * this->getTransform());
   shader->setUniform("viewPos",
   this->getContext()->camera->getPosition());
   shader->setUniform("lightPos",this->getContext()->light->getPosition());

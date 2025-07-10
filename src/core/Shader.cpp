@@ -263,15 +263,13 @@ ShaderProgram::~ShaderProgram() {
 void ShaderProgram::activate() const {
   glUseProgram(handle);
 
-  for(auto tex: textures){
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, tex.texID);
-    GLint loc = glGetUniformLocation(getHandle(), tex.uniform.c_str());
-    glUniform1i(loc, 0);
+  for(auto binding: textures){
+    bindTexture(binding);
+     
+  // #ifdef DEBUG_GL 
+    glCheckError(__FILE__, __LINE__, (this->name + " " + binding.uniform).c_str() );
+  // #endif
   }
-  #ifdef DEBUG_GL
-  glCheckError(__FILE__, __LINE__);
-  #endif
 }
 
 void ShaderProgram::deactivate() const {
@@ -283,10 +281,10 @@ GLuint ShaderProgram::getHandle() const {
 }
 
 GLuint ShaderProgram::loadTexture(const std::string& path, const std::string& uniformName, GLuint unit) {
-    GLuint texID;
-    glGenTextures(1, &texID);
+    GLuint textureID;
+    glGenTextures(1, &textureID);
     glActiveTexture(GL_TEXTURE0 + unit);
-    glBindTexture(GL_TEXTURE_2D, texID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
 
     // Texture settings
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -303,8 +301,78 @@ GLuint ShaderProgram::loadTexture(const std::string& path, const std::string& un
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
+    glCheckError(__FILE__, __LINE__);
     stbi_image_free(data);
 
-    textures.push_back(TexBinding{texID,uniformName});
-    return texID;
+    textures.push_back(TextureBinding{textureID, unit, TextureType::TEXTURE, uniformName});
+    return textureID;
+}
+
+// For a given path 
+GLuint ShaderProgram::loadCubemap(const std::string& path, const std::string& uniformName, GLuint unit) {
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glActiveTexture(GL_TEXTURE0 + unit);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    std::vector<std::string> faces = {"+X","-X","+Y","-Y","+Z","-Z"};
+
+    int width, height, nrChannels;
+    GLuint i = 0;
+    for (auto face : faces) {
+      auto fileName = path + "_" + face + ".jpg";
+        unsigned char* data = stbi_load(fileName.c_str(), &width, &height, &nrChannels, 0);
+        if (data) {
+            glTexImage2D(
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+            );
+#ifdef DEBUG_GL
+            glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_TEXTURE_WIDTH, &width);
+            std::cout << "Face " << i << ": width = " << width << "\n";
+#endif
+            stbi_image_free(data);
+        } else {
+            std::cerr << "Failed to load cubemap face: " << fileName << std::endl;
+        }
+        i++;
+    }
+    
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+    glCheckError(__FILE__, __LINE__);
+    textures.push_back(TextureBinding{textureID,unit,TextureType::CUBEMAP, uniformName});
+    return textureID;
+}
+
+void ShaderProgram::bindTexture(TextureBinding& binding) const {
+  switch (binding.textureType) {
+    case TextureType::TEXTURE: {
+      bind2DTexture(binding);
+      break;
+    }
+    case TextureType::CUBEMAP: {
+      bind3DTexture(binding);
+      break;
+    }
+  }
+}
+
+void ShaderProgram::bind2DTexture(TextureBinding& binding) const{
+    glActiveTexture(GL_TEXTURE0 + binding.unit);
+    glBindTexture(GL_TEXTURE_2D, binding.textureID);
+    GLint loc = glGetUniformLocation(getHandle(), binding.uniform.c_str());
+    glUniform1i(loc, binding.unit);
+}
+
+void ShaderProgram::bind3DTexture(TextureBinding& binding) const{
+    glActiveTexture(GL_TEXTURE0 + binding.unit);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, binding.textureID);
+    GLint loc = glGetUniformLocation(getHandle(), binding.uniform.c_str());
+    glUniform1i(loc, binding.unit);
 }

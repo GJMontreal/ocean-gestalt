@@ -47,9 +47,11 @@ void Model::drawWireframe(Uniforms& uniforms) {
   for (Mesh mesh : meshes) {
     auto shader = configuration->getShader("wireframe_shader");
     auto _guard = ShaderScope(shader);
-   
+       glCheckError(__FILE__, __LINE__);
     shader->setUniform("time", uniforms.time);
+        glCheckError(__FILE__, __LINE__);
     shader->setUniform("model", getTransform());
+        glCheckError(__FILE__, __LINE__);
 
 #ifdef __EMSCRIPTEN__
     shader->setUniform("projection",

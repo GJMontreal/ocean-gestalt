@@ -35,25 +35,28 @@ void Mesh::drawWireframe()const{
                  nullptr              // element array buffer offset
   );
 
-  #ifdef DEBUG_GL
+#ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);
-  #endif
+#endif
 
   glBindVertexArray(0);
 }
 
+
+
 void Mesh::draw() const {
   auto xy = size * subdivisions;
   glBindVertexArray(vao);
+
   glDrawElements(GL_TRIANGLES,     // mode
                  xy * xy * 2 * 3,  // count
                  GL_UNSIGNED_INT,  // type
                  nullptr           // element array buffer offset
   );
 
-  #ifdef DEBUG_GL
+#ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);
-  #endif
+#endif
 
   glBindVertexArray(0);
 }

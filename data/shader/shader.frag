@@ -16,6 +16,7 @@ layout(std140) uniform Matrices
 };
 
 uniform sampler2D normalMap; 
+uniform samplerCube envMap;
 
 uniform vec3 lightPos;
 uniform vec3 viewPos;
@@ -26,17 +27,18 @@ uniform float time;
 // Output
 out vec4 FragColor;
 
+// these should be uniforms
 // Constants
-const float FOG_DENSITY = 0.01;
-const float AMBIENT_STRENGTH = 0.9;
-const float SPECULAR_STRENGTH = 0.9;
-const float SHININESS = 8.0;
+uniform float fogDensity = 0.01;
+// const float AMBIENT_STRENGTH = 0.9;
+uniform float specularStrength = 0.5;
+uniform float shininess = 4.0;
 
 uniform float causticScale;
 uniform float causticSpeed;
 uniform float causticIntensity;
 
-const vec3 CAUSTIC_COLOUR = vec3(1.0, 0.9, 0.7);
+const vec3 CAUSTIC_COLOUR = vec3(1.0, 0.9, 0.7); //another uniform
 
 uniform float foamScale;
 uniform float foamScrollSpeed;
@@ -112,12 +114,8 @@ void main() {
                 normalize(fs_in.Bitangent),
                 normalize(fs_in.Normal));
 
-    // float distance = length(lightPos - fs_in.FragPos);
-    // float attenuation = 1.0 / (distance * distance);
-
     vec3 sampledNormal = texture(normalMap, fs_in.FragUV).rgb;
     sampledNormal = normalize(sampledNormal * 2.0 - 1.0);
-    // vec3 normal = normalize(TBN * sampledNormal);
     
     vec3 normal = normalize(fs_in.Normal);
 
@@ -126,14 +124,18 @@ void main() {
     vec3 halfway  = normalize(lightDir + viewDir);
 
     // Lighting terms
-    vec3 ambient  = AMBIENT_STRENGTH * fs_in.Color;
     float diff    = max(dot(normal, lightDir), 0.0);
+    // vec3 ambient = AMBIENT_STRENGTH * fs_in.Color;
+    vec3 reflectedDir = reflect(-viewDir, normal);
+    vec3 envReflection = texture(envMap, reflectedDir).rgb;
+    float fresnelWeight = pow(1.0 - max(dot(viewDir, normal), 0.0), 5.0); // or use fresnelSchlick if defined
+    vec3 reflection = mix(fs_in.Color, envReflection, fresnelWeight);
  
     vec3 diffuse  = diff * fs_in.Color;
 
-    float spec    = pow(max(dot(normal, halfway), 0.0), SHININESS);
+    float spec    = pow(max(dot(normal, halfway), 0.0), shininess);
     float fresnel = pow(1.0 - max(dot(viewDir, normal), 0.0), 5.0);
-    vec3 specular = vec3(1.0) * spec * fresnel * SPECULAR_STRENGTH;
+    vec3 specular = vec3(1.0) * spec * fresnel * specularStrength;
  
 
     // Depth-based colour modulation
@@ -163,7 +165,7 @@ void main() {
     shiftedColor = pow(shiftedColor, vec3(0.45));
 
     vec3 finalColor =
-    ambient  * shiftedColor +
+    reflection  * shiftedColor +
     diffuse * shiftedColor +
     specular * shiftedColor +            // white or lightly tinted
     causticLight; 
@@ -176,7 +178,7 @@ void main() {
     finalColor = mix(finalColor, foamColor, foam);
 
     // Fog
-    float fogFactor = clamp(exp(-FOG_DENSITY * depth), 0.0, 1.0);
+    float fogFactor = clamp(exp(-fogDensity * depth), 0.0, 1.0);
     vec3 fogColor = vec3(0.4, 0.6, 0.7); // sky-ish blue
     finalColor = mix(fogColor, finalColor, fogFactor);
     

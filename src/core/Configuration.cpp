@@ -19,6 +19,13 @@ using std::cout;
 using std::endl;
 using std::make_shared;
 
+const std::string VERTEX_KEY = "vertex";
+const std::string FRAGMENT_KEY = "fragment";
+const std::string GEOMETRY_KEY = "geometry";
+const std::string TEXTURE_KEY = "texture";
+const std::string CUBEMAP_KEY = "cubemap";
+const std::string COLOR_KEY = "color";
+
 Configuration::Configuration(const string& environment,
                              const string& shader,
                              const string& generator,
@@ -103,12 +110,12 @@ shared_ptr<ShaderProgram> Configuration::buildShader(json& j,
   // are colors associated with shaders, or models - models I think
   //TODO: decide what to do here with the color
   // color should be optional
-  if (shaderJSON.contains("color")) {
-    color = shaderJSON.at("color");
+  if (shaderJSON.contains(COLOR_KEY)) {
+    color = shaderJSON.at(COLOR_KEY);
   }
 
   // optional geometry shader where supported
-  auto geometry = shaderJSON["geometry"];
+  auto geometry = shaderJSON[GEOMETRY_KEY];
   shared_ptr<ShaderProgram> program;
   if (geometry != nullptr) {
     Shader geometryShader(SHADER_DIR + (string)geometry, GL_GEOMETRY_SHADER);
@@ -118,6 +125,26 @@ shared_ptr<ShaderProgram> Configuration::buildShader(json& j,
     program =
         make_shared<ShaderProgram>(ShaderProgram(name,{vertexShader, fragmentShader}));
   }
+  GLuint unit = 0;
+  // any textures 
+  if (shaderJSON.contains(TEXTURE_KEY)){
+    auto textures = shaderJSON.at(TEXTURE_KEY);
+    for(auto &[uniform, texture] : textures.items()){
+      std::string path = TEXTURE_DIR + texture.get<std::string>();
+      program->loadTexture(path, uniform,unit);
+      unit++;  //we should track textures and units for reuse and sharing
+    }
+  }
+
+  if (shaderJSON.contains(CUBEMAP_KEY)){
+    auto textures = shaderJSON.at(CUBEMAP_KEY);
+    for(auto &[uniform, cubemap] : textures.items()){
+      std::string path = TEXTURE_DIR + cubemap.get<std::string>();
+      program->loadCubemap(path, uniform, unit);
+      unit++;
+    }
+  }
+
   return program;
 }
 
@@ -222,11 +249,11 @@ void Configuration::setInitialUniformState(const ApiAdapter& api){
     api.setValue("uniforms.wireframe_shader.lineColor", uniformToApi(wireframeColor));
 
     // these need to be set before the render loop runs
-    for (auto shader : {shaders["mesh_shader"], shaders["wireframe_shader"],
+    for (auto shader : {shaders["wireframe_shader"],
                         shaders["normal_shader"], shaders["LODSurface"]}) {
       auto _guard = ShaderScope(shader);
-      shader->loadTexture(SHADER_DIR "ridged_noise.png","gustNoise");
-      shader->loadTexture(SHADER_DIR "NormalMap.png","gustNormalMap");
+      shader->loadTexture(TEXTURE_DIR "NormalMap.png","gustNormalMap",0);
+      shader->loadTexture(TEXTURE_DIR "ridged_noise.png","gustNoise",1);
     }
 
     dispatch_async([this, &api] {
@@ -235,11 +262,11 @@ void Configuration::setInitialUniformState(const ApiAdapter& api){
 }
 
 void Configuration::setInitialWaveUniforms(const ApiAdapter& api)const{
-     api.setValue("uniforms.gust.direction",
-                   uniformToApi(glm::vec3(-1.0, 0.3, 0.0)));
-      api.setValue("uniforms.gust.strength", uniformToApi(0.0f));
-      api.setValue("uniforms.gust.speed", uniformToApi(0.0f));
-      api.setValue("uniforms.gust.scale", 0.052f);
+    //  api.setValue("uniforms.gust.direction",
+    //                uniformToApi(glm::vec3(-1.0, 0.3, 0.0)));
+    //   api.setValue("uniforms.gust.strength", uniformToApi(0.0f));
+    //   api.setValue("uniforms.gust.speed", uniformToApi(0.0f));
+    //   api.setValue("uniforms.gust.scale", 0.052f);
       //TODO: this should somehow be a key in our shader json
       for(auto shaderName: {"mesh_shader","wireframe_shader","normal_shader","LODSurface"}){
      int i = 0;
