@@ -35,6 +35,7 @@ add_library(app-core STATIC
   GerstnerWave.cpp
   TextRenderer.cpp
   LODSurface.cpp
+  Skybox.cpp
 )
 
 set_property(TARGET app-core PROPERTY CXX_STANDARD 17)

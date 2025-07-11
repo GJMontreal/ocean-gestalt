@@ -100,6 +100,7 @@ ShaderProgram::ShaderProgram() {
   handle = glCreateProgram();
   if (!handle)
     throw std::runtime_error("Impossible to create a new shader program");
+  stbi_set_flip_vertically_on_load(false);
 }
 
 ShaderProgram::ShaderProgram(const std::string& name, std::initializer_list<Shader> shaderList)
@@ -321,6 +322,7 @@ GLuint ShaderProgram::loadCubemap(const std::string& path, const std::string& un
     GLuint i = 0;
     for (auto face : faces) {
       auto fileName = path + "_" + face + ".jpg";
+      
         unsigned char* data = stbi_load(fileName.c_str(), &width, &height, &nrChannels, 0);
         if (data) {
             glTexImage2D(
@@ -335,6 +337,7 @@ GLuint ShaderProgram::loadCubemap(const std::string& path, const std::string& un
         } else {
             std::cerr << "Failed to load cubemap face: " << fileName << std::endl;
         }
+        
         i++;
     }
     

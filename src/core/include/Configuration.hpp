@@ -1,8 +1,6 @@
 #ifndef __CONFIGURATION_HPP
 #define __CONFIGURATION_HPP
 
-#define DEBUG_GL
-
 #include "AppContextInterface.hpp"
 #include "ApiValue.hpp"
 

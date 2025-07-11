@@ -132,7 +132,7 @@ shared_ptr<ShaderProgram> Configuration::buildShader(json& j,
     for(auto &[uniform, texture] : textures.items()){
       std::string path = TEXTURE_DIR + texture.get<std::string>();
       program->loadTexture(path, uniform,unit);
-      unit++;  //we should track textures and units for reuse and sharing
+      unit++;  //TODO: we should track textures and units for reuse and sharing
     }
   }
 

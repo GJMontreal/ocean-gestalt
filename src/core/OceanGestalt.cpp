@@ -8,6 +8,7 @@
 #include "asset.hpp"
 #include "glError.hpp"
 #include "Buoy.hpp"
+#include "Skybox.hpp"
 #include "TextRenderer.hpp"
 #include "GerstnerWave.hpp"
 
@@ -34,6 +35,11 @@ OceanGestalt::OceanGestalt() : Application() {
   this->camera = config->camera;
   this->camera->getMoveable().movementSpeed = 10.f;
   moveables.push_back(this->camera);
+
+  //It's important that the skybox is always rendered first
+  auto skybox = std::make_shared<Skybox>(config);
+  skybox->setIfShouldDraw(true);
+  drawables.push_back(skybox);
 
   this->light = std::make_shared<Light>(config->lightPosition, config);
   config->light = light;
@@ -64,6 +70,7 @@ OceanGestalt::OceanGestalt() : Application() {
   // lodSurface->setRayShader(config->getShader("LODSurfaceRay"));
   // lodSurface->setShader(config->getShader("LODSurface"));
   // drawables.push_back(lodSurface);
+
 
 
   waveUI = unique_ptr<WaveUI>(new WaveUI(config->waves)); //I don't think we need this anymore - or at least it's not working properly

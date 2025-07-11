@@ -29,6 +29,21 @@
                 "display": "Specular Strength",
                 "control": "slider"
             }
+        },"normalStrength": {
+            "type": "float",
+            "min": 0,
+            "max": 1,
+            "_meta": {
+                "display": "Normal Strength",
+                "control": "slider"
+            }
+        },
+            "showEnv": {
+            "type": "bool",
+            "_meta": {
+                "display": "Show Environment",
+                "control": "toggle"
+            }
         }
         }
         }

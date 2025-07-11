@@ -34,11 +34,16 @@ class Drawable: public MoveableBase<Drawable>  {
     }
     return nullptr;
     }
+  
   void activate() override ;
   void deactivate() override ;
 
+  void setIfShouldDraw(bool aBool) { shouldDraw = aBool; }
+
+  bool getIfShouldDraw() { return shouldDraw; }
+
   std::function<glm::mat4(Drawable& drawable, float time)> preDraw;
-  std::function<void(Drawable& drawable)> postDraw;
+  std::function<void(Drawable& drawable)> postDraw;  //TODO: remove if we're not using this
   
   protected:
 
@@ -50,6 +55,9 @@ class Drawable: public MoveableBase<Drawable>  {
 
   std::weak_ptr<Configuration> context;
 
+  //TODO: not all drawables should be moveable
   friend MoveableBase<Drawable>;
   Moveable moveable;
+
+  bool shouldDraw;
 };

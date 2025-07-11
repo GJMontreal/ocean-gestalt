@@ -23,6 +23,12 @@
     "mesh_shader": {
         "vertex": "gerstner.vert",
         "fragment": "shader.frag",
+         "texture":{
+          "gustNoise":"gust_noise_512.png",
+          "gustNormalMap":"NormalMap.png"
+        },"cubemap" :{
+          "envMap":"skybox"
+        },
         "color": {
             "r": 0.10,
             "g": 0.2,
@@ -70,5 +76,12 @@
     "LODSurface":{
       "vertex":"ViewAlignedGerstner.vert",
       "fragment":"shader.frag"
+    },
+    "skybox":{
+      "vertex":"skybox.vert",
+      "fragment":"skybox.frag",
+      "cubemap" :{
+          "envMap":"skybox"
+        }
     }
 }

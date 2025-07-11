@@ -27,12 +27,10 @@ uniform float time;
 // Output
 out vec4 FragColor;
 
-// these should be uniforms
-// Constants
 uniform float fogDensity = 0.01;
-// const float AMBIENT_STRENGTH = 0.9;
 uniform float specularStrength = 0.5;
 uniform float shininess = 4.0;
+uniform float normalStrength;
 
 uniform float causticScale;
 uniform float causticSpeed;
@@ -46,11 +44,13 @@ uniform float foamSlopeMin;
 uniform float foamSlopeMax;
 uniform float foamSlopeAmplifier;
 
+
 uniform int showNormalMap;
 uniform int showUVs;
 uniform int debugLightPos;
 uniform int debugFragPos;
 uniform int debugDiffuse;
+uniform int showEnv;
 
 vec3 visualizeLightContribution(vec3 lightPos, vec3 fragPos) {
     float intensity = 1.0 / distance(lightPos, fragPos); // or squared falloff
@@ -116,16 +116,17 @@ void main() {
 
     vec3 sampledNormal = texture(normalMap, fs_in.FragUV).rgb;
     sampledNormal = normalize(sampledNormal * 2.0 - 1.0);
+    sampledNormal = normalize(mix(vec3(0.0, 0.0, 1.0), sampledNormal, normalStrength));
     
-    vec3 normal = normalize(fs_in.Normal);
-
+    // vec3 normal = normalize(fs_in.Normal);
+    vec3 normal = sampledNormal;
     vec3 lightDir = normalize(lightPos - fs_in.FragPos);
     vec3 viewDir  = normalize(viewPos - fs_in.FragPos);
     vec3 halfway  = normalize(lightDir + viewDir);
 
     // Lighting terms
     float diff    = max(dot(normal, lightDir), 0.0);
-    // vec3 ambient = AMBIENT_STRENGTH * fs_in.Color;
+    
     vec3 reflectedDir = reflect(-viewDir, normal);
     vec3 envReflection = texture(envMap, reflectedDir).rgb;
     float fresnelWeight = pow(1.0 - max(dot(viewDir, normal), 0.0), 5.0); // or use fresnelSchlick if defined
@@ -191,6 +192,6 @@ void main() {
 
     vec3 fragViz = normalize(fs_in.FragPos);
     finalColor = mix(finalColor, fragViz, float(debugFragPos));
-
+    finalColor = mix(finalColor, envReflection, float(showEnv));
     FragColor = vec4(finalColor, 1.0);
 }
