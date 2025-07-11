@@ -25,7 +25,7 @@
         "fragment": "shader.frag",
          "texture":{
           "gustNoise":"gust_noise_512.png",
-          "gustNormalMap":"NormalMap.png"
+          "normalMap":"fbm_normalmap.png"
         },"cubemap" :{
           "envMap":"skybox"
         },
@@ -64,18 +64,6 @@
     "text":{
         "vertex": "text.vert",
         "fragment": "text.frag"
-    },
-    "LODSurfaceProjection":{
-        "vertex": "LODSurface.vert",
-        "fragment": "raycast.frag"
-    },
-    "LODSurfaceRay":{
-      "vertex":"raycast.vert",
-      "fragment":"raycast.frag"
-    },
-    "LODSurface":{
-      "vertex":"ViewAlignedGerstner.vert",
-      "fragment":"shader.frag"
     },
     "skybox":{
       "vertex":"skybox.vert",

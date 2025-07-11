@@ -141,7 +141,6 @@ void Application::run() {
   // Make the window's context current
   glfwMakeContextCurrent(window);
 
-  setUIDelegate();
   time = (float)glfwGetTime();
   runOnce();
   registered_loop = [&]() {

@@ -31,13 +31,14 @@ struct GUST{
 
 uniform GUST gust;
 
-// struct NormalMapping{
-//   float scale;
-//   float speed;
-//   vec3 direction;
-// }
+struct NormalMapping{
+  float scale;
+  float speed;
+  vec3 direction;
+ };
 
-// uniform NormalMapping normalMapping;
+uniform NormalMapping normalMapping;
+
 uniform int showMesh = 1;
 
 struct WAVE{  
@@ -67,6 +68,14 @@ const float PI = 3.14159265358979323;
 const float speedScale = 3.0;
 
 const float GRAVITY = 9.81; 
+
+vec2 calcUV(vec3 position, vec2 dir, vec2 origin, float speed, float scale, float time){
+  vec2 offset = normalize(dir) * speed * time;
+  vec2 uv = (position.xz - origin) * scale;
+  uv += offset;
+  uv = fract(uv);
+  return uv;
+}
 
 vec2 uvLocation(vec3 position, vec2 gustDir){
     vec2 gustUVOrigin = vec2(-60);  //this should be a uniform
@@ -139,16 +148,17 @@ vec3 calcNormal(vec3 originalPosition,
 void main(void)
 {   
     mat4 _ = model; //for consistency
-    vec2 windDirection = normalize(gust.direction.xy);
-    vec2 uv = uvLocation(position, windDirection);
+    // vec2 windDirection = normalize(gust.direction.xy);
+    vec2 gustUV = calcUV(position, normalize(gust.direction.xy), vec2(-60), gust.speed, gust.scale, time);
+    vec2 normalUV = calcUV(position, normalize(normalMapping.direction.xy), vec2(-60), normalMapping.speed, normalMapping.scale, time);
 
     vec3 newPosition = calcNewPosition(position);
-    float gust = gustDisplacement(uv);
+    float gust = gustDisplacement(gustUV);
     newPosition.y += gust;
     vec3 tangent;
     vec3 bitangent;
 
-    vec3 normalFD = calcNormal(position, newPosition, uv, NORMAL_OFFSET, tangent, bitangent);
+    vec3 normalFD = calcNormal(position, newPosition, gustUV, NORMAL_OFFSET, tangent, bitangent);
 
     vec4 projectedPosition = projection * view * vec4(newPosition, 1.0);
     vec4 offscreen = vec4(2.0, 2.0, 2.0, 1.0);
@@ -161,5 +171,5 @@ void main(void)
     vs_out.Color = vec3(color);
     vs_out.Bitangent = bitangent;
     vs_out.Tangent = tangent;
-    vs_out.FragUV = uv;
+    vs_out.FragUV = normalUV;
 }

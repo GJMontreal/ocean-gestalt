@@ -5,36 +5,41 @@
             "display": "Shader Uniforms"
         },
          "mesh_shader": {
-            "shininess": {
+             
+        
+        "normalMapping.speed": {
             "type": "float",
             "min": 0,
-            "max": 10,
+            "max": 0.5,
             "_meta": {
-                "display": "Shininess",
+                "display": "Normal Map Speed",
                 "control": "slider"
             }
-        },"fogDensity": {
+        },
+        "normalMapping.scale": {
+            "type": "float",
+            "min": 0.0,
+            "max": 0.5,
+            "_meta": {
+                "display": "Normal Map Scale",
+                "control": "slider"
+            }
+        },
+        "normalMapping.heading": {
+            "type": "float",
+            "min": 0,
+            "max": 360,
+            "_meta": {
+                "display": "Normal Map Heading",
+                "control": "slider"
+            }
+        },
+        "fogDensity": {
             "type": "float",
             "min": 0,
             "max": 0.01,
             "_meta": {
                 "display": "Fog Density",
-                "control": "slider"
-            }
-        },"specularStrength": {
-            "type": "float",
-            "min": 0,
-            "max": 1,
-            "_meta": {
-                "display": "Specular Strength",
-                "control": "slider"
-            }
-        },"normalStrength": {
-            "type": "float",
-            "min": 0,
-            "max": 1,
-            "_meta": {
-                "display": "Normal Strength",
                 "control": "slider"
             }
         },
@@ -46,5 +51,16 @@
             }
         }
         }
-        }
-      }
+        
+        
+          ,"ambientStrength":{
+            "type": "float",
+            "min": 0,
+            "max": 1,
+            "_meta": {
+                "display": "Ambient Strength",
+                "control": "slider"
+            }
+          }
+    }
+  }

@@ -60,12 +60,17 @@ void UniformState::renderThreadCallback() {
       return;
     }
 
+    // auto _guard = ShaderScope(shader); // TODO: make shader a ptr
     shader->activate();
     for (auto& u : updates) {
       UniformDispatcher<ShaderProgram> dispatcher{shader, u.uniform};
       std::visit(dispatcher, u.value);
 
+#ifdef DEBUG_GL
       if(dispatcher.success && !glCheckError(__FILE__, __LINE__)){
+#else
+      if(dispatcher.success){
+#endif
         uniformStates[u.shader + "." + u.uniform] = u.value;
         u.ack.set_value(true);
       }else{

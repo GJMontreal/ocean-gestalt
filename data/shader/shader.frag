@@ -28,13 +28,10 @@ uniform float time;
 out vec4 FragColor;
 
 uniform float fogDensity = 0.01;
-uniform float specularStrength = 0.5;  //Is this being optimized out?
-uniform float shininess = 4.0;
-uniform float normalStrength;
 
-uniform float causticScale;
-uniform float causticSpeed;
-uniform float causticIntensity;
+uniform float causticScale = 0.0;
+uniform float causticSpeed = 0.0;
+uniform float causticIntensity = 0.0;
 
 const vec3 CAUSTIC_COLOUR = vec3(1.0, 0.9, 0.7); //another uniform
 
@@ -51,6 +48,8 @@ uniform int debugLightPos;
 uniform int debugFragPos;
 uniform int debugDiffuse;
 uniform int showEnv;
+
+const vec3 F0 = vec3(0.04); // typical for dielectrics, metals use albedo or tuned value
 
 vec3 visualizeLightContribution(vec3 lightPos, vec3 fragPos) {
     float intensity = 1.0 / distance(lightPos, fragPos); // or squared falloff
@@ -107,6 +106,10 @@ vec2 slopeDir = normalize(vec2(
   return foam;
 }
 
+vec3 fresnelSchlick(float cosTheta, vec3 F0)
+{
+    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
 
 // Main
 void main() {
@@ -114,12 +117,10 @@ void main() {
                 normalize(fs_in.Bitangent),
                 normalize(fs_in.Normal));
 
-    vec3 sampledNormal = texture(normalMap, fs_in.FragUV).rgb;
-    sampledNormal = normalize(sampledNormal * 2.0 - 1.0);
-    sampledNormal = normalize(mix(fs_in.Normal, sampledNormal, normalStrength));
+    vec3 sampledNormalTS = normalize(texture(normalMap, fs_in.FragUV).rgb * 2.0 - 1.0);
+    vec3 normal = normalize(TBN * sampledNormalTS);
+    // vec3 normal = normalize(mix(fs_in.Normal, normalWS, normalStrength));
     
-    // vec3 normal = normalize(fs_in.Normal);
-    vec3 normal = normalize(TBN * sampledNormal);
     vec3 lightDir = normalize(lightPos - fs_in.FragPos);
     vec3 viewDir  = normalize(viewPos - fs_in.FragPos);
     vec3 halfway  = normalize(lightDir + viewDir);
@@ -129,17 +130,14 @@ void main() {
 
     vec3 reflectedDir = reflect(-viewDir, normal);
     vec3 envReflection = texture(envMap, reflectedDir).rgb;
-    // vec3 envReflection = texture(envMap,vec3(0.0,0.0,-1.0)).rgb;
-    
-    float fresnelWeight = pow(1.0 - max(dot(viewDir, normal), 0.0), 5.0); // or use fresnelSchlick if defined
-    vec3 reflection = mix(fs_in.Color, envReflection, fresnelWeight);
- 
-    vec3 diffuse  = diff * fs_in.Color;
 
-    float spec    = pow(max(dot(normal, halfway), 0.0), shininess);
-    float fresnel = pow(1.0 - max(dot(viewDir, normal), 0.0), 5.0);
-    vec3 specular = vec3(1.0) * spec * fresnel * specularStrength;
+    float cosTheta = max(dot(viewDir, normal), 0.0);
+    
+    vec3 fresnel = fresnelSchlick(cosTheta, F0);
+
+    vec3 reflection = fresnel * envReflection;
  
+    vec3 diffuse  = (1.0 - fresnel) * diff * fs_in.Color;
 
     // Depth-based colour modulation
     float depth = length(viewPos - fs_in.FragPos);
@@ -163,18 +161,14 @@ void main() {
     float causticMask = 1.0;
     vec3 causticLight = CAUSTIC_COLOUR * causticFlicker * causticMask * causticStrength * causticIntensity;
 
-    float lightingIntensity = diff + spec + fresnel;
-
+    //Gamma correction
     shiftedColor = pow(shiftedColor, vec3(0.45));
 
     vec3 finalColor =
-    reflection  * shiftedColor +
-    diffuse * shiftedColor +
-    specular * shiftedColor +            // white or lightly tinted
+    reflection  +
+    diffuse  +
     causticLight; 
 
-    lightingIntensity = clamp(lightingIntensity, 0.0, 1.0);
-    
     // Foam blend
     float foam = calcFoam(fs_in.FragPos);
     vec3 foamColor = vec3(1.0);
@@ -185,7 +179,7 @@ void main() {
     vec3 fogColor = vec3(0.4, 0.6, 0.7); // sky-ish blue
     finalColor = mix(fogColor, finalColor, fogFactor);
     
-    finalColor = mix(finalColor, sampledNormal * 0.5 + 0.5, float(showNormalMap));
+    finalColor = mix(finalColor, sampledNormalTS * 0.5 + 0.5, float(showNormalMap));
     finalColor = mix(finalColor, vec3(fs_in.FragUV,0.0), float(showUVs));
     finalColor = mix(finalColor, diffuse, float(debugDiffuse));
 
@@ -194,6 +188,6 @@ void main() {
 
     vec3 fragViz = normalize(fs_in.FragPos);
     finalColor = mix(finalColor, fragViz, float(debugFragPos));
-    finalColor = mix(finalColor, envReflection, float(showEnv));
+    finalColor = mix(finalColor, reflection, float(showEnv));
     FragColor = vec4(finalColor, 1.0);
 }

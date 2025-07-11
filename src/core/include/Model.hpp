@@ -51,7 +51,7 @@ class Model : public Drawable{
  
   bool shouldDrawWireframe = false;
   bool shouldDrawNormals = false;
-  bool shouldDrawMesh = false;  //it would be nice to specify these in our configuration
+  bool shouldDrawMesh = true;  //it would be nice to specify these in our configuration
   
   bool drawTriangles = true;
   bool drawLines = false;

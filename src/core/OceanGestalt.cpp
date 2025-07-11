@@ -11,6 +11,7 @@
 #include "Skybox.hpp"
 #include "TextRenderer.hpp"
 #include "GerstnerWave.hpp"
+#include "HeightMapGenerator.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -36,6 +37,10 @@ OceanGestalt::OceanGestalt() : Application() {
   this->camera->getMoveable().movementSpeed = 10.f;
   moveables.push_back(this->camera);
 
+  HeightMapGenerator generator(512, 512);       // create a 512×512 heightmap
+  generator.generateFBM(20.0f, 20);                 // generate using FBM noise, scale = 20
+  generator.writeToFile(TEXTURE_DIR "fbm_heightmap.png");   // save as grayscale PNG
+  generator.writeNormalMapToFile(TEXTURE_DIR "fbm_normalmap.png");
   //It's important that the skybox is always rendered first
   auto skybox = std::make_shared<Skybox>(config);
   skybox->setIfShouldDraw(true);
@@ -65,16 +70,6 @@ OceanGestalt::OceanGestalt() : Application() {
   drawables.push_back(buoyDrawable);
   moveables.push_back(buoy);
 
-  // auto lodSurface = std::make_shared<LODSurface>(glm::vec3(0.f),config);
-  // lodSurface->setProjectionShader(config->getShader("LODSurfaceProjection"));
-  // lodSurface->setRayShader(config->getShader("LODSurfaceRay"));
-  // lodSurface->setShader(config->getShader("LODSurface"));
-  // drawables.push_back(lodSurface);
-
-
-
-  waveUI = unique_ptr<WaveUI>(new WaveUI(config->waves)); //I don't think we need this anymore - or at least it's not working properly
-
   glEnable(GL_BLEND); 
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -93,7 +88,7 @@ OceanGestalt::OceanGestalt() : Application() {
   // doOnReady([&]{surfAudio->start();});
 
   // onRender([&]{surfAudio->setFoamLevel(float foam);});
-  currentMoveable = moveables.begin();
+  currentMoveable = moveables.begin(); //we should have selectable, which could be drawable moveable one or the other or both
 
 #ifdef DEBUG_GL
   glDumpTextureBindings();
@@ -293,11 +288,9 @@ void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
     configuration->save(CONFIGURATION_DIR "/output.json");
   });
 
-  executeIfPressed(window, GLFW_KEY_R, [this]() {
-    WaveGenerator(configuration->waves, configuration->stdDeviation,
-                  configuration->medianWavelength,
-                  configuration->medianAmplitude);
-    wavesNeedUpdate = true;
+  executeIfPressed(window, GLFW_KEY_V, [this]() {
+   /* We'd also like to be able to cycle through drawables*/
+   // for now just toggle the skybox's visability
   });
 
   executeIfPressed(window, GLFW_KEY_T,[this]{

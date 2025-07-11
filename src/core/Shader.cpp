@@ -138,9 +138,9 @@ GLint ShaderProgram::uniform(const std::string& name) {
     // uniform that is not referenced
     GLint r = glGetUniformLocation(handle, name.c_str());
     if (r == GL_INVALID_OPERATION){
-      cout << "[ERROR] GL_INVALID_OPERATION Getting uniform location" << endl;
+      cerr << "[ERROR] GL_INVALID_OPERATION Getting uniform location" << endl;
     } else if( r < 0) {
-      cout << "[Warning] uniform " << name << " doesn't exist in program" << endl;
+      cout << "[Warning] uniform " << name << " doesn't exist in shader " << this->getName() << endl;
     }else{
       uniforms[name] = r; // I don't think we should add it if it's not in the program
     }
@@ -152,8 +152,7 @@ GLint ShaderProgram::uniform(const std::string& name) {
 GLint ShaderProgram::attribute(const std::string& name) {
   GLint attrib = glGetAttribLocation(handle, name.c_str());
   if (attrib == GL_INVALID_OPERATION || attrib < 0)
-    cout << "[Error] Attribute " << name << " doesn't exist in program" << endl;
-
+    cout << "[Error] Attribute " << name << " doesn't exist in shader" << this->getName() << endl;
   return attrib;
 }
 
@@ -192,51 +191,95 @@ void ShaderProgram::setAttribute(const std::string& name,
   setAttribute(name, size, stride, offset, false, GL_FLOAT);
 }
 
-void ShaderProgram::setUniform(const std::string& name,
+GLint ShaderProgram::setUniform(const std::string& name,
                                float x,
                                float y,
                                float z) {
-  glUniform3f(uniform(name), x, y, z);
+  auto id = uniform(name);
+  if(id > -1){
+    glUniform3f(id, x, y, z);
+  }  
+  return id;
 }
 
-void ShaderProgram::setUniform(const std::string& name, const vec2& v) {
-  glUniform3fv(uniform(name), 1, value_ptr(v));
+GLint ShaderProgram::setUniform(const std::string& name, const vec2& v) {
+  auto id = uniform(name);
+  if(id > -1){
+    glUniform3fv(id, 1, value_ptr(v));
+  }
+  return id;
 }
 
-void ShaderProgram::setUniform(const std::string& name, const vec3& v) {
-  glUniform3fv(uniform(name), 1, value_ptr(v));
+GLint ShaderProgram::setUniform(const std::string& name, const vec3& v) {
+  auto id = uniform(name);
+  if(id > -1){
+    glUniform3fv(id, 1, value_ptr(v));
+  }
+  return id;
 }
 
-void ShaderProgram::setUniform(const std::string& name, const dvec3& v) {
-  glUniform3dv(uniform(name), 1, value_ptr(v));
+GLint ShaderProgram::setUniform(const std::string& name, const dvec3& v) {
+  auto id = uniform(name);
+  if(id > -1){
+    glUniform3dv(id, 1, value_ptr(v));
+  }
+  return id;
 }
 
-void ShaderProgram::setUniform(const std::string& name, const vec4& v) {
-  glUniform4fv(uniform(name), 1, value_ptr(v));
+GLint ShaderProgram::setUniform(const std::string& name, const vec4& v) {
+  auto id = uniform(name);
+  if(id > -1){
+    glUniform4fv(id, 1, value_ptr(v));
+  }
+  return id;
 }
 
-void ShaderProgram::setUniform(const std::string& name, const dvec4& v) {
-  glUniform4dv(uniform(name), 1, value_ptr(v));
+GLint ShaderProgram::setUniform(const std::string& name, const dvec4& v) {
+  auto id = uniform(name);
+  if(id > -1){
+    glUniform4dv(id, 1, value_ptr(v));
+  }
+  return id;
 }
 
-void ShaderProgram::setUniform(const std::string& name, const dmat4& m) {
-  glUniformMatrix4dv(uniform(name), 1, GL_FALSE, value_ptr(m));
+GLint ShaderProgram::setUniform(const std::string& name, const dmat4& m) {
+  auto id = uniform(name);
+  if(id > -1){
+    glUniformMatrix4dv(id, 1, GL_FALSE, value_ptr(m));
+  }
+  return id;
 }
 
-void ShaderProgram::setUniform(const std::string& name, const mat4& m) {
-  glUniformMatrix4fv(uniform(name), 1, GL_FALSE, value_ptr(m));
+GLint ShaderProgram::setUniform(const std::string& name, const mat4& m) {
+  auto id = uniform(name);
+  if(id > -1){
+    glUniformMatrix4fv(id, 1, GL_FALSE, value_ptr(m));
+  }
+  return id;
 }
 
-void ShaderProgram::setUniform(const std::string& name, const mat3& m) {
-  glUniformMatrix3fv(uniform(name), 1, GL_FALSE, value_ptr(m));
+GLint ShaderProgram::setUniform(const std::string& name, const mat3& m) {
+  auto id = uniform(name);
+  if(id > -1){
+    glUniformMatrix3fv(id, 1, GL_FALSE, value_ptr(m));
+  }
+  return id;
 }
 
-void ShaderProgram::setUniform(const std::string& name, float val) {
-  glUniform1f(uniform(name), val);
+GLint ShaderProgram::setUniform(const std::string& name, float val) {
+  auto id = uniform(name);
+  if(id > -1){
+    glUniform1f(uniform(name), val);
+  }
+  return id;
 }
 
-void ShaderProgram::setUniform(const std::string& name, int val) {
-  glUniform1i(uniform(name), val);
+GLint ShaderProgram::setUniform(const std::string& name, int val) {
+  auto id = uniform(name);
+  if(id > -1){
+    glUniform1i(id, val);
+  }
+  return id;
 }
 
 void ShaderProgram::listUniforms() const {

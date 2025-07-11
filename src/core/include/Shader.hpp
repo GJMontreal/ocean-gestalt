@@ -81,17 +81,18 @@ class ShaderProgram {
   GLint operator[](const std::string& name);
 
   // affect uniform
-  void setUniform(const std::string& name, float x, float y, float z);
-  void setUniform(const std::string& name, const glm::vec2& v);
-  void setUniform(const std::string& name, const glm::vec3& v);
-  void setUniform(const std::string& name, const glm::dvec3& v);
-  void setUniform(const std::string& name, const glm::vec4& v);
-  void setUniform(const std::string& name, const glm::dvec4& v);
-  void setUniform(const std::string& name, const glm::dmat4& m);
-  void setUniform(const std::string& name, const glm::mat4& m);
-  void setUniform(const std::string& name, const glm::mat3& m);
-  void setUniform(const std::string& name, float val);
-  void setUniform(const std::string& name, int val);
+  // TODO: these should all return whether they were successful or not
+  GLint setUniform(const std::string& name, float x, float y, float z);
+  GLint setUniform(const std::string& name, const glm::vec2& v);
+  GLint setUniform(const std::string& name, const glm::vec3& v);
+  GLint setUniform(const std::string& name, const glm::dvec3& v);
+  GLint setUniform(const std::string& name, const glm::vec4& v);
+  GLint setUniform(const std::string& name, const glm::dvec4& v);
+  GLint setUniform(const std::string& name, const glm::dmat4& m);
+  GLint setUniform(const std::string& name, const glm::mat4& m);
+  GLint setUniform(const std::string& name, const glm::mat3& m);
+  GLint setUniform(const std::string& name, float val);
+  GLint setUniform(const std::string& name, int val);
 
   // TODO: get rid of these two
   void listUniforms() const;

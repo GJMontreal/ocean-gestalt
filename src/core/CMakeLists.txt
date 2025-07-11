@@ -36,6 +36,7 @@ add_library(app-core STATIC
   TextRenderer.cpp
   LODSurface.cpp
   Skybox.cpp
+  HeightMapGenerator.cpp
 )
 
 set_property(TARGET app-core PROPERTY CXX_STANDARD 17)

@@ -7,6 +7,8 @@ class Skybox : public Drawable {
   Skybox(std::shared_ptr<Configuration> context);
   void draw(Uniforms& uniforms) override;
   void drawNormals(Uniforms&, glm::mat4) override { /*do nothing*/ } ;
+  void activate() override;
+  
  private:
   GLuint vao;
   GLuint vbo;

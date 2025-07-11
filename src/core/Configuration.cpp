@@ -234,8 +234,6 @@ std::shared_ptr<ShaderProgram> Configuration::getShader(const std::string& shade
 
 void Configuration::setWaveParameter(const std::string& key, const ApiValue& value){
   std::cout << "set wave parameters" << std::endl;
-  // I wonder what thread we're on here
-  // we'll need a mutex to guard
 }
 
 template <typename F>
@@ -244,48 +242,14 @@ void dispatch_async(F&& task) {
 }
 
 void Configuration::setInitialUniformState(const ApiAdapter& api){
-  //set all the uniforms
-  // api.setValue("uniforms.mesh_shader.lineColor",  uniformToApi(meshColor));
-    api.setValue("uniforms.wireframe_shader.lineColor", uniformToApi(wireframeColor));
-
-    // these need to be set before the render loop runs
-    for (auto shader : {shaders["wireframe_shader"],
-                        shaders["normal_shader"], shaders["LODSurface"]}) {
-      auto _guard = ShaderScope(shader);
-      shader->loadTexture(TEXTURE_DIR "NormalMap.png","gustNormalMap",0);
-      shader->loadTexture(TEXTURE_DIR "ridged_noise.png","gustNoise",1);
-    }
-
     dispatch_async([this, &api] {
-      this->setInitialWaveUniforms(api);
+      this->loadUniforms(CONFIGURATION_DIR "uniforms_min.json");
+      // this->setInitialWaveUniforms(api);
     });
 }
 
 void Configuration::setInitialWaveUniforms(const ApiAdapter& api)const{
-    //  api.setValue("uniforms.gust.direction",
-    //                uniformToApi(glm::vec3(-1.0, 0.3, 0.0)));
-    //   api.setValue("uniforms.gust.strength", uniformToApi(0.0f));
-    //   api.setValue("uniforms.gust.speed", uniformToApi(0.0f));
-    //   api.setValue("uniforms.gust.scale", 0.052f);
-      //TODO: this should somehow be a key in our shader json
-      for(auto shaderName: {"mesh_shader","wireframe_shader","normal_shader","LODSurface"}){
-     int i = 0;
-        for (const shared_ptr<Wave> wave : waves) {
-        std::string uniformName =
-            string_format("uniforms.%s.waves[%i].amplitude", shaderName, i);
-        api.setValue(uniformName, uniformToApi(wave->amplitude));
-
-        uniformName = string_format("uniforms.%s.waves[%i].steepness", shaderName,i);
-        api.setValue(uniformName, uniformToApi(wave->steepness));
-        uniformName = string_format("uniforms.%s.waves[%i].wavelength", shaderName, i);
-        api.setValue(uniformName, uniformToApi(wave->wavelength));
-        uniformName = string_format("uniforms.%s.waves[%i].direction", shaderName, i);
-        api.setValue(uniformName,
-                     uniformToApi(glm::vec3(wave->direction, 0.0f)));
-
-        i++;
-      }
-    }
+   
 }
 
 std::shared_ptr<WaveInterface> Configuration::getWaveInterface() {
