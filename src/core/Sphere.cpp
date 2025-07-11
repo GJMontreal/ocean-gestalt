@@ -121,29 +121,33 @@ void Sphere::draw(Uniforms& uniforms) {
 
 void Sphere::drawMesh(Uniforms& uniforms, mat4 transform) {
   assert(shader); // ensure we have assigned a shader
-  shader->activate();
+  auto _guard = ShaderScope(shader);
 
   shader->setUniform("model", transform * this->getTransform());
   shader->setUniform("viewPos",
   this->getContext()->camera->getPosition());
   shader->setUniform("lightPos",this->getContext()->light->getPosition());
+
+#ifdef __EMSCRIPTEN__
+    shader->setUniform("projection", uniforms.projection);
+    shader->setUniform("view", uniforms.view);
+#endif
+
   glBindVertexArray(VAO);
   glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
-  shader->deactivate();
 #ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);
 #endif  
 }
 
 void Sphere::drawNormals(Uniforms& uniforms, mat4 transform) {
-  normalShader->activate();
+  auto _guard = ShaderScope(normalShader);
   
   shader->setUniform("model", this->getTransform() * transform);
   glBindVertexArray(VAO);
   glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0);
 
-  normalShader->deactivate();
 #ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);
 #endif

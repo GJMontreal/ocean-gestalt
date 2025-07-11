@@ -21,7 +21,7 @@ I started with the OpenGL CMake Skeleton.
 https://github.com/ArthurSonzogni/OpenGL_CMake_Skeleton.git 
 
 How it's even possible to get C++ running in a browser   
-https://emscripten.orghttps  
+https://emscripten.org  
 
 An updated glfw api  
 https://github.com/pongasoft/emscripten-glfw  

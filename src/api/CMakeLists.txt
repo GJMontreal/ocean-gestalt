@@ -15,9 +15,14 @@ target_compile_features(app-api PRIVATE cxx_std_17)
 target_compile_options(app-api PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-std=c++17>)
 
 target_link_libraries(app-api
-  PRIVATE libglew_static
   PRIVATE glm
 )
+
+if (NOT EMSCRIPTEN)
+  target_link_libraries(app-api
+  PRIVATE libglew_static
+  )
+endif()
 
 target_include_directories(app-api
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}

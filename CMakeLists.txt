@@ -7,9 +7,20 @@ enable_testing()
 # cspell: disable
 
 add_subdirectory(src/core)
-add_subdirectory(src/rest)
+
+# We need to come up with a better way to specify this path
+if (EMSCRIPTEN)
+  target_include_directories(app-core BEFORE PRIVATE
+  "/Users/gjones/emsdk/upstream/emscripten/cache/ports/contrib.glfw3/include"
+  )
+endif()
+
 add_subdirectory(src/api)
-add_subdirectory(tests)
+
+if (!EMSCRIPTEN)
+  add_subdirectory(src/rest)
+  add_subdirectory(tests)
+endif()
 
 # The main executable
 add_executable(ocean-gestalt
@@ -26,11 +37,16 @@ if (EMSCRIPTEN)
   target_link_libraries(ocean-gestalt PUBLIC "-s MIN_WEBGL_VERSION=2")
   target_link_libraries(ocean-gestalt PUBLIC "-s WASM=1")
 
-  target_compile_options(ocean-gestalt PUBLIC "--use-port=${CMAKE_SOURCE_DIR}/emscripten-glfw3.py")
-  target_link_options(ocean-gestalt PUBLIC "--use-port=${CMAKE_SOURCE_DIR}/emscripten-glfw3.py")
+  target_compile_options(ocean-gestalt PUBLIC "--use-port=contrib.glfw3")
+  target_link_options(ocean-gestalt PUBLIC "--use-port=contrib.glfw3")
 
   target_compile_options(ocean-gestalt PRIVATE -fexceptions )
   target_link_options(ocean-gestalt PRIVATE -fexceptions)
+ 
+  target_link_libraries(ocean-gestalt
+    PRIVATE app-core
+    PRIVATE app-api
+  )
 
 
   # Copy the index.html file.
@@ -52,7 +68,7 @@ if (EMSCRIPTEN)
    "data/config/generator.json"
   )
   
-    configure_file(${file} ${file})
+  configure_file(${file} ${file})
   endforeach(file)
 
   foreach(file

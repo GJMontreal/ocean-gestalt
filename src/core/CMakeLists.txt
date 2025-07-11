@@ -45,11 +45,16 @@ target_compile_options(app-core PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-std=c++17>)
 
 target_link_libraries(app-core
   PRIVATE glfw
-  PRIVATE libglew_static
   PRIVATE glm
   PRIVATE nlohmann_json::nlohmann_json
   PRIVATE app-api
 )
+
+if (NOT EMSCRIPTEN)
+  target_link_libraries(app-core
+  PRIVATE libglew_static
+  )
+endif()
 
 target_include_directories(app-core 
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}

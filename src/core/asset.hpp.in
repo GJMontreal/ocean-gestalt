@@ -1,6 +1,7 @@
 namespace asset {
 #ifdef __EMSCRIPTEN__
 #define SHADER_DIR "/shader/webgl/"
+#define TEXTURE_DIR "/shader/texture/"
 #define CONFIGURATION_DIR "/config/"
 #define FONT_DIR "/font/"
 #else

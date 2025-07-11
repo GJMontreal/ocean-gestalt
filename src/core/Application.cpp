@@ -11,6 +11,7 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
 #include <iostream>
 #include <stdexcept>
 
@@ -79,7 +80,11 @@ Application::Application()
   #endif
   
   glfwMakeContextCurrent(window);
+
+#ifndef __EMSCRIPTEN__
   glfwSetInputMode(window,GLFW_CURSOR, GLFW_CURSOR_CAPTURED);
+#endif
+
   glewExperimental = GL_TRUE;
   GLenum err = glewInit();
 

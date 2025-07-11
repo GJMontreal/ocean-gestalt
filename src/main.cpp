@@ -7,7 +7,11 @@
  */
 
 #include "OceanGestalt.hpp"
+
+#ifndef __EMSCRIPTEN__
 #include "RestServer.hpp"
+#endif
+
 #include "OceanApi.hpp"
 #include "UniformState.hpp"
 
@@ -24,8 +28,11 @@ int main(int argc, const char* argv[]) {
   });
 
   app->getContext().setApi(api);
-  auto server = std::make_unique<RestServer>(api,"0.0.0.0:8080");
-  server->addHandlers(); // why does this have to explicit
+  #ifndef __EMSCRIPTEN__
+    auto server = std::make_unique<RestServer>(api,"0.0.0.0:8080");
+    server->addHandlers(); // why does this have to explicit 
+  #endif
+  
   app->run();
   return 0;
 }

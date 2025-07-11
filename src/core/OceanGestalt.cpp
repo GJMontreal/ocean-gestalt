@@ -41,9 +41,10 @@ OceanGestalt::OceanGestalt() : Application() {
   generator.generateFBM(20.0f, 20);                 // generate using FBM noise, scale = 20
   generator.writeToFile(TEXTURE_DIR "fbm_heightmap.png");   // save as grayscale PNG
   generator.writeNormalMapToFile(TEXTURE_DIR "fbm_normalmap.png");
+ 
   //It's important that the skybox is always rendered first
   auto skybox = std::make_shared<Skybox>(config);
-  skybox->setIfShouldDraw(true);
+  // skybox->setIfShouldDraw(true);
   drawables.push_back(skybox);
 
   this->light = std::make_shared<Light>(config->lightPosition, config);
