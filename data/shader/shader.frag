@@ -28,7 +28,7 @@ uniform float time;
 out vec4 FragColor;
 
 uniform float fogDensity = 0.01;
-uniform float specularStrength = 0.5;
+uniform float specularStrength = 0.5;  //Is this being optimized out?
 uniform float shininess = 4.0;
 uniform float normalStrength;
 
@@ -116,19 +116,21 @@ void main() {
 
     vec3 sampledNormal = texture(normalMap, fs_in.FragUV).rgb;
     sampledNormal = normalize(sampledNormal * 2.0 - 1.0);
-    sampledNormal = normalize(mix(vec3(0.0, 0.0, 1.0), sampledNormal, normalStrength));
+    sampledNormal = normalize(mix(fs_in.Normal, sampledNormal, normalStrength));
     
     // vec3 normal = normalize(fs_in.Normal);
-    vec3 normal = sampledNormal;
+    vec3 normal = normalize(TBN * sampledNormal);
     vec3 lightDir = normalize(lightPos - fs_in.FragPos);
     vec3 viewDir  = normalize(viewPos - fs_in.FragPos);
     vec3 halfway  = normalize(lightDir + viewDir);
 
     // Lighting terms
     float diff    = max(dot(normal, lightDir), 0.0);
-    
+
     vec3 reflectedDir = reflect(-viewDir, normal);
     vec3 envReflection = texture(envMap, reflectedDir).rgb;
+    // vec3 envReflection = texture(envMap,vec3(0.0,0.0,-1.0)).rgb;
+    
     float fresnelWeight = pow(1.0 - max(dot(viewDir, normal), 0.0), 5.0); // or use fresnelSchlick if defined
     vec3 reflection = mix(fs_in.Color, envReflection, fresnelWeight);
  
