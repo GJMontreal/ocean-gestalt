@@ -17,7 +17,7 @@ endif()
 
 add_subdirectory(src/api)
 
-if (!EMSCRIPTEN)
+if (NOT EMSCRIPTEN)
   add_subdirectory(src/rest)
   add_subdirectory(tests)
 endif()
@@ -59,16 +59,22 @@ if (EMSCRIPTEN)
     configure_file(src/${file} ${file})
   endforeach(file)
 
-  foreach(file 
-   "data/shader/webgl/shader.frag"
-   "data/shader/webgl/simple.frag" 
-   "data/shader/webgl/gerstner.vert"
-   "data/config/environment.json"
-   "data/config/shader.json"
-   "data/config/generator.json"
-  )
-  
-  configure_file(${file} ${file})
+  file(GLOB SHADER_FILES "data/shader/webgl/*")
+  foreach(file ${SHADER_FILES})
+    get_filename_component(fname "${file}" NAME)
+    configure_file(${file} ${CMAKE_CURRENT_BINARY_DIR}/data/shader/webgl/${fname})
+  endforeach()
+
+  file(GLOB TEXTURE_FILES "data/shader/texture/*")
+  foreach(file ${TEXTURE_FILES})
+    get_filename_component(fname "${file}" NAME)
+    configure_file(${file} ${CMAKE_CURRENT_BINARY_DIR}/data/shader/texture/${fname} COPYONLY)
+  endforeach()
+
+  file(GLOB CONFIG_FILES "data/config/*.json")
+  foreach(file ${CONFIG_FILES})
+    get_filename_component(fname "${file}" NAME)
+    configure_file(${file} ${CMAKE_CURRENT_BINARY_DIR}/data/config/${fname})
   endforeach(file)
 
   foreach(file

@@ -23,11 +23,13 @@ class Drawable: public MoveableBase<Drawable>  {
   virtual ~Drawable() = default;
 
   inline void setOrigin(glm::vec3 origin) {
-    transform = glm::translate(glm::mat4(1.0f), origin);
+    position = origin;
   };
 
-  inline glm::mat4 getTransform() const { return transform; };
- 
+  inline void setScale(glm::vec3 aScale) {
+    scale = aScale;
+  }
+  inline glm::mat4 getTransform() const { return glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f),scale); };
   inline std::shared_ptr<Configuration> getContext() {
     if(auto locked = this->context.lock()){
       return locked;
@@ -51,7 +53,10 @@ class Drawable: public MoveableBase<Drawable>  {
   virtual void drawMesh(Uniforms& uniforms, glm::mat4 transform) = 0;
 
  private:
-  glm::mat4 transform = glm::mat4(1.0);
+  // glm::mat4 transform = glm::mat4(1.0);
+  glm::vec3 position;
+  glm::vec3 scale = glm::vec3(1.0f);
+  glm::vec3 rotation;
 
   std::weak_ptr<Configuration> context;
 

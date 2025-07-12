@@ -10,7 +10,7 @@ struct ApiAdapter {
   virtual void pauseSimulation(bool pause) = 0;
   virtual void updateSimulation(std::string path, std::string value) = 0;
 
-  virtual std::optional<ApiValue> setValue(const std::string& path,const ApiValue& value) const = 0;
+  virtual std::optional<ApiValue> setValue(const std::string& path,const ApiValue& value, bool block = false) const = 0;
   virtual std::optional<ApiValue> getValue(const std::string& path) const = 0;
   
   virtual std::optional<ApiValue> setUniform(const std::string& shaderName,

@@ -44,7 +44,7 @@ std::optional<std::string> UniformHandler::handlePost(
       continue;
     }
     ApiValue parsed = handler.apply(value);
-    if (auto result = api.setValue(path, parsed)) {
+    if (auto result = api.setValue(path, parsed,true)) {
       return std::visit(
           [](auto&& val) -> std::string { return nlohmann::json(val).dump(); },
           *result);

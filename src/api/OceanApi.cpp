@@ -40,13 +40,12 @@ void OceanApi::updateSimulation(std::string path, std::string value) {
   std::cout << "updating " << path << " with " << value << std::endl;
 }
 
-std::optional<ApiValue> OceanApi::setValue(const std::string& path, const ApiValue& value) const {
+std::optional<ApiValue> OceanApi::setValue(const std::string& path, const ApiValue& value, bool block) const {
   auto parts = splitPath(path);
   std::optional<ApiValue> result;
   for(auto& handler:pathHandlers){
-    // how could we handle multiple handlers
     if(handler->matches(parts)){
-      auto r = handler->set(parts, value);
+      auto r = handler->set(parts, value, block);
       if(r){
         result = std::move(r);
       }

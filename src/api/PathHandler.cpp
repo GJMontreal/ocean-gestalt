@@ -80,7 +80,8 @@ ParsedUniformPath UniformPathHandler::parseUniformPath(
 
 std::optional<ApiValue> UniformPathHandler::set(
     const std::vector<std::string>& parts,
-    const ApiValue& value) {
+    const ApiValue& value,
+    bool block) {
   auto locked = uniformState.lock();
   if (!locked || parts.size() < 2) {
     return std::nullopt;
@@ -95,10 +96,10 @@ std::optional<ApiValue> UniformPathHandler::set(
   std::optional<ApiValue> result;
 
   if (u.shaderName) {
-    result = locked->setUniform(*u.shaderName, u.internalPath, val);
+    result = locked->setUniform(*u.shaderName, u.internalPath, val, block);
   } else {
     for (const auto& shader : shaderNames) {
-      result = locked->setUniform(shader, u.internalPath, val);
+      result = locked->setUniform(shader, u.internalPath, val, block);
     }
   }
 

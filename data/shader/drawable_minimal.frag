@@ -14,6 +14,7 @@ out vec4 FragColor;
 
 void main() {
     vec3 _ = viewPos;
+   
     // Normalize interpolated normal
     vec3 normal = normalize(fs_in.Normal);
     

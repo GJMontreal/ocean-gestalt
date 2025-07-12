@@ -1,9 +1,6 @@
-// The analytic surface normals were derived from the parametric Gerstner wave model as described by Tessendorf (2001) and implemented in GPU-based systems (Finch, 2004). These are obtained by taking partial derivatives of the wave function with respect to horizontal coordinates and computing their cross product.
 /*
 Tessendorf, J. (2001). Simulating Ocean Water. In ACM SIGGRAPH Course Notes.
-
 Finch, M. (2004). Simulating Ocean Water. In GPU Gems (Chapter 1). NVIDIA Corporation.
-
 */
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
@@ -39,7 +36,7 @@ struct NormalMapping{
 
 uniform NormalMapping normalMapping;
 
-uniform int showMesh = 1;
+uniform int showMesh;
 
 struct WAVE{  
   vec3 direction;
@@ -147,8 +144,6 @@ vec3 calcNormal(vec3 originalPosition,
 
 void main(void)
 {   
-    mat4 _ = model; //for consistency
-    // vec2 windDirection = normalize(gust.direction.xy);
     vec2 gustUV = calcUV(position, normalize(gust.direction.xy), vec2(-60), gust.speed, gust.scale, time);
     vec2 normalUV = calcUV(position, normalize(normalMapping.direction.xy), vec2(-60), normalMapping.speed, normalMapping.scale, time);
 
@@ -160,7 +155,7 @@ void main(void)
 
     vec3 normalFD = calcNormal(position, newPosition, gustUV, NORMAL_OFFSET, tangent, bitangent);
 
-    vec4 projectedPosition = projection * view * vec4(newPosition, 1.0);
+    vec4 projectedPosition = projection * view * model * vec4(newPosition, 1.0);
     vec4 offscreen = vec4(2.0, 2.0, 2.0, 1.0);
     vec4 finalPosition = mix(offscreen, projectedPosition, float(showMesh));
 

@@ -179,10 +179,6 @@ void Application::loop() {
   cout << "[INFO] : loop" << endl;
 }
 
-void Application::setUIDelegate() {
-  cout << "[INFO] : setUIDelegate" << endl;
-}
-
 int Application::getWidth() const {
   return width;
 }

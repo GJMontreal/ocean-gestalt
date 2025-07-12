@@ -95,12 +95,12 @@ class Application: public InputProcessor {
 
   std::string title;
 
+  // I think our context will retain these
   std::shared_ptr<Camera> camera;
   std::shared_ptr<Light> light;
 
   virtual void loop();
   virtual void runOnce();
-  virtual void setUIDelegate();
   
   void processInput(GLFWwindow *window, float deltaTime) override;
 };

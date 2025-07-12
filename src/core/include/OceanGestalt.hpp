@@ -49,7 +49,6 @@ class OceanGestalt : public OceanGestaltInterface,
   void pauseSimulation(bool) override;
 
  protected:
-  void setUIDelegate() override;
   void loop() override;
   void processInput(GLFWwindow *window, float deltaTime) override;
   void runOnce() override;
@@ -79,7 +78,7 @@ class OceanGestalt : public OceanGestaltInterface,
   double lastTime;
   bool isRunning = true;
 
-  bool floatingCamera = false;
+  bool floatingCamera = true;
   FPSCounter fps;
 
   void toggleNormalDisplay();
@@ -94,7 +93,8 @@ class OceanGestalt : public OceanGestaltInterface,
 
   void initUniformBuffers();
   void setUniformBuffers(mat4& projection, mat4& view) const;
-
+  void loadUniforms();
+  
   std::vector<std::function<void()>> onReadyCallbacks;
   std::vector<std::function<void()>> renderThreadCallbacks;
 

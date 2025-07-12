@@ -47,15 +47,11 @@ void Model::drawWireframe(Uniforms& uniforms) {
   for (Mesh mesh : meshes) {
     auto shader = configuration->getShader("wireframe_shader");
     auto _guard = ShaderScope(shader);
-       glCheckError(__FILE__, __LINE__);
     shader->setUniform("time", uniforms.time);
-        glCheckError(__FILE__, __LINE__);
     shader->setUniform("model", getTransform());
-        glCheckError(__FILE__, __LINE__);
-
+      
 #ifdef __EMSCRIPTEN__
-    shader->setUniform("projection",
-                                               uniforms.projection);
+    shader->setUniform("projection", uniforms.projection);
     shader->setUniform("view", uniforms.view);
 #endif
 
@@ -74,10 +70,8 @@ void Model::drawMesh(Uniforms& uniforms, glm::mat4 _) {
     shader->setUniform("time", uniforms.time);
 
     shader->setUniform("model", this->getTransform());
-    shader->setUniform("lightPos",
-                                          configuration->light->getPosition());
-    shader->setUniform("viewPos",
-                                          configuration->camera->getPosition()); //this will be wrong if the camera is moving up and down with the waves
+    shader->setUniform("lightPos",configuration->light->getPosition());
+    shader->setUniform("viewPos",configuration->camera->getPosition()); //this will be wrong if the camera is moving up and down with the waves
 
 #ifdef __EMSCRIPTEN__
     shader->setUniform("projection", uniforms.projection);

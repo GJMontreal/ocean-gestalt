@@ -20,6 +20,7 @@
     "mesh_shader.showEnv": 0,
     "mesh_shader.showNormalMap": 0,
     "mesh_shader.showUVs": 0,
+    "showMesh": 1,
     "waves[0].amplitude": 0.0,
     "waves[0].direction": [
         -1.0,

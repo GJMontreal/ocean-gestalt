@@ -17,9 +17,12 @@ struct PendingUniformUpdate {
 class UniformState{
   public:
   UniformState(AppContextInterface& context) : context(context){};
-  std::optional<ApiValue> setUniform(const std::string& shaderName,
-                                  const std::string& uniformName,
-                                  ApiValue value);
+
+  std::optional<ApiValue> setUniform(
+      const std::string& shaderName,
+      const std::string& uniformName,
+      ApiValue value,
+      bool block = false);
 
   std::optional<ApiValue> getUniform(const std::string& shaderName,
                                      const std::string& uniformName);

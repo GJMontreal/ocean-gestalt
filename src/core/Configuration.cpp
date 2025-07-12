@@ -7,12 +7,15 @@
 #include "UniformValue.hpp"
 #include "Utilities.hpp"
 #include "TextRenderer.hpp"
-
 #include <memory>
 #include <fstream>
 #include <iostream>
 #include <thread>
 #include <future>
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 using nlohmann::json;
 using std::cout;
@@ -125,6 +128,7 @@ shared_ptr<ShaderProgram> Configuration::buildShader(json& j,
     program =
         make_shared<ShaderProgram>(ShaderProgram(name,{vertexShader, fragmentShader}));
   }
+
   GLuint unit = 0;
   // any textures 
   if (shaderJSON.contains(TEXTURE_KEY)){
@@ -241,11 +245,22 @@ void dispatch_async(F&& task) {
   std::thread(std::forward<F>(task)).detach();  //fire and forget
 }
 
+
+// TODO: this looks like a duplication of code in app with the exception of the file names
 void Configuration::setInitialUniformState(const ApiAdapter& api){
-    dispatch_async([this, &api] {
+#ifndef __EMSCRIPTEN__
+  dispatch_async([this, &api] {
+      std::cout << "Loading uniforms" << std::endl;
       this->loadUniforms(CONFIGURATION_DIR "uniforms_min.json");
-      // this->setInitialWaveUniforms(api);
     });
+#else
+    auto* that = this;
+  emscripten_async_call([](void* arg) {
+    auto* self = static_cast<Configuration*>(arg);
+    std::cout << "Loading uniforms" << std::endl;
+    self->loadUniforms(CONFIGURATION_DIR "uniforms.json");
+  }, that, 0);  // delay = 0 ms
+#endif
 }
 
 void Configuration::setInitialWaveUniforms(const ApiAdapter& api)const{

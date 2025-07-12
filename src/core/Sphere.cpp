@@ -10,7 +10,8 @@
 
 Sphere::Sphere(glm::vec3 origin, glm::vec4 color, std::shared_ptr<Configuration> context, float radius):
 Drawable(origin, context), color(color) {
-  generateSphereMesh(vertices, indices, radius);
+  generateSphereMesh(vertices, indices, 1.0);
+  this->setScale(glm::vec3(radius));
   bindVertices();
 }
 
@@ -124,8 +125,7 @@ void Sphere::drawMesh(Uniforms& uniforms, mat4 transform) {
   auto _guard = ShaderScope(shader);
 
   shader->setUniform("model", transform * this->getTransform());
-  shader->setUniform("viewPos",
-  this->getContext()->camera->getPosition());
+  // shader->setUniform("viewPos", this->getContext()->camera->getPosition());
   shader->setUniform("lightPos",this->getContext()->light->getPosition());
 
 #ifdef __EMSCRIPTEN__

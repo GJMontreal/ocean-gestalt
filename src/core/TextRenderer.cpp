@@ -122,6 +122,7 @@ bool TextRenderer::loadFont(const std::string& fontPath, int fontSize) {
 
 void TextRenderer::setShader(std::shared_ptr<ShaderProgram> shader) {
   this->shader = shader;
+  assert(shader);
   auto _guard = ShaderScope(shader);
   glGenTextures(1, &atlasTex);
   glActiveTexture(GL_TEXTURE0);

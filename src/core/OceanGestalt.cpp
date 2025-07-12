@@ -24,6 +24,10 @@
 #include <memory>
 #include <nlohmann/json.hpp>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 using std::cout;
 using std::endl;
 
@@ -37,10 +41,10 @@ OceanGestalt::OceanGestalt() : Application() {
   this->camera->getMoveable().movementSpeed = 10.f;
   moveables.push_back(this->camera);
 
-  HeightMapGenerator generator(512, 512);       // create a 512×512 heightmap
-  generator.generateFBM(20.0f, 20);                 // generate using FBM noise, scale = 20
-  generator.writeToFile(TEXTURE_DIR "fbm_heightmap.png");   // save as grayscale PNG
-  generator.writeNormalMapToFile(TEXTURE_DIR "fbm_normalmap.png");
+  // HeightMapGenerator generator(512, 512);       // create a 512×512 heightmap
+  // generator.generateFBM(20.0f, 20);                 // generate using FBM noise, scale = 20
+  // generator.writeToFile(TEXTURE_DIR "fbm_heightmap.png");   // save as grayscale PNG
+  // generator.writeNormalMapToFile(TEXTURE_DIR "fbm_normalmap.png");
  
   //It's important that the skybox is always rendered first
   auto skybox = std::make_shared<Skybox>(config);
@@ -53,21 +57,26 @@ OceanGestalt::OceanGestalt() : Application() {
   auto lightDrawable = this->light->getDrawable();
 
   auto drawableMeshShader = config->getShader("drawable_mesh");
+#ifndef __EMSCRIPTEN__
   auto drawableNormalShader = config->getShader("drawable_normal");
-  
+#endif
   lightDrawable->setShader(drawableMeshShader);
+#ifndef __EMSCRIPTEN__
   lightDrawable->setNormalShader(drawableNormalShader);
+#endif
   drawables.push_back(this->light->getDrawable());
 
   configuration = config;
   auto ocean = std::make_shared<Ocean>(config);
-  models.push_back(ocean.get()); // yeah, we don't want this
+  models.push_back(ocean.get()); // yeah, we don't want this ?
   drawables.push_back(ocean);
-
+  std::cout << "creating buoy" << std::endl;
   auto buoy = std::make_shared<Buoy>(glm::vec3(5.0f,0.f,5.0f),config);
   auto buoyDrawable = buoy->getDrawable();
   buoyDrawable->setShader(config->getShader("buoy_mesh"));
+#ifndef __EMSCRIPTEN__
   buoyDrawable->setNormalShader(drawableNormalShader);
+#endif
   drawables.push_back(buoyDrawable);
   moveables.push_back(buoy);
 
@@ -79,12 +88,12 @@ OceanGestalt::OceanGestalt() : Application() {
   initUniformBuffers();
 #endif
   
-  auto textRenderer = std::make_shared<TextRenderer>(FONT_DIR 
-  "FiraCode-Regular.ttf", 90);
-  config->textRenderer = textRenderer;
-  textRenderer->setShader(config->getShaders()["text"]);
-  textRenderer->setScreenHeight(static_cast<float>(getHeight()));
-  textRenderer->setProjection(glm::ortho(0.0f, static_cast<float>(getWidth()),0.0f,static_cast<float>(getHeight()) ));
+  // auto textRenderer = std::make_shared<TextRenderer>(FONT_DIR 
+  // "FiraCode-Regular.ttf", 90);
+  // config->textRenderer = textRenderer;
+  // textRenderer->setShader(config->getShaders()["text"]);
+  // textRenderer->setScreenHeight(static_cast<float>(getHeight()));
+  // textRenderer->setProjection(glm::ortho(0.0f, static_cast<float>(getWidth()),0.0f,static_cast<float>(getHeight()) ));
   // surfAudio = std::make_shared<SurfAudio>();
   // doOnReady([&]{surfAudio->start();});
 
@@ -94,10 +103,6 @@ OceanGestalt::OceanGestalt() : Application() {
 #ifdef DEBUG_GL
   glDumpTextureBindings();
 #endif
-}
-
-void OceanGestalt::setUIDelegate() {
-  waveUI->updatable = weak_from_this();
 }
 
 void OceanGestalt::runOnce(){
@@ -157,9 +162,9 @@ void OceanGestalt::loop() {
     drawable->draw(uniforms);
   }
 
-configuration->textRenderer->drawBegin();
-configuration->textRenderer->drawText(fps.getFPSString(), {10.0f, 10.0f, 0.0f}, {1.f, 0.f, 0.f, 1.f}, 100.0f);
-configuration->textRenderer->render();
+// configuration->textRenderer->drawBegin();
+// configuration->textRenderer->drawText(fps.getFPSString(), {10.0f, 10.0f, 0.0f}, {1.f, 0.f, 0.f, 1.f}, 100.0f);
+// configuration->textRenderer->render();
 }
 
 void OceanGestalt::initUniformBuffers() {
@@ -193,13 +198,6 @@ void OceanGestalt::toggleNormalDisplay() {
 void OceanGestalt::toggleSimulation() {
   std::cout << "Toggle simulation" << std::endl;
   isRunning = !isRunning;
-
-  // TODO: why are we doing this following?
-  auto shader = configuration->getShader("wireframe_shader");
-  auto _guard = ShaderScope(shader);
-  shader->activate();
-  auto color = glm::vec4(0.5,0.5,0.5,1.0);
-  shader->setUniform("lineColor",color);
 }
 
 void OceanGestalt::toggleWireframe() {
@@ -230,6 +228,21 @@ void OceanGestalt::toggleDrawLines() {
   }
 }
 
+void OceanGestalt::loadUniforms() {
+#ifndef __EMSCRIPTEN__
+    std::thread([this] {
+      configuration->loadUniforms(CONFIGURATION_DIR "uniforms.json");
+    }).detach();
+#else
+    auto* that = this;
+  emscripten_async_call([](void* arg) {
+    auto* self = static_cast<OceanGestalt*>(arg);
+    std::cout << "Loading uniforms" << std::endl;
+    self->configuration->loadUniforms(CONFIGURATION_DIR "uniforms.json");
+  }, that, 0);  // delay = 0 ms
+#endif
+}
+
 void OceanGestalt::dumpUniforms() {
   configuration->dumpUniforms(CONFIGURATION_DIR "/uniforms.json");
 }
@@ -256,9 +269,7 @@ void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
     (*currentMoveable)->getMoveable().ProcessKeyboard(Movement::DOWN, deltaTime);
 
   executeIfPressed(window, GLFW_KEY_G, [this]() {
-    std::thread([this] {
-      configuration->loadUniforms(CONFIGURATION_DIR "uniforms.json");
-    }).detach();
+    this->loadUniforms();
   });
 
   executeIfPressed(window, GLFW_KEY_C, [this]() {

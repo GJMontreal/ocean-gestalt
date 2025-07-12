@@ -22,28 +22,18 @@
     },
     "mesh_shader": {
         "vertex": "gerstner.vert",
-        "fragment": "shader.frag",
+        "fragment": "water.frag",
          "texture":{
           "gustNoise":"gust_noise_512.png",
           "normalMap":"fbm_normalmap.png"
         },"cubemap" :{
           "envMap":"skybox"
         },
+        
         "color": {
             "r": 0.10,
             "g": 0.2,
             "b": 0.25,
-            "a": 1
-        }
-    },
-    "drawable_normal": {
-        "vertex": "drawable.vert",
-        "geometry": "drawable_normal.gs",
-        "fragment": "drawable.frag",
-        "color": {
-            "r": 0,
-            "g": 1,
-            "b": 1,
             "a": 1
         }
     },
@@ -59,17 +49,10 @@
     },
     "buoy_mesh":{
         "vertex": "drawable.vert",
-        "fragment": "drawable_minimal.frag"
+        "fragment": "drawable.frag"
     },
-    "text":{
+        "text":{
         "vertex": "text.vert",
         "fragment": "text.frag"
-    },
-    "skybox":{
-      "vertex":"skybox.vert",
-      "fragment":"skybox.frag",
-      "cubemap" :{
-          "envMap":"skybox"
-        }
     }
 }

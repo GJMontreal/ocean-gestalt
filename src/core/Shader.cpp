@@ -116,6 +116,11 @@ const std::string& ShaderProgram::getName() {
 }
 
 void ShaderProgram::link() {
+  #ifdef __EMSCRIPTEN__
+  glBindAttribLocation(handle, 0, "Position");
+  glBindAttribLocation(handle, 1, "Normal");
+  glBindAttribLocation(handle, 2, "Color");
+  #endif
   glLinkProgram(handle);
   GLint result;
   glGetProgramiv(handle, GL_LINK_STATUS, &result);
@@ -338,12 +343,13 @@ GLuint ShaderProgram::loadTexture(const std::string& path, const std::string& un
 
     int width, height, channels;
     stbi_set_flip_vertically_on_load(true);
-    unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 1);
+    unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 3);
     if (!data) {
         throw std::runtime_error("Failed to load texture: " + path);
     }
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glCheckError(__FILE__, __LINE__);
     glGenerateMipmap(GL_TEXTURE_2D);
     glCheckError(__FILE__, __LINE__);
     stbi_image_free(data);
@@ -373,8 +379,10 @@ GLuint ShaderProgram::loadCubemap(const std::string& path, const std::string& un
                 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
             );
 #ifdef DEBUG_GL
+#ifndef __EMSCRIPTEN__
             glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_TEXTURE_WIDTH, &width);
             std::cout << "Face " << i << ": width = " << width << "\n";
+#endif
 #endif
             stbi_image_free(data);
         } else {

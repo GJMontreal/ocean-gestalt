@@ -6,31 +6,32 @@
 
 static const int TIMEOUT = 50;
 
-
 std::optional<ApiValue> UniformState::setUniform(
     const std::string& shaderName,
     const std::string& uniformName,
-    ApiValue value) {
-  
+    ApiValue value,
+    bool block) {
   UniformValue uniformValue = apiToUniform(value);
-  PendingUniformUpdate update{shaderName,uniformName, uniformValue};
-  
-  auto fut = update.ack.get_future();
 
+  PendingUniformUpdate update{shaderName, uniformName, uniformValue};
+
+  std::optional<std::future<bool>> fut;
+
+  if (block) {
+    fut.emplace(update.ack.get_future());
+  } 
   {
     std::lock_guard lock(updateMutex);
     pendingUpdatesFront[shaderName].push_back(std::move(update));
   }
-  
-  if(fut.wait_for(std::chrono::milliseconds(TIMEOUT)) == std::future_status::ready){
-    if(fut.get()){
-      return value;
-    }else{
-      return std::nullopt;
+
+  if (fut) {
+    if (fut->wait_for(std::chrono::milliseconds(TIMEOUT)) ==
+        std::future_status::ready) {
+          fut->get() ? std::optional<ApiValue>{value} : std::nullopt;
     }
-  } else {
-    return std::nullopt;
   }
+  return std::nullopt;
 }
 
 std::optional<ApiValue> UniformState::getUniform(const std::string& shader, const std::string& uniform) {
@@ -57,7 +58,10 @@ void UniformState::renderThreadCallback() {
 
     if(!shader){
       std::cerr << "No matching shader for: " << shaderName << std::endl;
-      return;
+      for (auto& u : updates) {
+          u.ack.set_value(false);  // indicate failure
+      }
+      continue;
     }
 
     // auto _guard = ShaderScope(shader); // TODO: make shader a ptr
@@ -72,10 +76,8 @@ void UniformState::renderThreadCallback() {
       if(dispatcher.success){
 #endif
         uniformStates[u.shader + "." + u.uniform] = u.value;
-        u.ack.set_value(true);
-      }else{
-        u.ack.set_value(false);
       }
+          u.ack.set_value(dispatcher.success);
     }
     shader->deactivate();
   }

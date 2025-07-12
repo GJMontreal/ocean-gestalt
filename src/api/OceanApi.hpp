@@ -17,7 +17,7 @@ public:
   void pauseSimulation(bool pause) override;
   void updateSimulation(std::string path, std::string value) override;
   
-  std::optional<ApiValue> setValue(const std::string& path, const ApiValue& value) const override;
+  std::optional<ApiValue> setValue(const std::string& path, const ApiValue& value, bool block = false) const override;
   std::optional<ApiValue> getValue(const std::string& path) const override;
   
   //we're going to deprecate the following
