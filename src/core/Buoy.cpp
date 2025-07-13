@@ -8,6 +8,9 @@
 
 #include <glm/gtc/quaternion.hpp>
 
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/vector_angle.hpp>
+
 Buoy::Buoy(glm::vec3 origin, std::shared_ptr<Configuration> context) : context(context){
 
   sphere = std::make_shared<Sphere>(origin, glm::vec4(0.85f,0.31f,0.f,1.f), context,2.0f);
@@ -26,17 +29,19 @@ Buoy::Buoy(glm::vec3 origin, std::shared_ptr<Configuration> context) : context(c
      auto displacement = evaluateGerstnerWaves(this->getContext()->getWaves(), positionXZ, time);
     
     //calculate the normal and use this to drive a rotation
-    auto dx = evaluateGerstnerWaves(this->getContext()->getWaves(), positionXZ + glm::vec2(0.01f,0.0f), time);
-    auto dz = evaluateGerstnerWaves(this->getContext()->getWaves(), positionXZ + glm::vec2(0.0f,0.01f), time);
-   
+    auto dx = evaluateGerstnerWaves(this->getContext()->getWaves(), positionXZ + glm::vec2(0.1f,0.0f), time);
+    auto dz = evaluateGerstnerWaves(this->getContext()->getWaves(), positionXZ + glm::vec2(0.0f,0.1f), time);
+  
     auto tangentX = dx - displacement;
     auto tangentZ = dz - displacement;
-    auto up = glm::normalize((glm::cross(tangentZ, tangentX))); //this might need to be flipped
+    auto normal = glm::cross(tangentX, tangentZ);
     
-    glm::vec3 right   = glm::normalize(tangentX);
-    glm::vec3 forward = glm::normalize(glm::cross(up, right));
-    glm::mat3 rotation(right, up, forward);
+    glm::vec3 prevUp = lastRotation * glm::vec3(0, 1, 0);  // what "up" was last frame
+    glm::vec3 newUp  = normal;                      // your computed surface normal
 
+    glm::quat rAlign = glm::rotation(prevUp, newUp);       // minimal rotation to match normal
+    glm::quat rotation = glm::normalize(rAlign * lastRotation);
+    lastRotation = rotation;
     return {displacement, rotation, glm::vec3(1.0f)};
   };
 }

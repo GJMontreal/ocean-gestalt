@@ -132,7 +132,11 @@ void Sphere::drawMesh(Uniforms& uniforms, Transform transform) {
   auto _guard = ShaderScope(shader);
  
   //why are the moveable and drawables position different?
-  auto model =glm::translate(glm::mat4(1.0f), this->getPosition() + transform.displacement ) ; 
+  auto model = glm::translate(glm::mat4(1.0f),
+                              this->getPosition() + transform.displacement);
+
+  model = model * glm::mat4_cast(transform.rotation);
+  model = model * glm::scale(glm::mat4(1.0f), this->getScale());
   shader->setUniform("model",  model);
   shader->setUniform("viewPos", this->getContext()->camera->getPosition());
   shader->setUniform("lightPos",this->getContext()->light->getPosition());
@@ -153,9 +157,9 @@ void Sphere::drawMesh(Uniforms& uniforms, Transform transform) {
 void Sphere::drawNormals(Uniforms& uniforms, Transform transform) {
   auto _guard = ShaderScope(normalShader);
   
-    auto model =  glm::translate(glm::mat4(1.0f), this->getMoveable().position) * glm::mat4_cast(transform.rotation); 
+  
 
-  shader->setUniform("model", model);
+  // shader->setUniform("model", model);
   glBindVertexArray(VAO);
   glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0);
 

@@ -38,7 +38,7 @@ Configuration::Configuration(const string& environment,
   loadLight(environment);
   loadMesh(environment);
   loadShaders(shader);
-  loadGenerator(generator);
+  // loadGenerator(generator);
   loadAPISettings(api);
 }
 

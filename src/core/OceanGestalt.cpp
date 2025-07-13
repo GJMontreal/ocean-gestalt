@@ -3,7 +3,6 @@
 #include "Configuration.hpp"
 #include "Ocean.hpp"
 #include "Uniforms.hpp"
-#include "WaveGenerator.hpp"
 #include "asset.hpp"
 #include "glError.hpp"
 #include "Buoy.hpp"

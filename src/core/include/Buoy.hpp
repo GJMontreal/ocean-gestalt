@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Moveable.hpp"
+#include <glm/gtc/quaternion.hpp>
 
 class Configuration;
 class Sphere;
@@ -21,6 +22,8 @@ class Buoy: public MoveableBase<Buoy> {
     private:
     friend MoveableBase<Buoy>;
     Moveable moveable;
+    
+    glm::quat lastRotation;
 
     std::shared_ptr<Sphere> sphere;
     std::weak_ptr<Configuration> context;

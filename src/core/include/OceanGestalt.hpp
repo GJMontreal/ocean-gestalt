@@ -24,9 +24,6 @@
 #include "SurfAudio.hpp"
 
 #include "FPSCounter.hpp"
-#include "FrameLimiter.hpp"
-
-#include <iterator>
 
 using std::unique_ptr;
 using std::string;
