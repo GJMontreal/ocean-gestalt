@@ -23,17 +23,17 @@ void Model::draw(Uniforms& uniforms) {
 
 #ifndef __EMSCRIPTEN__
     if (shouldDrawNormals) {
-      drawNormals(uniforms,glm::mat4(1.f));
+      drawNormals(uniforms,Transform());
     }
 #endif
 
     if (shouldDrawMesh) {
-      drawMesh(uniforms,glm::mat4(1.f));
+      drawMesh(uniforms, Transform());
     }
   }
 }
 
-void Model::drawNormals(Uniforms& uniforms, glm::mat4 _) {
+void Model::drawNormals(Uniforms& uniforms, Transform _) {
   for (Mesh mesh : meshes) {
     auto shader = configuration->getShader("normal_shader");
     auto _guard = ShaderScope(shader);
@@ -62,7 +62,7 @@ void Model::drawWireframe(Uniforms& uniforms) {
   }
 }
 
-void Model::drawMesh(Uniforms& uniforms, glm::mat4 _) {
+void Model::drawMesh(Uniforms& uniforms, Transform _) {
   for (Mesh mesh : meshes) {
     auto shader = configuration->getShader("mesh_shader");
     auto _guard = ShaderScope(shader);

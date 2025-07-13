@@ -110,7 +110,7 @@ void Sphere::draw(Uniforms& uniforms) {
     return;
   }
   
-  auto transform = glm::mat4(1.f);
+  Transform transform;
   if(preDraw){
     transform = preDraw(*this, uniforms.time);
   }
@@ -125,16 +125,15 @@ void Sphere::draw(Uniforms& uniforms) {
   }
   #endif
 
-  if(postDraw){
-    postDraw(*this);
-  }
 }
 
-void Sphere::drawMesh(Uniforms& uniforms, mat4 transform) {
+void Sphere::drawMesh(Uniforms& uniforms, Transform transform) {
   assert(shader); // ensure we have assigned a shader
   auto _guard = ShaderScope(shader);
-
-  shader->setUniform("model",  transform * this->getTransform());
+ 
+  //why are the moveable and drawables position different?
+  auto model =glm::translate(glm::mat4(1.0f), this->getPosition() + transform.displacement ) ; 
+  shader->setUniform("model",  model);
   shader->setUniform("viewPos", this->getContext()->camera->getPosition());
   shader->setUniform("lightPos",this->getContext()->light->getPosition());
 
@@ -151,10 +150,12 @@ void Sphere::drawMesh(Uniforms& uniforms, mat4 transform) {
 #endif  
 }
 
-void Sphere::drawNormals(Uniforms& uniforms, mat4 transform) {
+void Sphere::drawNormals(Uniforms& uniforms, Transform transform) {
   auto _guard = ShaderScope(normalShader);
   
-  shader->setUniform("model", this->getTransform() * transform);
+    auto model =  glm::translate(glm::mat4(1.0f), this->getMoveable().position) * glm::mat4_cast(transform.rotation); 
+
+  shader->setUniform("model", model);
   glBindVertexArray(VAO);
   glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0);
 

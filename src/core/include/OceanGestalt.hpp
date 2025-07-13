@@ -78,7 +78,7 @@ class OceanGestalt : public OceanGestaltInterface,
   double lastTime;
   bool isRunning = true;
 
-  bool floatingCamera = true;
+  bool floatingCamera = false;
   FPSCounter fps;
 
   void toggleNormalDisplay();

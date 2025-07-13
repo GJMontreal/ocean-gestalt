@@ -34,7 +34,6 @@ add_library(app-core STATIC
   Buoy.cpp
   GerstnerWave.cpp
   TextRenderer.cpp
-  LODSurface.cpp
   Skybox.cpp
   HeightMapGenerator.cpp
 )

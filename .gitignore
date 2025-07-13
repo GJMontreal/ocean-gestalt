@@ -1,6 +1,6 @@
 # Created by https://www.toptal.com/developers/gitignore/api/cmake,c++,c,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=cmake,c++,c,visualstudiocode
-
+junk/
 ### C ###
 # Prerequisites
 *.d

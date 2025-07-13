@@ -6,6 +6,8 @@
 #include "Sphere.hpp"
 #include "GerstnerWave.hpp"
 
+#include <glm/gtc/quaternion.hpp>
+
 Buoy::Buoy(glm::vec3 origin, std::shared_ptr<Configuration> context) : context(context){
 
   sphere = std::make_shared<Sphere>(origin, glm::vec4(0.85f,0.31f,0.f,1.f), context,2.0f);
@@ -19,10 +21,23 @@ Buoy::Buoy(glm::vec3 origin, std::shared_ptr<Configuration> context) : context(c
     return this->getContext()->camera->getMoveDirection(); //capturing context directly fails in here. It must be changing
   };
 
-  sphere->preDraw = [this](Drawable& drawable, float time)->glm::mat4{
-  auto offset = calcGerstnerDisplacement(this->getContext()->getWaves(), time);
-  auto transform = glm::translate(glm::mat4(1.f),offset);
-  return transform;
+  sphere->preDraw = [this](Drawable& drawable, float time)->Transform{
+     auto positionXZ = glm::vec2(getMoveable().position.x, getMoveable().position.z);
+     auto displacement = evaluateGerstnerWaves(this->getContext()->getWaves(), positionXZ, time);
+    
+    //calculate the normal and use this to drive a rotation
+    auto dx = evaluateGerstnerWaves(this->getContext()->getWaves(), positionXZ + glm::vec2(0.01f,0.0f), time);
+    auto dz = evaluateGerstnerWaves(this->getContext()->getWaves(), positionXZ + glm::vec2(0.0f,0.01f), time);
+   
+    auto tangentX = dx - displacement;
+    auto tangentZ = dz - displacement;
+    auto up = glm::normalize((glm::cross(tangentZ, tangentX))); //this might need to be flipped
+    
+    glm::vec3 right   = glm::normalize(tangentX);
+    glm::vec3 forward = glm::normalize(glm::cross(up, right));
+    glm::mat3 rotation(right, up, forward);
+
+    return {displacement, rotation, glm::vec3(1.0f)};
   };
 }
 

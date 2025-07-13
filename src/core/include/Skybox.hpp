@@ -6,7 +6,7 @@ class Skybox : public Drawable {
 
   Skybox(std::shared_ptr<Configuration> context);
   void draw(Uniforms& uniforms) override;
-  void drawNormals(Uniforms&, glm::mat4) override { /*do nothing*/ } ;
+  void drawNormals(Uniforms&, Transform) override { /*do nothing*/ } ;
   void activate() override;
   
  private:
@@ -16,7 +16,7 @@ class Skybox : public Drawable {
 
   unsigned int indexCount;
 
-  void drawMesh(Uniforms& uniforms, glm::mat4 transform) override;
+  void drawMesh(Uniforms& uniforms, Transform transform) override;
 
   void bindVertices();
 };

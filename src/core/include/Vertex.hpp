@@ -4,7 +4,7 @@
 
 #include <glm/glm.hpp>
 
-// TO DO:  Rename this type
+// We want to standardize what we're passing to the shaders as much as possible
 struct VertexType {
   glm::vec3 position;
   glm::vec3 normal;

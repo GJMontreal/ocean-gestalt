@@ -48,10 +48,10 @@ class Moveable {
   public:
     void ProcessKeyboard(Movement direction, float deltaTime);
     float movementSpeed = 5.0f;
-    void setPosition(glm::vec3 position) {
-      this->position = position;
+    void setPosition(glm::vec3 aPosition) {
+      this->position = aPosition;
       if (onPositionChanged) {
-        onPositionChanged(position);
+        onPositionChanged(aPosition);
       };
     };
     vec3 position;

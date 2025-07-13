@@ -22,8 +22,8 @@ class Sphere : public Drawable {
   };
 
  protected:
-  void drawNormals(Uniforms& uniforms, glm::mat4 transform) override;
-  void drawMesh(Uniforms& uniforms, glm::mat4 transform) override;
+  void drawNormals(Uniforms& uniforms, Transform transform) override;
+  void drawMesh(Uniforms& uniforms, Transform transform) override;
 
   void generateSphereMesh(std::vector<Vertex>& vertices,
                           std::vector<unsigned int>& indices,

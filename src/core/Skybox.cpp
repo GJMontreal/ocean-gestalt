@@ -69,11 +69,10 @@ void Skybox::draw(Uniforms& uniforms){
   if(!getIfShouldDraw()){
     return;
   }
-
-  drawMesh(uniforms, glm::mat4(1.0f));
+  Transform empty;
 }
 
-void Skybox::drawMesh(Uniforms& uniforms, glm::mat4 transform) {
+void Skybox::drawMesh(Uniforms& uniforms, Transform transform) {
   auto shader = getContext()->getShader("skybox");
   auto _guard = ShaderScope(shader);
 

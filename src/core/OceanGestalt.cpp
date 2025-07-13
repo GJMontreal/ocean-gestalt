@@ -1,7 +1,6 @@
 #include "OceanGestalt.hpp"
 
 #include "Configuration.hpp"
-#include "LODSurface.hpp"
 #include "Ocean.hpp"
 #include "Uniforms.hpp"
 #include "WaveGenerator.hpp"
