@@ -48,8 +48,14 @@
         }
     },
     "buoy_mesh":{
-        "vertex": "drawable.vert",
-        "fragment": "drawable.frag"
+        "vertex": "normal_bump.vert",
+        "fragment": "normal_bump.frag",
+        "texture":{
+          "normalMap":"metal_normal.png",
+          "bumpMap":"metal_bump.png",
+          "colorMap":"metal_color.png"
+        }
+        
     },
         "text":{
         "vertex": "text.vert",

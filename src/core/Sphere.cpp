@@ -17,7 +17,7 @@ Drawable(origin, context), color(color) {
 
 //Chat GPT generated!
 void Sphere::generateSphereMesh(
-    std::vector<glm::vec3>& vertices,
+    std::vector<Vertex>& vertices,
     std::vector<unsigned int>& indices,
     float radius,
     unsigned int sectorCount,
@@ -35,8 +35,18 @@ void Sphere::generateSphereMesh(
             float x = xy * cosf(sectorAngle);
             float y = xy * sinf(sectorAngle);
             glm::vec3 pos(x,y,z);
-            vertices.push_back(pos);
-            normals.push_back(glm::normalize(pos));
+            
+            // Texture coordinates from spherical projection
+            float u = (float)j / sectorCount;
+            float v = (float)i / stackCount;
+            glm::vec2 texCoord(u, 1.0f - v);  // flip V for OpenGL convention
+            
+            // Tangent vector (direction of increasing longitude)
+            glm::vec3 tangent = glm::normalize(glm::vec3(-y, x, 0.0f));  // ∂/∂longitude
+            if (std::abs(z / radius) > 0.999f)  // handle poles
+                tangent = glm::vec3(1.0f, 0.0f, 0.0f);
+
+            vertices.push_back({pos, texCoord, tangent});
         }
     }
 
@@ -58,10 +68,10 @@ void Sphere::generateSphereMesh(
 
 void Sphere::bindVertices(){
 
-std::vector<VertexType> vertexData;
-for (size_t i = 0; i < vertices.size(); ++i) {
-    vertexData.push_back({vertices[i], normals[i],this->color});
-}
+// std::vector<VertexType> vertexData;
+// for (size_t i = 0; i < vertices.size(); ++i) {
+//     vertexData.push_back({vertices[i], normals[i],this->color});
+// }
 
 // VAO
 glGenVertexArrays(1, &VAO);
@@ -70,8 +80,8 @@ glBindVertexArray(VAO);
 // VBO
 glGenBuffers(1, &VBO);
 glBindBuffer(GL_ARRAY_BUFFER, VBO);
-glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(VertexType),
-             vertexData.data(), GL_STATIC_DRAW);
+glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex),
+             vertices.data(), GL_STATIC_DRAW);
 
 // EBO
 glGenBuffers(1, &EBO);
@@ -80,16 +90,16 @@ glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
              indices.data(), GL_STATIC_DRAW);
 
 glEnableVertexAttribArray(0);
-glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexType),
-                      (void*)offsetof(VertexType, position));
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                      (void*)offsetof(Vertex, position));
 
-glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexType),
-                      (void*)offsetof(VertexType, normal));
+glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                      (void*)offsetof(Vertex, texCoord));
 glEnableVertexAttribArray(1);
 
 glEnableVertexAttribArray(2);
-glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(VertexType),
-                      (void*)offsetof(VertexType, color));
+glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                      (void*)offsetof(Vertex, tangent));
 
 glBindVertexArray(0);
 glCheckError(__FILE__, __LINE__);
@@ -124,8 +134,8 @@ void Sphere::drawMesh(Uniforms& uniforms, mat4 transform) {
   assert(shader); // ensure we have assigned a shader
   auto _guard = ShaderScope(shader);
 
-  shader->setUniform("model", transform * this->getTransform());
-  // shader->setUniform("viewPos", this->getContext()->camera->getPosition());
+  shader->setUniform("model",  transform * this->getTransform());
+  shader->setUniform("viewPos", this->getContext()->camera->getPosition());
   shader->setUniform("lightPos",this->getContext()->light->getPosition());
 
 #ifdef __EMSCRIPTEN__

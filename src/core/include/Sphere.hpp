@@ -4,6 +4,12 @@
 #include "Configuration.hpp"
 #include "Drawable.hpp"
 
+struct Vertex{
+  glm::vec3 position;
+  glm::vec2 texCoord;
+  glm::vec3 tangent;
+};
+
 class Sphere : public Drawable {
  public:
   explicit Sphere(vec3 position, vec4 color, std::shared_ptr<Configuration> context, float radius = 1.f);
@@ -19,7 +25,7 @@ class Sphere : public Drawable {
   void drawNormals(Uniforms& uniforms, glm::mat4 transform) override;
   void drawMesh(Uniforms& uniforms, glm::mat4 transform) override;
 
-  void generateSphereMesh(std::vector<glm::vec3>& vertices,
+  void generateSphereMesh(std::vector<Vertex>& vertices,
                           std::vector<unsigned int>& indices,
                           float radius = 1.0f,
                           unsigned int sectorCount = 36,
@@ -43,7 +49,7 @@ class Sphere : public Drawable {
   GLuint EBO;
   
   glm::vec4 color;
-  std::vector<glm::vec3> vertices;
+  std::vector<Vertex> vertices;
   std::vector<glm::vec3> normals;
   std::vector<unsigned int> indices;
 };
