@@ -2,9 +2,9 @@
 Tessendorf, J. (2001). Simulating Ocean Water. In ACM SIGGRAPH Course Notes.
 Finch, M. (2004). Simulating Ocean Water. In GPU Gems (Chapter 1). NVIDIA Corporation.
 */
-layout (location = 0) in vec3 position;
-layout (location = 1) in vec3 normal;
-layout (location = 2) in vec4 color;
+layout (location = 0) in vec3 aPosition;
+layout (location = 1) in vec2 aTexCoords;
+layout (location = 2) in vec3 aTangent;
 
 layout(std140) uniform Matrices
 {
@@ -37,6 +37,7 @@ struct NormalMapping{
 uniform NormalMapping normalMapping;
 
 uniform int showMesh;
+uniform vec4 baseColor;
 
 struct WAVE{  
   vec3 direction;
@@ -111,13 +112,13 @@ vec3 waveOffset(float time, vec3 aPosition, WAVE wave) {
 }
 
 
-vec3 calcNewPosition(vec3 aPosition){
+vec3 calcNewPosition(vec3 position){
   vec3 offset = vec3(0.0);
   for(int i=0; i < NUM_WAVES; i++){
-    vec3 newOffset = waveOffset(time, aPosition, waves[i] );
+    vec3 newOffset = waveOffset(time, position, waves[i] );
     offset += newOffset;
   }
-  offset = aPosition + offset;
+  offset = position + offset;
   return offset;
 }
 
@@ -144,16 +145,16 @@ vec3 calcNormal(vec3 originalPosition,
 
 void main(void)
 {   
-    vec2 gustUV = calcUV(position, normalize(gust.direction.xy), vec2(-60), gust.speed, gust.scale, time);
-    vec2 normalUV = calcUV(position, normalize(normalMapping.direction.xy), vec2(-60), normalMapping.speed, normalMapping.scale, time);
+    vec2 gustUV = calcUV(aPosition, normalize(gust.direction.xy), vec2(-60), gust.speed, gust.scale, time);
+    vec2 normalUV = calcUV(aPosition, normalize(normalMapping.direction.xy), vec2(-60), normalMapping.speed, normalMapping.scale, time);
 
-    vec3 newPosition = calcNewPosition(position);
+    vec3 newPosition = calcNewPosition(aPosition);
     float gust = gustDisplacement(gustUV);
     newPosition.y += gust;
     vec3 tangent;
     vec3 bitangent;
 
-    vec3 normalFD = calcNormal(position, newPosition, gustUV, NORMAL_OFFSET, tangent, bitangent);
+    vec3 normalFD = calcNormal(aPosition, newPosition, gustUV, NORMAL_OFFSET, tangent, bitangent);
 
     vec4 projectedPosition = projection * view * model * vec4(newPosition, 1.0);
     vec4 offscreen = vec4(2.0, 2.0, 2.0, 1.0);
@@ -163,7 +164,7 @@ void main(void)
    
     vs_out.FragPos = newPosition;
     vs_out.Normal = normalize(normalFD);
-    vs_out.Color = vec3(color);
+    vs_out.Color = baseColor.rgb;
     vs_out.Bitangent = bitangent;
     vs_out.Tangent = tangent;
     vs_out.FragUV = normalUV;

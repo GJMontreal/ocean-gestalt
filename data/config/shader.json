@@ -23,15 +23,15 @@
     "mesh_shader": {
         "vertex": "gerstner.vert",
         "fragment": "water.frag",
-         "texture":{
-          "gustNoise":"gust_noise_512.png",
-          "normalMap":"fbm_normalmap.png"
-        },"cubemap" :{
-          "envMap":"skybox"
+        "texture": {
+            "gustNoise": "gust_noise_512.png",
+            "normalMap": "fbm_normalmap.png"
         },
-        
+        "cubemap": {
+            "envMap": "skybox"
+        },
         "color": {
-            "r": 0.10,
+            "r": 0.1,
             "g": 0.2,
             "b": 0.25,
             "a": 1
@@ -47,17 +47,20 @@
             "a": 1
         }
     },
-    "buoy_mesh":{
+    "buoy_mesh": {
         "vertex": "normal_bump.vert",
         "fragment": "normal_bump.frag",
-        "texture":{
-          "normalMap":"metal_normal.png",
-          "bumpMap":"metal_bump.png",
-          "colorMap":"metal_color.png"
+        "texture": {
+            "normalMap": "metal_normal.png",
+            "bumpMap": "metal_bump.png",
+            "colorMap": "metal_color.png",
+            "roughnessMap": "metal_bump.png"
+        },
+        "cubemap": {
+            "envMap": "skybox"
         }
-        
     },
-        "text":{
+    "text": {
         "vertex": "text.vert",
         "fragment": "text.frag"
     }

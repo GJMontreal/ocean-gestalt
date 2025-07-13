@@ -34,8 +34,15 @@ set_property(TARGET ocean-gestalt PROPERTY CXX_STANDARD 17)
 add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
 
 if (EMSCRIPTEN)
-  target_link_libraries(ocean-gestalt PUBLIC "-s MIN_WEBGL_VERSION=2")
+  target_link_libraries(ocean-gestalt PUBLIC "-s USE_WEBGL2=1")
   target_link_libraries(ocean-gestalt PUBLIC "-s WASM=1")
+
+  target_link_libraries(ocean-gestalt PUBLIC "-s ASSERTIONS=1")
+ 
+  target_link_libraries(ocean-gestalt PUBLIC
+    "-s INITIAL_MEMORY=64MB"
+    "-s ALLOW_MEMORY_GROWTH=1"
+  )
 
   target_compile_options(ocean-gestalt PUBLIC "--use-port=contrib.glfw3")
   target_link_options(ocean-gestalt PUBLIC "--use-port=contrib.glfw3")

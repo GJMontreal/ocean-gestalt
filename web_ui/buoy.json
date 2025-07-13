@@ -7,28 +7,53 @@
         "buoy_mesh": {
             "_meta": {
                 "display": "Buoy"
-            },"ambientStrength": {
+            },
+            "specularFactor": {
                 "type": "float",
                 "min": 0,
                 "max": 1,
                 "_meta": {
-                    "display": "Ambient Strength",
+                    "display": "Reflection  Strength",
                     "control": "slider"
                 }
-              }
-              },
-          "wireframe_shader": {
+            },
+            "bumpFactor": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Bump  Strength",
+                    "control": "slider"
+                }
+            }
+        }
+        ,"mesh_shader": {
+            "_meta": {
+                "display": "Water"
+            },"baseColor": {
+                "type": "vec4",
+                "_meta": {
+                    "display": "Base Colour",
+                    "control": "color",
+                    "range": [
+                        0,
+                        1
+                    ]
+                }
+              }},
+               "wireframe_shader": {
             "_meta": {
                 "display": "Wireframe"
-            },"yOffset": {
-                "type": "float",
-                "min": -10,
-                "max": 10,
+            },"baseColor": {
+                "type": "vec4",
                 "_meta": {
-                    "display": "Vertical Offset",
-                    "control": "slider"
+                    "display": "Base Colour",
+                    "control": "color",
+                    "range": [
+                        0,
+                        1
+                    ]
                 }
-              }
-              }
-            }
-          }
+              }}
+    }
+}

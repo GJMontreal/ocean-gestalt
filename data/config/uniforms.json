@@ -1,5 +1,11 @@
 {
-    "mesh_shader.causticIntensity": 0.9359999895095825,
+    "mesh_shader.baseColor": [
+        0.0,
+        0.03999999910593033,
+        0.029999999329447746,
+        1.0
+    ],
+    "mesh_shader.causticIntensity": 0.3540000021457672,
     "mesh_shader.foamScale": 0.4009999930858612,
     "mesh_shader.foamScrollSpeed": 0.0010000000474974513,
     "mesh_shader.foamSlopeAmplifier": 72.68000030517578,

@@ -2,12 +2,9 @@
 Tessendorf, J. (2001). Simulating Ocean Water. In ACM SIGGRAPH Course Notes.
 Finch, M. (2004). Simulating Ocean Water. In GPU Gems (Chapter 1). NVIDIA Corporation.
 */
-in vec3 Position;
-in vec3 Normal;
-in vec4 Color;
-// layout (location = 0) in vec3 Position;
-// layout (location = 1) in vec3 Normal;
-// layout (location = 2) in vec4 Color;
+in vec3 aPosition;
+in vec2 aTexCoord;
+in vec3 aTangent;
 
 uniform mat4 projection;
 uniform mat4 view;
@@ -36,6 +33,7 @@ struct NormalMapping{
 uniform NormalMapping normalMapping;
 
 uniform int showMesh;
+uniform vec4 baseColor;
 
 struct WAVE{  
   vec3 direction;
@@ -143,16 +141,16 @@ void main(void)
 {   
     // mat4 _ = model; //for consistency though this is being optimized out on WebGL!
     // vec2 windDirection = normalize(gust.direction.xy);
-    vec2 gustUV = calcUV(Position, normalize(gust.direction.xy), vec2(-60), gust.speed, gust.scale, time);
-    vec2 normalUV = calcUV(Position, normalize(normalMapping.direction.xy), vec2(-60), normalMapping.speed, normalMapping.scale, time);
+    vec2 gustUV = calcUV(aPosition, normalize(gust.direction.xy), vec2(-60), gust.speed, gust.scale, time);
+    vec2 normalUV = calcUV(aPosition, normalize(normalMapping.direction.xy), vec2(-60), normalMapping.speed, normalMapping.scale, time);
 
-    vec3 newPosition = calcNewPosition(Position);
+    vec3 newPosition = calcNewPosition(aPosition);
     float gust = gustDisplacement(gustUV);
     newPosition.y += gust;
     vec3 tangent;
     vec3 bitangent;
 
-    vec3 normalFD = calcNormal(Position, newPosition, gustUV, NORMAL_OFFSET, tangent, bitangent);
+    vec3 normalFD = calcNormal(aPosition, newPosition, gustUV, NORMAL_OFFSET, tangent, bitangent);
 
     vec4 projectedPosition = projection * view * model * vec4(newPosition, 1.0);
     vec4 offscreen = vec4(2.0, 2.0, 2.0, 1.0);
@@ -162,7 +160,7 @@ void main(void)
    
     oFragPos = newPosition;
     oNormal = normalize(normalFD);
-    oColor = vec3(Color);
+    oColor = baseColor.rgb;
     oBitangent = bitangent;
     oTangent = tangent;
     oFragUV = normalUV;

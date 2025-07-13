@@ -3,13 +3,7 @@
 #include <glm/glm.hpp>
 #include "Configuration.hpp"
 #include "Drawable.hpp"
-
-struct Vertex{
-  glm::vec3 position;
-  glm::vec2 texCoord;
-  glm::vec3 tangent;
-};
-
+#include "Vertex.hpp"
 class Sphere : public Drawable {
  public:
   explicit Sphere(vec3 position, vec4 color, std::shared_ptr<Configuration> context, float radius = 1.f);
@@ -52,4 +46,6 @@ class Sphere : public Drawable {
   std::vector<Vertex> vertices;
   std::vector<glm::vec3> normals;
   std::vector<unsigned int> indices;
+
+  glm::mat4 getModelTransform(Transform transform);
 };
