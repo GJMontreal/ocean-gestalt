@@ -28,7 +28,7 @@ std::optional<ApiValue> UniformState::setUniform(
   if (fut) {
     if (fut->wait_for(std::chrono::milliseconds(TIMEOUT)) ==
         std::future_status::ready) {
-          fut->get() ? std::optional<ApiValue>{value} : std::nullopt;
+          return fut->get() ? std::optional<ApiValue>{value} : std::nullopt;
     }
   }
   return std::nullopt;

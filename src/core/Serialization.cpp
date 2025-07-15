@@ -1,17 +1,14 @@
 #include "Serialization.hpp"
 
 #include "Light.hpp"
-#include "ApiValue.hpp"
-
-#include <iostream>
 
 // Configuration
 void to_json(json& j, const Configuration& configuration) {
-  j = {   {"camera", *(configuration.camera.get())},
-           {"waves", configuration.waves},
-           {"light", configuration.light->getPosition()}};
+  j = {{"camera", *(configuration.camera.get())},
+       {"light", configuration.light->getPosition()}};
 
-  j["mesh"] = {{"size",configuration.meshSize},{"subdivisions",configuration.meshSubdivisions}};
+  j["mesh"] = {{"size", configuration.meshSize},
+               {"subdivisions", configuration.meshSubdivisions}};
 }
 
 void to_json(json& j, shared_ptr<Wave> p) {

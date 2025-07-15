@@ -24,7 +24,6 @@ Wave::Wave(const WaveSerialized& serialized) {
 }
 
 
-// I don't think this is used
 Wave::Wave(float anAmplitude, float aWavelength, float aHeading, float aSteepness){
   amplitude = anAmplitude;
   wavelength = aWavelength;
@@ -39,7 +38,7 @@ float Wave::getVelocity() const {
   return 2.0f * (float)M_PI / wavelength;
 }
 
-  void WaveInterface::setWaveParameters(std::vector<std::shared_ptr<Wave>> waves,
+void WaveInterface::setWaveParameters(std::vector<std::shared_ptr<Wave>> waves,
                                       const std::string& path,
                                       const ApiValue& value) {
 
@@ -85,6 +84,8 @@ float Wave::getVelocity() const {
         wave->setSteepness(std::get<float>(value));
     } else if (param == "direction") {
         wave->setDirection(glm::dvec2(std::get<glm::vec3>(val)));
+    } else if (param == "phase") {
+        wave->setPhase(std::get<float>(value));
     } else {
         std::cerr << "Unknown wave parameter: " << param << std::endl;
     }

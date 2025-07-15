@@ -19,11 +19,14 @@ class WaveSerialized {
   float wavelength = 0.0f;
   float steepness = 1.0f;
   float amplitude = 0.0f;
+  float phase = 0.0f;
 };
 
 class WaveInterface{
   public:
-  void setWaveParameters(std::vector<std::shared_ptr<Wave>> waves, const std::string& path, const ApiValue& value );
+   void setWaveParameters(std::vector<std::shared_ptr<Wave>> waves,
+                          const std::string& path,
+                          const ApiValue& value);
 };
 
 class Wave {
@@ -37,13 +40,14 @@ class Wave {
   void setDirection (glm::vec2 direction) { this->direction = direction;};
   void setWavelength(float wavelength) { this->wavelength = wavelength;};
   void setSteepness(float steepnesss) { this->steepness = steepnesss;};
+  void setPhase(float phase) { this->phase = phase;};
 
   vec2 direction = vec2(0.0f, 0.0f);
   float heading = 0.0f;
   float wavelength = 0.0f;
   float steepness = 1.0f;
   float amplitude = 0.0f;
-
+  float phase = 0.0f;
   float getVelocity() const;
 };
 

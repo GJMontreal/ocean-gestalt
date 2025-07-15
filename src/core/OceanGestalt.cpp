@@ -10,6 +10,7 @@
 #include "TextRenderer.hpp"
 #include "GerstnerWave.hpp"
 #include "HeightMapGenerator.hpp"
+#include "WaveGenerator.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -29,7 +30,16 @@
 using std::cout;
 using std::endl;
 
+  static const std::vector< std::pair<int, Movement>> movementKeys{
+    {GLFW_KEY_W, Movement::FORWARD},
+    {GLFW_KEY_S, Movement::BACKWARD},
+    {GLFW_KEY_A, Movement::LEFT},
+    {GLFW_KEY_D, Movement::RIGHT},
+    {GLFW_KEY_SPACE, Movement::UP},
+    {GLFW_KEY_LEFT_SHIFT, Movement::DOWN}
+  };
 
+  
 // our application should keep a reference to the OceanApi
 OceanGestalt::OceanGestalt() : Application() {
   auto config = std::make_shared<Configuration>(
@@ -38,16 +48,6 @@ OceanGestalt::OceanGestalt() : Application() {
   this->camera = config->camera;
   this->camera->getMoveable().movementSpeed = 10.f;
   moveables.push_back(this->camera);
-
-  // HeightMapGenerator generator(512, 512);       // create a 512×512 heightmap
-  // generator.generateFBM(20.0f, 20);                 // generate using FBM noise, scale = 20
-  // generator.writeToFile(TEXTURE_DIR "fbm_heightmap.png");   // save as grayscale PNG
-  // generator.writeNormalMapToFile(TEXTURE_DIR "fbm_normalmap.png");
- 
-  //It's important that the skybox is always rendered first
-  auto skybox = std::make_shared<Skybox>(config);
-  // skybox->setIfShouldDraw(true);
-  drawables.push_back(skybox);
 
   this->light = std::make_shared<Light>(config->lightPosition, config);
   config->light = light;
@@ -68,7 +68,7 @@ OceanGestalt::OceanGestalt() : Application() {
   auto ocean = std::make_shared<Ocean>(config);
   models.push_back(ocean.get()); // yeah, we don't want this ?
   drawables.push_back(ocean);
-  std::cout << "creating buoy" << std::endl;
+
   auto buoy = std::make_shared<Buoy>(glm::vec3(5.0f,0.f,5.0f),config);
   auto buoyDrawable = buoy->getDrawable();
   buoyDrawable->setShader(config->getShader("buoy_mesh"));
@@ -85,15 +85,6 @@ OceanGestalt::OceanGestalt() : Application() {
 #ifndef __EMSCRIPTEN__
   initUniformBuffers();
 #endif
-  
-  // auto textRenderer = std::make_shared<TextRenderer>(FONT_DIR 
-  // "FiraCode-Regular.ttf", 90);
-  // config->textRenderer = textRenderer;
-  // textRenderer->setShader(config->getShaders()["text"]);
-  // textRenderer->setScreenHeight(static_cast<float>(getHeight()));
-  // textRenderer->setProjection(glm::ortho(0.0f, static_cast<float>(getWidth()),0.0f,static_cast<float>(getHeight()) ));
-  // surfAudio = std::make_shared<SurfAudio>();
-  // doOnReady([&]{surfAudio->start();});
 
   // onRender([&]{surfAudio->setFoamLevel(float foam);});
   currentMoveable = moveables.begin(); //we should have selectable, which could be drawable moveable one or the other or both
@@ -160,9 +151,6 @@ void OceanGestalt::loop() {
     drawable->draw(uniforms);
   }
 
-// configuration->textRenderer->drawBegin();
-// configuration->textRenderer->drawText(fps.getFPSString(), {10.0f, 10.0f, 0.0f}, {1.f, 0.f, 0.f, 1.f}, 100.0f);
-// configuration->textRenderer->render();
 }
 
 void OceanGestalt::initUniformBuffers() {
@@ -241,6 +229,15 @@ void OceanGestalt::loadUniforms() {
 #endif
 }
 
+void OceanGestalt::generateUniforms() {
+#ifndef __EMSCRIPTEN__
+   auto api = this->configuration->getApi();
+    glm::vec2 dir{ randf(-1.0f,1.0f),randf(-1.0f,1.0f)};
+    Wind wind{dir,randf(0.1f,100.f)};
+    WaveGenerator(configuration->waves.size(), wind, api);
+#endif
+}
+
 void OceanGestalt::dumpUniforms() {
   configuration->dumpUniforms(CONFIGURATION_DIR "/uniforms.json");
 }
@@ -249,68 +246,41 @@ void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
 
-  // TODO:
-  // moveable->processInput(window, deltaTime);
-
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    (*currentMoveable)->getMoveable().ProcessKeyboard(Movement::FORWARD, deltaTime);
-  }
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    (*currentMoveable)->getMoveable().ProcessKeyboard(Movement::BACKWARD, deltaTime);
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    (*currentMoveable)->getMoveable().ProcessKeyboard(Movement::LEFT, deltaTime);
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    (*currentMoveable)->getMoveable().ProcessKeyboard(Movement::RIGHT, deltaTime);
-  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-    (*currentMoveable)->getMoveable().ProcessKeyboard(Movement::UP, deltaTime);
-  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-    (*currentMoveable)->getMoveable().ProcessKeyboard(Movement::DOWN, deltaTime);
-
-  executeIfPressed(window, GLFW_KEY_G, [this]() {
-    this->loadUniforms();
-  });
-
-  executeIfPressed(window, GLFW_KEY_C, [this]() {
-    (*currentMoveable)->deactivate();
-    ++currentMoveable;
-    if(currentMoveable == moveables.end()){
-      currentMoveable = moveables.begin();
+  auto& moveable = (*currentMoveable)->getMoveable();
+  for (auto& [key, direction] : movementKeys) {
+    if (glfwGetKey(window, key) == GLFW_PRESS) {
+      moveable.ProcessKeyboard( direction, deltaTime);
     }
-    (*currentMoveable)->activate();
-    // cout << "activating " << (*currentMoveable)->getName() << std::endl;
-  });
+  }
 
-  executeIfPressed(window, GLFW_KEY_N, [this]() { toggleNormalDisplay(); });
-
-  executeIfPressed(window, GLFW_KEY_P, [this]() { toggleSimulation(); });
-
-  executeIfPressed(window, GLFW_KEY_M, [this]() { toggleMesh(); });
-
-  executeIfPressed(window, GLFW_KEY_J, [this]() { toggleDrawTriangles(); });
-
-  executeIfPressed(window, GLFW_KEY_K, [this]() { toggleDrawLines(); });
-
-  executeIfPressed(window, GLFW_KEY_L, [this]() { toggleWireframe(); });
-
-  executeIfPressed(window, GLFW_KEY_B, [this](){ dumpUniforms(); });
-
-  executeIfPressed(window, GLFW_KEY_O, [this]() {
-    configuration->save(CONFIGURATION_DIR "/output.json");
-  });
-
-  executeIfPressed(window, GLFW_KEY_V, [this]() {
-   /* We'd also like to be able to cycle through drawables*/
-   // for now just toggle the skybox's visability
-  });
-
-  executeIfPressed(window, GLFW_KEY_T,[this]{
-    this->floatingCamera = ! this->floatingCamera;
-  });
-
+  using Action = std::function<void()>;
+  const std::vector<std::pair<int, Action>> keyBindings = {
+    {GLFW_KEY_G, [this]() { loadUniforms(); }},
+    {GLFW_KEY_R, [this]() { generateUniforms(); }},
+    {GLFW_KEY_C, [this]() {
+      (*currentMoveable)->deactivate();
+      if (++currentMoveable == moveables.end())
+        currentMoveable = moveables.begin();
+      (*currentMoveable)->activate();
+    }},
+    {GLFW_KEY_N, [this]() { toggleNormalDisplay(); }},
+    {GLFW_KEY_P, [this]() { toggleSimulation(); }},
+    {GLFW_KEY_M, [this]() { toggleMesh(); }},
+    {GLFW_KEY_J, [this]() { toggleDrawTriangles(); }},
+    {GLFW_KEY_K, [this]() { toggleDrawLines(); }},
+    {GLFW_KEY_L, [this]() { toggleWireframe(); }},
+    {GLFW_KEY_B, [this]() { dumpUniforms(); }},
+    {GLFW_KEY_O, [this]() { configuration->save(CONFIGURATION_DIR "/output.json"); }},
+    {GLFW_KEY_T, [this]() { floatingCamera = !floatingCamera; }},
 #ifndef __EMSCRIPTEN__
-  executeIfPressed(window, GLFW_KEY_F,
-                   [this, window]() { toggleFullscreen(window); });
+    {GLFW_KEY_F, [this, window]() { toggleFullscreen(window); }},
 #endif
+  };
+
+  for (const auto& [key, action] : keyBindings) {
+    executeIfPressed(window, key, action);
+  }
+
 }
 
 void OceanGestalt::toggleFullscreen(GLFWwindow* window) {

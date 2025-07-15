@@ -44,6 +44,7 @@ struct WAVE{
   float amplitude;
   float wavelength;
   float steepness;
+  float phase;
 };
 
 #define NUM_WAVES 10
@@ -99,7 +100,7 @@ vec3 waveOffset(float time, vec3 aPosition, WAVE wave) {
     float w = VELOCITY_SCALE * sqrt(GRAVITY * k); // only frequency is scaled
     vec2 D = normalize(wave.direction.xy);
 
-    float phase = dot(D * k, aPosition.xz) - w * time;
+    float phase = dot(D * k, aPosition.xz) - w * time + wave.phase;
 
     float S = sin(phase);
     float C = cos(phase);

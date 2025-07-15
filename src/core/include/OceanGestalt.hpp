@@ -91,6 +91,7 @@ class OceanGestalt : public OceanGestaltInterface,
   void initUniformBuffers();
   void setUniformBuffers(mat4& projection, mat4& view) const;
   void loadUniforms();
+  void generateUniforms();
   
   std::vector<std::function<void()>> onReadyCallbacks;
   std::vector<std::function<void()>> renderThreadCallbacks;

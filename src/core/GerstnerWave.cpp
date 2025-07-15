@@ -23,7 +23,7 @@ glm::vec3 computeGerstnerDisplacement(std::shared_ptr<Wave> wave, const glm::vec
     
     auto direction = glm::normalize(wave->direction); // this could be done once in the wave
     
-    float phase = glm::dot(direction * k, positionXZ) - omega * time;
+    float phase = glm::dot(direction * k, positionXZ) - omega * time + wave->phase;
 
     float sinPhase = sin(phase);
     float cosPhase = cos(phase);
@@ -33,7 +33,7 @@ glm::vec3 computeGerstnerDisplacement(std::shared_ptr<Wave> wave, const glm::vec
 
     displacement.y = wave->amplitude * cosPhase;
 
-    displacement.x =  -1.0 * wave->steepness * direction.x  * sinPhase * wave->amplitude;
+    displacement.x = -1.0 * wave->steepness * direction.x  * sinPhase * wave->amplitude;
     displacement.z = -1.0 * wave->steepness * direction.y * sinPhase * wave->amplitude;
  
     return displacement;

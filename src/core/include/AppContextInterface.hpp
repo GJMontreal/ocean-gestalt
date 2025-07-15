@@ -18,5 +18,6 @@ class AppContextInterface{
     virtual void setWaveParameter(const std::string& key,const ApiValue& value) = 0;
     virtual void setInitialUniformState(const ApiAdapter& api) = 0;
     virtual void setApi(std::shared_ptr<ApiAdapter> api) = 0;
+    virtual std::shared_ptr<ApiAdapter> getApi() = 0;
     virtual ~AppContextInterface() = default;
 };

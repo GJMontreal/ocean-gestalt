@@ -8,13 +8,12 @@
 
 #include <glm/gtc/quaternion.hpp>
 
-#include <glm/gtx/string_cast.hpp>
 #include <glm/gtx/vector_angle.hpp>
 
 Buoy::Buoy(glm::vec3 origin, std::shared_ptr<Configuration> context) : context(context){
 
   sphere = std::make_shared<Sphere>(origin, glm::vec4(0.85f,0.31f,0.f,1.f), context,2.0f);
-  
+  lastRotation = glm::angleAxis(glm::half_pi<float>(), glm::vec3(0.0f, 1.0f, 1.0f));
   moveable.onPositionChanged = [&](const glm::vec3& pos) {
     this->sphere->setOrigin(pos);
   };
