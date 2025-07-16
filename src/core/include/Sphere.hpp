@@ -10,10 +10,6 @@ class Sphere : public Drawable {
   void draw(Uniforms& uniforms) override;
   void setShader(std::shared_ptr<ShaderProgram> shader);
   void setNormalShader(std::shared_ptr<ShaderProgram> shader);
-  
-  void enableDrawing(bool should) {
-    shouldDraw = should;
-  };
 
  protected:
   void drawNormals(Uniforms& uniforms, Transform transform) override;
@@ -29,7 +25,7 @@ class Sphere : public Drawable {
 
  private:
   
-  bool shouldDraw = true;
+  // TODO: bubble this up into drawable
   bool shouldDrawMesh = true;
   bool shouldDrawNormals = false;
 

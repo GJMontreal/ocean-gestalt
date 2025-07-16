@@ -29,17 +29,9 @@
 
 using std::cout;
 using std::endl;
-
-  static const std::vector< std::pair<int, Movement>> movementKeys{
-    {GLFW_KEY_W, Movement::FORWARD},
-    {GLFW_KEY_S, Movement::BACKWARD},
-    {GLFW_KEY_A, Movement::LEFT},
-    {GLFW_KEY_D, Movement::RIGHT},
-    {GLFW_KEY_SPACE, Movement::UP},
-    {GLFW_KEY_LEFT_SHIFT, Movement::DOWN}
-  };
-
   
+constexpr float TIME_WRAP_WINDOW = 10000.00f;
+
 // our application should keep a reference to the OceanApi
 OceanGestalt::OceanGestalt() : Application() {
   auto config = std::make_shared<Configuration>(
@@ -47,11 +39,11 @@ OceanGestalt::OceanGestalt() : Application() {
       CONFIGURATION_DIR "generator.json", CONFIGURATION_DIR "api.json");
   this->camera = config->camera;
   this->camera->getMoveable().movementSpeed = 10.f;
-  moveables.push_back(this->camera);
 
+  sceneElements.emplace_back(std::nullopt,this->camera);
+  
   this->light = std::make_shared<Light>(config->lightPosition, config);
   config->light = light;
-  moveables.push_back(this->light);
   auto lightDrawable = this->light->getDrawable();
 
   auto drawableMeshShader = config->getShader("drawable_mesh");
@@ -62,22 +54,20 @@ OceanGestalt::OceanGestalt() : Application() {
 #ifndef __EMSCRIPTEN__
   lightDrawable->setNormalShader(drawableNormalShader);
 #endif
-  drawables.push_back(this->light->getDrawable());
+  sceneElements.emplace_back(lightDrawable, this->light);  //TODO: light should have a moveable, not be a moveable
 
   configuration = config;
   auto ocean = std::make_shared<Ocean>(config);
-  models.push_back(ocean.get()); // yeah, we don't want this ?
-  drawables.push_back(ocean);
-
+  sceneElements.emplace_back(ocean,std::nullopt);
+  
   auto buoy = std::make_shared<Buoy>(glm::vec3(5.0f,0.f,5.0f),config);
   auto buoyDrawable = buoy->getDrawable();
   buoyDrawable->setShader(config->getShader("buoy_mesh"));
 #ifndef __EMSCRIPTEN__
   buoyDrawable->setNormalShader(drawableNormalShader);
 #endif
-  drawables.push_back(buoyDrawable);
-  moveables.push_back(buoy);
-
+  sceneElements.emplace_back(buoyDrawable,buoy);
+  
   glEnable(GL_BLEND); 
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -87,7 +77,7 @@ OceanGestalt::OceanGestalt() : Application() {
 #endif
 
   // onRender([&]{surfAudio->setFoamLevel(float foam);});
-  currentMoveable = moveables.begin(); //we should have selectable, which could be drawable moveable one or the other or both
+  currentElement = sceneElements.begin(); //we should have selectable, which could be drawable moveable one or the other or both
 
 #ifdef DEBUG_GL
   glDumpTextureBindings();
@@ -110,14 +100,17 @@ void OceanGestalt::loop() {
   for(auto const& cb : renderThreadCallbacks){
       cb();
   }
-  auto time = float(glfwGetTime());
+  auto time = glfwGetTime();
   auto interval = time - lastTime;
   lastTime = time;
 
   //update our time if the simulation is running
   if (isRunning) {
-    elapsedTime += (float)interval;
+    elapsedTime += interval;
   }
+
+  double anchor = std::floor(elapsedTime/TIME_WRAP_WINDOW) * TIME_WRAP_WINDOW;
+  auto uniformTime = static_cast<float>(elapsedTime - anchor);
 
   projection = glm::perspective(glm::radians(getCamera()->Zoom),
                                 getWindowRatio(), 0.1f, 200.f);
@@ -126,13 +119,13 @@ void OceanGestalt::loop() {
   //TODO: move this into the camera
   if(floatingCamera){
     auto position = camera->getPosition();
-    auto waveOffset = evaluateGerstnerWaves(configuration->getWaves(), glm::vec2(position.x,position.z),elapsedTime);
+    auto waveOffset = evaluateGerstnerWaves(configuration->getWaves(), glm::vec2(position.x,position.z),uniformTime);
     view = glm::lookAt(position + waveOffset, position + waveOffset + camera->Front, camera->Up);
   } else {
     view = camera->GetViewMatrix();
   }
 
-  Uniforms uniforms{.projection = projection, .view = view, .time = elapsedTime};
+  Uniforms uniforms{.projection = projection, .view = view, .time = uniformTime};
 
 #ifndef __EMSCRIPTEN__
   setUniformBuffers(projection, view);
@@ -145,10 +138,10 @@ void OceanGestalt::loop() {
                1.0f);  // we should set this in the environment
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-  // just until we get our text rendering working
-  for( auto drawable : drawables){
-    drawable->draw(uniforms);
+  for( auto [drawable, moveable] : sceneElements){
+    if(drawable){
+      (*drawable)->draw(uniforms);
+    }
   }
 
 }
@@ -176,9 +169,7 @@ void OceanGestalt::setUniformBuffers(mat4& projection, mat4& view) const {
 
 void OceanGestalt::toggleNormalDisplay() {
   std::cout << "Toggle normals" << std::endl;
-  for (Model* model : models) {
-    model->toggleDrawNormals();
-  }
+
 }
 
 void OceanGestalt::toggleSimulation() {
@@ -188,30 +179,36 @@ void OceanGestalt::toggleSimulation() {
 
 void OceanGestalt::toggleWireframe() {
   std::cout << "Toggle wireframe" << std::endl;
-  for (Model* model : models) {
-    model->toggleDrawWireframe();
-  }
+
 }
 
 void OceanGestalt::toggleMesh() {
   std::cout << "Toggle mesh" << std::endl;
-  for (Model* model : models) {
-    model->toggleDrawMesh();
+  if (auto drawable = currentElement->first) {
+    (*drawable)->setIfShouldDraw(!(*drawable)->getIfShouldDraw());
   }
 }
 
 void OceanGestalt::toggleDrawTriangles() {
   std::cout << "Toggle triangles" << std::endl;
-  for (Model* model : models) {
-    model->toggleDrawTriangles();
-  }
+
 }
 
 void OceanGestalt::toggleDrawLines() {
   std::cout << "Toggle lines" << std::endl;
-  for (Model* model : models) {
-    model->toggleDrawLines();
+  if (auto drawable = currentElement->first) {
+    (*drawable)->setIfShouldDraw(!(*drawable)->getIfShouldDraw());
   }
+}
+
+void OceanGestalt::toggleFloatingCamera() {
+  floatingCamera = !floatingCamera;
+}
+
+void OceanGestalt::selectNextElement() {
+      if (++currentElement == sceneElements.end()){
+        currentElement = sceneElements.begin();
+      }
 }
 
 void OceanGestalt::loadUniforms() {
@@ -246,41 +243,21 @@ void OceanGestalt::processInput(GLFWwindow* window, float deltaTime) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
 
+  //I don't recall why there's this extra layer of indirection around moveables. Shit happens
+  if(auto currentMoveable = currentElement->second){
   auto& moveable = (*currentMoveable)->getMoveable();
   for (auto& [key, direction] : movementKeys) {
     if (glfwGetKey(window, key) == GLFW_PRESS) {
       moveable.ProcessKeyboard( direction, deltaTime);
     }
   }
-
-  using Action = std::function<void()>;
-  const std::vector<std::pair<int, Action>> keyBindings = {
-    {GLFW_KEY_G, [this]() { loadUniforms(); }},
-    {GLFW_KEY_R, [this]() { generateUniforms(); }},
-    {GLFW_KEY_C, [this]() {
-      (*currentMoveable)->deactivate();
-      if (++currentMoveable == moveables.end())
-        currentMoveable = moveables.begin();
-      (*currentMoveable)->activate();
-    }},
-    {GLFW_KEY_N, [this]() { toggleNormalDisplay(); }},
-    {GLFW_KEY_P, [this]() { toggleSimulation(); }},
-    {GLFW_KEY_M, [this]() { toggleMesh(); }},
-    {GLFW_KEY_J, [this]() { toggleDrawTriangles(); }},
-    {GLFW_KEY_K, [this]() { toggleDrawLines(); }},
-    {GLFW_KEY_L, [this]() { toggleWireframe(); }},
-    {GLFW_KEY_B, [this]() { dumpUniforms(); }},
-    {GLFW_KEY_O, [this]() { configuration->save(CONFIGURATION_DIR "/output.json"); }},
-    {GLFW_KEY_T, [this]() { floatingCamera = !floatingCamera; }},
-#ifndef __EMSCRIPTEN__
-    {GLFW_KEY_F, [this, window]() { toggleFullscreen(window); }},
-#endif
-  };
-
-  for (const auto& [key, action] : keyBindings) {
-    executeIfPressed(window, key, action);
   }
+  
 
+  for (const auto& pair : keyBindings.getKeyBindings()) {
+    executeIfPressed(window, pair.first,
+                     [action = pair.second, this]() { action(this); });
+  }
 }
 
 void OceanGestalt::toggleFullscreen(GLFWwindow* window) {

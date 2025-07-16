@@ -29,7 +29,6 @@ Camera::Camera(vec3 position, vec3 up, float yaw, float pitch)
 
 // returns the view matrix calculated using Euler Angles and the LookAt Matrix
 mat4 Camera::GetViewMatrix() const {
-  // if these values aren't changing, then how is the view changing?
   return glm::lookAt(moveable.position, moveable.position + Front, Up);
 }
 

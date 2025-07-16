@@ -45,37 +45,5 @@ glm::vec3 evaluateGerstnerWaves(const std::vector<std::shared_ptr<Wave>> waves, 
     for (const auto& wave : waves) {
         totalDisplacement += computeGerstnerDisplacement(wave, positionXZ, time);
     }
-    return totalDisplacement;// / glm::vec3(waves.size());
+    return totalDisplacement;
 }
-
-/*
-From our gerstner shader
-const float VELOCITY_SCALE = 1.0; // Scale spatial dimensions and wave wavelengths
-const float PI = 3.14159265358979323;
-vec3 waveOffset(float time, vec3 aPosition, WAVE wave) {
-    float k = 2.0 * PI / wave.wavelength; //what happens when wavelength is zero?
-    float w = VELOCITY_SCALE * sqrt(GRAVITY * k); // only frequency is scaled
-    vec2 D = normalize(wave.direction.xy);
-
-    float phase = dot(D * k, aPosition.xz) - w * time;
-
-    float S = sin(phase);
-    float C = cos(phase);
-
-    float y = wave.amplitude * C;
-    vec2 xz = aPosition.xz - D * wave.steepness * S * wave.amplitude;
-
-    return vec3(xz.x, y, xz.y);
-}
-
-
-vec3 calcNewPosition(vec3 aPosition){
-  vec3 offset = vec3(0.0);
-  for(int i=0; i < NUM_WAVES; i++){
-    vec3 newOffset = waveOffset(time, aPosition, waves[i] );
-    offset += newOffset;
-  }
-  offset = aPosition + offset / float(NUM_WAVES);
-  return offset;
-}
-*/

@@ -27,7 +27,7 @@ class Drawable: public MoveableBase<Drawable>  {
  public:
   Drawable(glm::vec3 origin, std::shared_ptr<Configuration>context);
   virtual void draw(Uniforms& uniforms) = 0;
-  virtual ~Drawable() = default;
+  ~Drawable() = default;
 
   inline void setOrigin(glm::vec3 origin) {
     position = origin;
@@ -36,8 +36,8 @@ class Drawable: public MoveableBase<Drawable>  {
   inline void setScale(glm::vec3 aScale) {
     scale = aScale;
   }
-  inline glm::vec3 getPosition(){return position;};
-  inline glm::vec3 getScale() { return scale;};
+  inline const glm::vec3& getPosition()const {return position;};
+  inline const glm::vec3& getScale()const { return scale;};
 
   inline glm::mat4 getTransform() const { return glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f),scale); };
   
@@ -52,11 +52,9 @@ class Drawable: public MoveableBase<Drawable>  {
   void deactivate() override ;
 
   void setIfShouldDraw(bool aBool) { shouldDraw = aBool; }
-
   bool getIfShouldDraw() { return shouldDraw; }
 
   std::function<Transform(Drawable& drawable, float time)> preDraw;
-  // std::function<void(Drawable& drawable)> postDraw;  //TODO: remove if we're not using this
   
   protected:
 
@@ -64,7 +62,7 @@ class Drawable: public MoveableBase<Drawable>  {
   virtual void drawMesh(Uniforms& uniforms, Transform transform) = 0;
 
  private:
-  // glm::mat4 transform = glm::mat4(1.0);
+
   glm::vec3 position;
   glm::vec3 scale = glm::vec3(1.0f);
   glm::vec3 rotation;

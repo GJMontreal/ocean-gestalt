@@ -12,25 +12,29 @@ Model::Model(std::shared_ptr<Configuration> configuration)
     : meshes({Mesh(configuration->meshSize,configuration->meshSubdivisions,configuration->meshColor)}), Drawable(glm::vec3(0.0f,0.0f,0.0f),configuration) {
   this->configuration = configuration;
   calculateNormalMatrix(getTransform(), normalMatrix);
+  setIfShouldDraw(true);
 }
 
 // specify different shaders for mesh, wireframe, and normals
 void Model::draw(Uniforms& uniforms) {
 {
-    if (shouldDrawWireframe) {
-      drawWireframe(uniforms);
-    }
+  if (!getIfShouldDraw()) {
+    return;
+  }
+  if (shouldDrawWireframe) {
+    drawWireframe(uniforms);
+  }
 
 #ifndef __EMSCRIPTEN__
-    if (shouldDrawNormals) {
-      drawNormals(uniforms,Transform());
-    }
+  if (shouldDrawNormals) {
+    drawNormals(uniforms, Transform());
+  }
 #endif
 
-    if (shouldDrawMesh) {
-      drawMesh(uniforms, Transform());
-    }
+  if (shouldDrawMesh) {
+    drawMesh(uniforms, Transform());
   }
+}
 }
 
 void Model::drawNormals(Uniforms& uniforms, Transform _) {

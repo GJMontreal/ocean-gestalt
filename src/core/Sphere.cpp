@@ -100,7 +100,7 @@ glCheckError(__FILE__, __LINE__);
 }
 
 void Sphere::draw(Uniforms& uniforms) {
-  if(!shouldDraw){
+  if(!getIfShouldDraw()){
     return;
   }
   
