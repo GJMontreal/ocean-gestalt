@@ -179,13 +179,15 @@ void OceanGestalt::toggleSimulation() {
 
 void OceanGestalt::toggleWireframe() {
   std::cout << "Toggle wireframe" << std::endl;
-
+    if (auto drawable = currentElement->first) {
+    (*drawable)->setIfShouldDrawWireframe(!(*drawable)->getIfShouldDrawWireframe());
+  }
 }
 
 void OceanGestalt::toggleMesh() {
   std::cout << "Toggle mesh" << std::endl;
   if (auto drawable = currentElement->first) {
-    (*drawable)->setIfShouldDraw(!(*drawable)->getIfShouldDraw());
+    (*drawable)->setIfShouldDrawMesh(!(*drawable)->getIfShouldDrawMesh());
   }
 }
 
@@ -197,7 +199,7 @@ void OceanGestalt::toggleDrawTriangles() {
 void OceanGestalt::toggleDrawLines() {
   std::cout << "Toggle lines" << std::endl;
   if (auto drawable = currentElement->first) {
-    (*drawable)->setIfShouldDraw(!(*drawable)->getIfShouldDraw());
+    (*drawable)->setIfShouldDrawLines(!(*drawable)->getIfShouldDrawLines());
   }
 }
 

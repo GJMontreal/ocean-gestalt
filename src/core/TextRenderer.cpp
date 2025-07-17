@@ -177,8 +177,6 @@ void TextRenderer::render(std::vector<TextVertex>& vertices) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    // shader->deactivate();
-
 #ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);
 #endif

@@ -78,6 +78,12 @@ if (EMSCRIPTEN)
     configure_file(${file} ${CMAKE_CURRENT_BINARY_DIR}/data/shader/texture/${fname} COPYONLY)
   endforeach()
 
+  file(GLOB FONT_FILES "data/font/*")
+  foreach(file ${FONT_FILES})
+    get_filename_component(fname "${file}" NAME)
+    configure_file(${file} ${CMAKE_CURRENT_BINARY_DIR}/data/font/${fname} COPYONLY)
+  endforeach()
+
   file(GLOB CONFIG_FILES "data/config/*.json")
   foreach(file ${CONFIG_FILES})
     get_filename_component(fname "${file}" NAME)

@@ -51,8 +51,6 @@
             }
         }
         }
-        
-        
           ,"ambientStrength":{
             "type": "float",
             "min": 0,

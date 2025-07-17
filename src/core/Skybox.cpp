@@ -52,8 +52,8 @@ void Skybox::bindVertices() {
 }
 
 void Skybox::draw(Uniforms& uniforms){
-  if(!getIfShouldDraw()){
-    return;
+  if(getIfShouldDrawMesh()){
+    drawMesh(uniforms, Transform());
   }
 }
 

@@ -39,6 +39,15 @@ class KeyBindings {
   std::vector<std::pair<int, Action>> getKeyBindings() const;
 };
 
+using OptionalMoveable = std::optional<std::shared_ptr<MoveableInterface>>;
+using OptionalDrawable = std::optional<std::shared_ptr<Drawable>>;
+  
+struct SceneElement{
+  std::string name;
+  OptionalDrawable drawable;
+  OptionalMoveable moveable;
+};
+
 static const std::vector<std::pair<int, Movement>> movementKeys{
     {GLFW_KEY_W, Movement::FORWARD}, {GLFW_KEY_S, Movement::BACKWARD},
     {GLFW_KEY_A, Movement::LEFT},    {GLFW_KEY_D, Movement::RIGHT},
@@ -79,9 +88,6 @@ class OceanGestalt : public OceanGestaltInterface,
 
   shared_ptr<Configuration> configuration;
   
-  using OptionalMoveable = std::optional<std::shared_ptr<MoveableInterface>>;
-  using OptionalDrawable = std::optional<std::shared_ptr<Drawable>>;
-  using SceneElement = std::pair<OptionalDrawable, OptionalMoveable>;
   std::vector<SceneElement> sceneElements;
   std::vector<SceneElement>::iterator currentElement;
 
@@ -108,6 +114,8 @@ class OceanGestalt : public OceanGestaltInterface,
   void setUniformBuffers(mat4& projection, mat4& view) const;
   void loadUniforms();
   void generateUniforms();
+
+  void buildScene();
   
   std::vector<std::function<void()>> onReadyCallbacks;
   std::vector<std::function<void()>> renderThreadCallbacks;

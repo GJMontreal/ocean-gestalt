@@ -1,4 +1,9 @@
-{
+{  "wireframe_shader.baseColor": [
+        0.15,
+        0.36,
+        0.25,
+        1.0
+    ],
     "mesh_shader.baseColor": [
         0.0,
         0.03999999910593033,

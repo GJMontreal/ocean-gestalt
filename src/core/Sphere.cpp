@@ -100,21 +100,17 @@ glCheckError(__FILE__, __LINE__);
 }
 
 void Sphere::draw(Uniforms& uniforms) {
-  if(!getIfShouldDraw()){
-    return;
-  }
-  
   Transform transform;
   if(preDraw){
     transform = preDraw(*this, uniforms.time);
   }
 
-  if (shouldDrawMesh) {
+  if (getIfShouldDrawMesh()) {
     drawMesh(uniforms, transform);
   }
 
   #ifndef __EMSCRIPTEN__
-  if (shouldDrawNormals){
+  if (getIfShouldDrawNormals()){
     drawNormals(uniforms, transform);
   }
   #endif
@@ -136,7 +132,7 @@ void Sphere::drawMesh(Uniforms& uniforms, Transform transform) {
 
   glBindVertexArray(VAO);
   glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-
+  glBindVertexArray(0);
 #ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);
 #endif  
@@ -144,10 +140,10 @@ void Sphere::drawMesh(Uniforms& uniforms, Transform transform) {
 
 void Sphere::drawNormals(Uniforms& uniforms, Transform transform) {
   auto _guard = ShaderScope(normalShader);
-  shader->setUniform("model", getModelTransform(transform));
+  normalShader->setUniform("model", getModelTransform(transform));
   glBindVertexArray(VAO);
   glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0);
-
+  glBindVertexArray(0);
 #ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);
 #endif

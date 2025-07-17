@@ -51,8 +51,17 @@ class Drawable: public MoveableBase<Drawable>  {
   void activate() override ;
   void deactivate() override ;
 
-  void setIfShouldDraw(bool aBool) { shouldDraw = aBool; }
-  bool getIfShouldDraw() { return shouldDraw; }
+  void setIfShouldDrawWireframe(bool aBool) { shouldDrawWireframe = aBool; }
+  bool getIfShouldDrawWireframe() const { return shouldDrawWireframe; }
+
+  void setIfShouldDrawLines(bool aBool) { shouldDrawLines = aBool; }
+  bool getIfShouldDrawLines() const { return shouldDrawLines; }
+
+  void setIfShouldDrawMesh(bool aBool) { shouldDrawMesh = aBool; }
+  bool getIfShouldDrawMesh() const { return shouldDrawMesh; }
+
+  void setIfShouldDrawNormals(bool aBool) { shouldDrawNormals = aBool; }
+  bool getIfShouldDrawNormals() const { return shouldDrawNormals; }
 
   std::function<Transform(Drawable& drawable, float time)> preDraw;
   
@@ -73,5 +82,8 @@ class Drawable: public MoveableBase<Drawable>  {
   friend MoveableBase<Drawable>;
   Moveable moveable;
 
-  bool shouldDraw;
+  bool shouldDrawWireframe;
+  bool shouldDrawLines;
+  bool shouldDrawNormals;
+  bool shouldDrawMesh;
 };

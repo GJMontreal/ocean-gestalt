@@ -46,6 +46,10 @@
             "b": 1,
             "a": 1
         }
+    },"drawable_normal": {
+        "vertex": "drawable.vert",
+        "fragment": "simple.frag",
+        "geometry": "drawable_normal.gs"
     },
     "buoy_mesh": {
         "vertex": "normal_bump.vert",

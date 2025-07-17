@@ -1,4 +1,10 @@
-{   "buoy_mesh.ambientStrength": 0.5,
+{   "wireframe_shader.baseColor": [
+        0.15,
+        0.36,
+        0.25,
+        1.0
+    ],
+    "buoy_mesh.ambientStrength": 0.5,
     "mesh_shader.causticIntensity": 1.0,
     "mesh_shader.foamScale": 0.4009999930858612,
     "mesh_shader.foamScrollSpeed": 0.0010000000474974513,

@@ -39,13 +39,14 @@ Configuration::Configuration(const string& environment,
   loadLight(environment);
   loadMesh(environment);
   loadShaders(shader);
-  // loadGenerator(generator);
   loadAPISettings(api);
 
   waves.reserve(NUM_WAVES);
   for(int i = 0; i < NUM_WAVES; i++){
     waves.push_back(make_shared<Wave>());
   }
+
+  textRenderer = make_shared<TextRenderer>(FONT_DIR "FiraCode-Regular.ttf",64.f);
 }
 
 void Configuration::setApi(std::shared_ptr<ApiAdapter> api) {
