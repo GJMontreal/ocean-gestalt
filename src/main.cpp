@@ -24,7 +24,6 @@ int main(int argc, const char* argv[]) {
   auto api = std::make_shared<OceanApi>(app,uniformState);
   app->onRender([&uniformState]{uniformState->renderThreadCallback();});
   app->doOnReady([&] {
-    std::cout << "setInitialUniformState" << std::endl;
       app->getContext().setInitialUniformState(*api);
   });
 

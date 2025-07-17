@@ -1,68 +1,77 @@
-#ifndef __CAMERA_HPP
-#define __CAMERA_HPP
+#pragma once
 
 #include "Moveable.hpp"
-
+#include "Configuration.hpp"
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
-#include <iostream>
-using glm::vec3;
 using glm::mat4;
+using glm::vec3;
 
 // Default camera values
-const float YAW         = -90.0f;
-const float PITCH       =  0.0f;
-const float SPEED       =  5.0f;
-const float SENSITIVITY =  0.1f;
-const float ZOOM        =  45.0f;
+const float YAW = -90.0f;
+const float PITCH = 0.0f;
+const float SPEED = 5.0f;
+const float SENSITIVITY = 0.1f;
+const float ZOOM = 45.0f;
 
-class Camera: public MoveableBase<Camera>{
-public:
-   //updating these directly won't properly recalculate camera vectors
+class Camera : public MoveableBase<Camera> {
+ public:
+  // updating these directly won't properly recalculate camera vectors
   // camera Attributes
-    vec3 Front;
-    vec3 Up;
-    vec3 Right;
-
-    // euler Angles
-    float Yaw;
-    float Pitch;
-
-    // camera options
-    float MouseSensitivity;
-    float Zoom;
 
   Camera(vec3 position = vec3(0.0f, 0.0f, 3.0f),
-           vec3 up = vec3(0.0f, 1.0f, 0.0f),
-           float yaw = YAW,
-           float pitch = PITCH);
-        
+         vec3 up = vec3(0.0f, 1.0f, 0.0f),
+         float yaw = YAW,
+         float pitch = PITCH,
+         float zoom = ZOOM);
+
   ~Camera() override = default;
+
+  glm::vec3 getPosition() const { return moveable.position; };
+  float getPitch() const { return Pitch;};
+  float getYaw() const { return Yaw;};
+  float getZoom() const { return Zoom;};
+
+  void processMouseScroll(float yoffset);
+  void processMouseMovement(float xoffset,
+                            float yoffset,
+                            GLboolean constrainPitch = true);
+
+  mat4 getViewMatrix(double time) const;
+
+  const MoveDirection& getMoveDirection() const { return moveDirection; };
+  MoveDirection& getMoveDirection() { return this->moveDirection; };
+
+  void activate() override{/* do nothing */};
+  void deactivate() override{/* do nothing */};
+
+  void setConfiguration(std::shared_ptr<Configuration> configuration) {context = configuration;};
+
+  void setIsFloating(bool floating) { isFloating = floating; };
+  bool getIsFloating() const { return isFloating; };
+
+ private:
+  friend class MoveableBase<Camera>;
+  Moveable moveable;
   
-  glm::vec3& getPosition() {return moveable.position;};
-  const glm::vec3& getPosition() const {return moveable.position;};
+  std::weak_ptr<Configuration> context;
 
-  std::function<void(glm::vec3 up, glm::vec3 forward, glm::vec3 right)> setMovementVector;
+  vec3 Front;
+  vec3 Up;
+  vec3 Right;
 
-// TODO:  make capitalization consistent
-    void updateCameraVectors();
-    void ProcessMouseScroll(float yoffset);
-    void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
-    mat4 GetViewMatrix() const;  //TODO: fix capitalization
+  void updateCameraVectors();
 
-    const MoveDirection& getMoveDirection()const {
-      return moveDirection;};
-    MoveDirection& getMoveDirection(){
-      return this->moveDirection;};
-    
-    void activate() override { /* do nothing */ };
-    void deactivate() override { /* do nothing */}; 
-    private:
-        friend class MoveableBase<Camera>;
-        Moveable moveable;
+  // euler Angles
+  float Yaw;
+  float Pitch;
+  float Zoom;
+  MoveDirection moveDirection;
 
-        MoveDirection moveDirection;
+  // camera options
+  float MouseSensitivity;
+
+  // simulation
+  bool isFloating;
 };
-
-#endif

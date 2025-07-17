@@ -1,17 +1,14 @@
 #include "Serialization.hpp"
 
 #include "Light.hpp"
-#include "ApiValue.hpp"
-
-#include <iostream>
 
 // Configuration
 void to_json(json& j, const Configuration& configuration) {
-  j = {   {"camera", *(configuration.camera.get())},
-           {"waves", configuration.waves},
-           {"light", configuration.light->getPosition()}};
+  j = {{"camera", *(configuration.camera.get())},
+       {"light", configuration.light->getPosition()}};
 
-  j["mesh"] = {{"size",configuration.meshSize},{"subdivisions",configuration.meshSubdivisions}};
+  j["mesh"] = {{"size", configuration.meshSize},
+               {"subdivisions", configuration.meshSubdivisions}};
 }
 
 void to_json(json& j, shared_ptr<Wave> p) {
@@ -38,21 +35,12 @@ void to_json(json& j, const WaveSerialized& wave) {
 }
 
 // Camera
-void from_json(const json& j, Camera& camera) {
-  j.at("position").get_to(camera.getPosition());
-  j.at("up").get_to(camera.getMoveDirection().up);
-  j.at("yaw").get_to(camera.Yaw);
-  j.at("pitch").get_to(camera.Pitch);
-  j.at("zoom").get_to(camera.Zoom);
-  camera.updateCameraVectors();
-}
-
 void to_json(json& j, const Camera& camera) {
   j = json{{"position", camera.getPosition()},
            {"up", camera.getMoveDirection().up},
-           {"yaw", camera.Yaw},
-           {"pitch", camera.Pitch},
-           {"zoom", camera.Zoom}};
+           {"yaw", camera.getYaw()},
+           {"pitch", camera.getPitch()},
+           {"zoom", camera.getZoom()}};
 }
 
 namespace glm {

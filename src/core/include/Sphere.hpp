@@ -3,23 +3,13 @@
 #include <glm/glm.hpp>
 #include "Configuration.hpp"
 #include "Drawable.hpp"
-
-struct Vertex{
-  glm::vec3 position;
-  glm::vec2 texCoord;
-  glm::vec3 tangent;
-};
-
+#include "Vertex.hpp"
 class Sphere : public Drawable {
  public:
   explicit Sphere(vec3 position, vec4 color, std::shared_ptr<Configuration> context, float radius = 1.f);
   void draw(Uniforms& uniforms) override;
   void setShader(std::shared_ptr<ShaderProgram> shader);
   void setNormalShader(std::shared_ptr<ShaderProgram> shader);
-  
-  void enableDrawing(bool should) {
-    shouldDraw = should;
-  };
 
  protected:
   void drawNormals(Uniforms& uniforms, Transform transform) override;
@@ -35,7 +25,7 @@ class Sphere : public Drawable {
 
  private:
   
-  bool shouldDraw = true;
+  // TODO: bubble this up into drawable
   bool shouldDrawMesh = true;
   bool shouldDrawNormals = false;
 
@@ -52,4 +42,6 @@ class Sphere : public Drawable {
   std::vector<Vertex> vertices;
   std::vector<glm::vec3> normals;
   std::vector<unsigned int> indices;
+
+  glm::mat4 getModelTransform(Transform transform);
 };

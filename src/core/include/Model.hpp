@@ -24,11 +24,6 @@ class Model : public Drawable{
   
   void draw(Uniforms& uniforms) override;
   
-  void toggleDrawWireframe();
-  void toggleDrawMesh();
-  void toggleDrawNormals();
-  void toggleDrawTriangles();
-  void toggleDrawLines();
   void toggleRunning();
 
   bool isRunning()const;
@@ -49,10 +44,6 @@ class Model : public Drawable{
  
   std::vector<Mesh> meshes; //this is going to be only 1 mesh
  
-  bool shouldDrawWireframe = false;
-  bool shouldDrawNormals = false;
-  bool shouldDrawMesh = true;  //it would be nice to specify these in our configuration
-  
   bool drawTriangles = true;
   bool drawLines = false;
 

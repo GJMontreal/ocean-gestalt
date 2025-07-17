@@ -57,7 +57,7 @@
           <button id="toggle_info" onclick="toggleInfo()" class="overlay_button_small">?</button>
           </div>
           <div id="bottom_right">
-          <button id="generate_waves" class="overlay_button_small">R</button>
+          <button id="activate_moveable" class="overlay_button_small">C</button>
           <a id="github_button" href="https://github.com/GJMontreal/ocean-gestalt"></a>
           </div>
         </div>
@@ -93,7 +93,7 @@
   addListeners("move_back", 's', 'KeyS');
   addListeners("move_up", " ", 'Space');
   addListeners("move_down", 'Shift','ShiftLeft');
-  addListeners("generate_waves", 'r','KeyR');
+  addListeners("activate_moveable", 'c','KeyC');
 
   
   function toggleInfo(){
@@ -135,7 +135,11 @@
         // element.innerHTML += text.replace('\n', '<br>', 'g') + '<br>';
       };
     })(),
-    canvas: document.getElementById('canvas')
+    canvas: document.getElementById('canvas'),
+    preinitializedWebGLContextAttributes: {
+    majorVersion: 2,
+    minorVersion: 0
+  }
   };
 window.addEventListener('load', function () {
   setTimeout(function () {

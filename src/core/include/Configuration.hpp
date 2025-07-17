@@ -72,10 +72,10 @@ class Configuration: public AppContextInterface, public std::enable_shared_from_
 
   void setWaveParameter(const std::string& key, const ApiValue& value) override;
   void setApi(std::shared_ptr<ApiAdapter> api) override;
+  std::shared_ptr<ApiAdapter> getApi() override;
 
   private:
   void loadJSON(const string& fileName, json& data)const;
-  void loadWaves(const string& fileName);
   void loadCamera(const string& fileName);
   void loadShaders(const string& fileName);
   void loadLight(const string& fileName);

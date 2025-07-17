@@ -1,14 +1,10 @@
-
-#ifndef VERTEX_HPP
-#define VERTEX_HPP
+#pragma once
 
 #include <glm/glm.hpp>
 
 // We want to standardize what we're passing to the shaders as much as possible
-struct VertexType {
+struct Vertex {
   glm::vec3 position;
-  glm::vec3 normal;
-  glm::vec4 color;
+  glm::vec2 texCoord;
+  glm::vec3 tangent;
 };
-
-#endif

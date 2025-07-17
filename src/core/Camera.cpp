@@ -1,41 +1,43 @@
 #include "Camera.hpp"
 
+#include "GerstnerWave.hpp"
+
 #include <glm/gtc/matrix_transform.hpp>
+
 
 using glm::radians;
 
-Camera::Camera(vec3 position, vec3 up, float yaw, float pitch)
+Camera::Camera(vec3 position, vec3 up, float yaw, float pitch, float zoom)
     : Front(vec3(0.0f, 0.0f, -1.0f)),
-      
-      MouseSensitivity(SENSITIVITY),
-      Zoom(ZOOM) {
-  
+      Zoom(zoom),
+      MouseSensitivity(SENSITIVITY) {
   moveable.getMoveDirection = [this]()->MoveDirection&{return this->moveDirection;};
-
   moveable.movementSpeed = SPEED;
   this->moveable.position = position;
   moveDirection.up = up;
   Yaw = yaw;
   Pitch = pitch;
 
-  setMovementVector = [this](glm::vec3 up, vec3 forward, vec3 right){
-      moveDirection.forward = forward;
-      moveDirection.up = up;
-      moveDirection.right = right;
-    };
-
   updateCameraVectors();
 }
 
 // returns the view matrix calculated using Euler Angles and the LookAt Matrix
-mat4 Camera::GetViewMatrix() const {
-  // if these values aren't changing, then how is the view changing?
-  return glm::lookAt(moveable.position, moveable.position + Front, Up);
+
+mat4 Camera::getViewMatrix(double time) const {
+  glm::mat4 view;
+  auto position = getPosition();
+  if(auto locked = context.lock(); isFloating && locked){
+    auto waveOffset = evaluateGerstnerWaves(locked->getWaves(), glm::vec2(position.x,position.z), time);
+    view = glm::lookAt(position + waveOffset, position + waveOffset + Front, Up);
+  }else{
+    view = glm::lookAt(position, position + Front, Up);
+  }
+  return view;
 }
 
 // processes input received from a mouse input system. Expects the offset value
 // in both the x and y direction.
-void Camera::ProcessMouseMovement(float xoffset,
+void Camera::processMouseMovement(float xoffset,
                                   float yoffset,
                                   GLboolean constrainPitch) {
   xoffset *= MouseSensitivity;
@@ -57,7 +59,7 @@ void Camera::ProcessMouseMovement(float xoffset,
 
 // processes input received from a mouse scroll-wheel event. Only requires input
 // on the vertical wheel-axis
-void Camera::ProcessMouseScroll(float yoffset) {
+void Camera::processMouseScroll(float yoffset) {
   Zoom -= yoffset;
   if (Zoom < 1.0f)
     Zoom = 1.0f;
@@ -89,8 +91,4 @@ void Camera::updateCameraVectors() {
     
   moveDirection.forward = glm::normalize(forward);
   moveDirection.right = glm::normalize(glm::cross(moveDirection.forward, moveDirection.up));
-  if(setMovementVector){
-    setMovementVector(moveDirection.up ,glm::normalize(forward), glm::normalize(glm::cross(moveDirection.forward, moveDirection.up)));
-  }
-
 }

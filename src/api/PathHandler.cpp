@@ -103,6 +103,7 @@ std::optional<ApiValue> UniformPathHandler::set(
     }
   }
 
+  // This is about the least elegant thing I've seen
   // pass it on to our shared wave config
   if(u.simulationPath && syncWaveFunction) {
     syncWaveFunction(*u.simulationPath, val);

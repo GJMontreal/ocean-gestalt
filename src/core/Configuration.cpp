@@ -21,51 +21,53 @@ using nlohmann::json;
 using std::cout;
 using std::endl;
 using std::make_shared;
-
+namespace {
+constexpr int NUM_WAVES = 10;
 const std::string VERTEX_KEY = "vertex";
 const std::string FRAGMENT_KEY = "fragment";
 const std::string GEOMETRY_KEY = "geometry";
 const std::string TEXTURE_KEY = "texture";
 const std::string CUBEMAP_KEY = "cubemap";
 const std::string COLOR_KEY = "color";
+}  // namespace
 
 Configuration::Configuration(const string& environment,
                              const string& shader,
                              const string& generator,
                              const string& api) {
-  loadWaves(environment);
   loadCamera(environment);
   loadLight(environment);
   loadMesh(environment);
   loadShaders(shader);
-  // loadGenerator(generator);
   loadAPISettings(api);
+
+  waves.reserve(NUM_WAVES);
+  for(int i = 0; i < NUM_WAVES; i++){
+    waves.push_back(make_shared<Wave>());
+  }
 }
 
 void Configuration::setApi(std::shared_ptr<ApiAdapter> api) {
   this->api = api;
 }
 
-void Configuration::loadWaves(const string& fileName) {
-  json data;
-  loadJSON(fileName, data);
-
-  for (const auto& element : data.at("waves")) {
-    WaveSerialized serialized;
-    element.get_to(serialized);
-    auto wave = make_shared<Wave>(serialized);
-    waves.push_back(std::move(wave));
-  }
+std::shared_ptr<ApiAdapter> Configuration::getApi() {
+  auto locked = api.lock();
+  return locked;
 }
 
 void Configuration::loadCamera(const string& fileName) {
   json data;
   loadJSON(fileName, data);
 
-  auto aCamera = make_shared<Camera>();
   auto j = data.at("camera");
-  j.get_to(*(aCamera.get()));
-  camera = std::move(aCamera);
+  auto position = j.at("position").get<glm::vec3>();
+  auto up = j.at("up").get<glm::vec3>();
+  auto yaw = j.at("yaw").get<float>();
+  auto pitch = j.at("pitch").get<float>();
+  auto zoom = j.at("zoom").get<float>();
+
+  camera = make_shared<Camera>(position, up, yaw, pitch, zoom);
 }
 
 void Configuration::loadJSON(const string& fileName, json& data) const {
@@ -216,7 +218,7 @@ void Configuration::save(const string& fileName) {
   std::ofstream file(fileName);
   if (file) {
     cout << "Writing configuration " << endl;
-    json data = *this; // I've already forgotten how this works
+    json data = *this;
     file << std::setw(4) << data << endl;
     cout << std::setw(4) << data
          << endl;  // so we can dump this in the web console

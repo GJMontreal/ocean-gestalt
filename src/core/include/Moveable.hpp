@@ -4,6 +4,7 @@
 
 #include <glm/glm.hpp>
 #include <functional>
+#include <optional>
 
 
 class Drawable;
@@ -30,8 +31,10 @@ class MoveableInterface {
 public:
     virtual Moveable& getMoveable() = 0;
     virtual const Moveable& getMoveable() const = 0;
+
     virtual void activate() = 0;
     virtual void deactivate() = 0;
+
     virtual ~MoveableInterface() = default;
 };
 

@@ -117,9 +117,9 @@ const std::string& ShaderProgram::getName() {
 
 void ShaderProgram::link() {
   #ifdef __EMSCRIPTEN__
-  glBindAttribLocation(handle, 0, "Position");
-  glBindAttribLocation(handle, 1, "Normal");
-  glBindAttribLocation(handle, 2, "Color");
+  glBindAttribLocation(handle, 0, "aPosition");
+  glBindAttribLocation(handle, 1, "aTexCoord");
+  glBindAttribLocation(handle, 2, "aTangent");
   #endif
   glLinkProgram(handle);
   GLint result;

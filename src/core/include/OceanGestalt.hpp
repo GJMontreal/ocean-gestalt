@@ -7,8 +7,7 @@
  *      * MIT
  */
 
-#ifndef __OCEAN_GESTALT_HPP
-#define __OCEAN_GESTALT_HPP
+#pragma once
 
 #include "Application.hpp"
 #include "Configuration.hpp"
@@ -31,10 +30,34 @@ using std::vector;
 
 using glm::mat4;
 
+class OceanGestalt;
+
+using Action = std::function<void(OceanGestalt*)>;
+
+class KeyBindings {
+  public:
+  std::vector<std::pair<int, Action>> getKeyBindings() const;
+};
+
+using OptionalMoveable = std::optional<std::shared_ptr<MoveableInterface>>;
+using OptionalDrawable = std::optional<std::shared_ptr<Drawable>>;
+  
+struct SceneElement{
+  std::string name;
+  OptionalDrawable drawable;
+  OptionalMoveable moveable;
+};
+
+static const std::vector<std::pair<int, Movement>> movementKeys{
+    {GLFW_KEY_W, Movement::FORWARD}, {GLFW_KEY_S, Movement::BACKWARD},
+    {GLFW_KEY_A, Movement::LEFT},    {GLFW_KEY_D, Movement::RIGHT},
+    {GLFW_KEY_SPACE, Movement::UP},  {GLFW_KEY_LEFT_SHIFT, Movement::DOWN}};
+
 class OceanGestalt : public OceanGestaltInterface,
                      public Application,
                      public Updatable,
                      public KeyExecutable {
+ friend KeyBindings;
  public:
   OceanGestalt();
 
@@ -64,38 +87,37 @@ class OceanGestalt : public OceanGestaltInterface,
   GLuint uboMatrices;
 
   shared_ptr<Configuration> configuration;
-  std::vector<shared_ptr<MoveableInterface>>::iterator currentMoveable;
-  unique_ptr<WaveUI> waveUI;
-  vector<Model*> models;
+  
+  std::vector<SceneElement> sceneElements;
+  std::vector<SceneElement>::iterator currentElement;
 
-  vector<std::shared_ptr<Drawable>> drawables;
-  vector<std::shared_ptr<MoveableInterface>> moveables;
-
-  float elapsedTime=0;
+  double elapsedTime=0;
   double lastTime;
   bool isRunning = true;
 
-  bool floatingCamera = false;
   FPSCounter fps;
 
-  void toggleNormalDisplay();
+  KeyBindings keyBindings;
 
+  void toggleNormalDisplay();
   void toggleWireframe();
   void toggleMesh();
   void toggleDrawTriangles();
   void toggleDrawLines();
   void dumpUniforms();
-
+  void toggleFloatingCamera();
+  void selectNextElement();
   void toggleFullscreen(GLFWwindow*);
 
   void initUniformBuffers();
   void setUniformBuffers(mat4& projection, mat4& view) const;
   void loadUniforms();
+  void generateUniforms();
+
+  void buildScene();
+  void renderText();
   
   std::vector<std::function<void()>> onReadyCallbacks;
   std::vector<std::function<void()>> renderThreadCallbacks;
 
-  std::shared_ptr<SurfAudio> surfAudio;
 };
-
-#endif

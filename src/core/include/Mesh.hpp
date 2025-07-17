@@ -1,5 +1,4 @@
-#ifndef MESH_HPP
-#define MESH_HPP
+#pragma once
 
 #include "Shader.hpp"
 #include "Vertex.hpp"
@@ -7,10 +6,6 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
-struct NormalVertices{
-  std::vector<VertexType> vertices;
-  std::vector<GLuint> indices;
-};
 class Mesh {
  public:
   Mesh(int size, int subdivisions, glm::vec4 aColor = glm::vec4({.01f, .15f, .210f, 0.0f})); // this colour should come from the configuration
@@ -22,17 +17,14 @@ class Mesh {
   void drawNormals()const;
 
   void calculateNormals(
-      std::vector<VertexType>& vertices,
+      std::vector<Vertex>& vertices,
       std::vector<GLuint>
           indices)const;  // this could also return an array of vertices that
                      // corresponds to the face normals
 
-  GLuint getVbo()const;
-  // we'll hang onto the mesh indices to simplify recalculating our normals
-  // later
+  GLuint getVbo()const; //why
+  
   std::vector<GLuint> getTriangularIndices()const;
-
-  NormalVertices generateNormalVertices(const std::vector<VertexType>& vertices)const;
 
  private:
   int size;  // x and y are symmetrical
@@ -48,14 +40,10 @@ class Mesh {
   GLuint wireframeIbo;
   GLuint meshVao;
 
-  GLuint normalsVao;
-  GLuint normalsVbo;
-  GLuint normalsIbo;
-
   std::vector<GLuint> triangularMeshIndices;
 
   void generateMesh(int size, int subdivisions);
-  VertexType generateVertex(const glm::vec2 position, const glm::vec4& color)const;
+  Vertex generateVertex(const glm::vec2 position) const;
 
   std::vector<GLuint> generateTriangularIndices(
       int size)const;  
@@ -66,5 +54,3 @@ class Mesh {
 
   void setVertexAttributes()const;
 };
-
-#endif

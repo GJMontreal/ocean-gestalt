@@ -14,34 +14,20 @@ void Skybox::bindVertices() {
   std::vector<glm::vec3> vertices = {{-1, -1, -1}, {1, -1, -1}, {1, 1, -1},
                                      {-1, 1, -1},  {-1, -1, 1}, {1, -1, 1},
                                      {1, 1, 1},    {-1, 1, 1}};
-  // std::vector<unsigned int> indices = {// back
-  //                           2, 1, 0, 0, 3, 2,
-  //                           // front
-  //                           4, 5, 6, 6, 7, 4,
-  //                           // left
-  //                           0, 3, 7, 7, 4, 0,
-  //                           // right
-  //                           1, 5, 6, 6, 2, 1,
-  //                           // top
-  //                           3, 2, 6, 6, 7, 3,
-  //                           // bottom
-  //                           0, 4, 5, 5, 1, 0};
 
-                            std::vector<unsigned int> indices = {
-    // -Z (back)
-    2, 1, 0, 0, 3, 2,
-    // +Z (front)
-    4, 5, 6, 6, 7, 4,
-    // -X (left)
-    0, 4, 7, 7, 3, 0,
-    // +X (right)
-    1, 2, 6, 6, 5, 1,
-    // +Y (top)
-    3, 7, 6, 6, 2, 3,
-    // -Y (bottom)
-    0, 1, 5, 5, 4, 0
-};
-  
+  std::vector<unsigned int> indices = {// -Z (back)
+                                       2, 1, 0, 0, 3, 2,
+                                       // +Z (front)
+                                       4, 5, 6, 6, 7, 4,
+                                       // -X (left)
+                                       0, 4, 7, 7, 3, 0,
+                                       // +X (right)
+                                       1, 2, 6, 6, 5, 1,
+                                       // +Y (top)
+                                       3, 7, 6, 6, 2, 3,
+                                       // -Y (bottom)
+                                       0, 1, 5, 5, 4, 0};
+
   indexCount = indices.size();
 
   glGenVertexArrays(1, &vao);
@@ -66,10 +52,9 @@ void Skybox::bindVertices() {
 }
 
 void Skybox::draw(Uniforms& uniforms){
-  if(!getIfShouldDraw()){
-    return;
+  if(getIfShouldDrawMesh()){
+    drawMesh(uniforms, Transform());
   }
-  Transform empty;
 }
 
 void Skybox::drawMesh(Uniforms& uniforms, Transform transform) {

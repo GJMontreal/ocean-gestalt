@@ -81,7 +81,7 @@ void Mesh::drawNormals()const{
 // This could be broken up a little
 void Mesh::generateMesh(int meshSize, int meshSubdivisions){
   // Mesh will have vertex and normal for the moment
-  std::vector<VertexType> vertices;
+  std::vector<Vertex> vertices;
   auto xyVertices = meshSize * meshSubdivisions;
   float subdivisionSize = 1.0f / (float)meshSubdivisions;
 //will this only work for even multiples of aSize - (maybe it should be something like subdivisions instead)
@@ -89,7 +89,7 @@ void Mesh::generateMesh(int meshSize, int meshSubdivisions){
     for (int x = 0; x <= xyVertices; ++x) {
       float xx = (float)x * subdivisionSize - ((float)meshSize / 2.0f);
       float yy = (float)y * subdivisionSize - ((float)meshSize / 2.0f);
-      vertices.push_back(generateVertex({xx, yy}, color));
+      vertices.push_back(generateVertex({xx, yy}));
     }
 
   // generate indices for a triangular mesh
@@ -98,13 +98,10 @@ void Mesh::generateMesh(int meshSize, int meshSubdivisions){
   std::cout << "vertices=" << vertices.size() << std::endl;
   std::cout << "index=" << triangularMeshIndices.size() << std::endl;
 
-  // given a vector of vertices and a vector of indices - generate normals
-   calculateNormals(vertices, triangularMeshIndices);
-   generateNormalVertices(vertices);
   // vbo
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(VertexType),
+  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex),
                vertices.data(), GL_STATIC_DRAW);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glCheckError(__FILE__, __LINE__);
@@ -149,78 +146,16 @@ void Mesh::generateMesh(int meshSize, int meshSubdivisions){
 
   glBindVertexArray(0);
   glCheckError(__FILE__, __LINE__);
-
-  NormalVertices normalVertices = generateNormalVertices(vertices);
-
-  glGenBuffers(1, &normalsVbo);
-  glBindBuffer(GL_ARRAY_BUFFER, normalsVbo);
-  glBufferData(GL_ARRAY_BUFFER, normalVertices.vertices.size() * sizeof(VertexType),
-               normalVertices.vertices.data(), GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-  glGenBuffers(1, &normalsIbo);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, normalsIbo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, normalVertices.indices.size() * sizeof(GLuint),
-               normalVertices.indices.data(), GL_STATIC_DRAW);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-  glGenVertexArrays(1, &normalsVao);
-  glBindVertexArray(normalsVao);
-
-  glBindBuffer(GL_ARRAY_BUFFER, normalsVbo); 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, normalsIbo);
-
-  setVertexAttributes();
-
-  glBindVertexArray(0);
-  glCheckError(__FILE__, __LINE__);
 }
 
-VertexType Mesh::generateVertex(const glm::vec2 position, const glm::vec4& color) const{
+Vertex Mesh::generateVertex(const glm::vec2 position) const{
   const glm::vec2 dx(1.0, 0.0);
   const glm::vec2 dy(0.0, 1.0);
 
-  VertexType v;
+  Vertex v;
   float h = 0;
   v.position = glm::vec3(position.x, h,position.y);
-
-  // We'll calculate normals once we have our triangles 
-  v.normal = glm::vec3(0.0f,0.0f,0.0f);
-  v.color = color;
   return v;
-}
-
-void Mesh::calculateNormals(std::vector<VertexType>& vertices,
-                            std::vector<GLuint> indices) const{
-  // go through the indices 3 at a time
-  for (int i = 0; i < indices.size() - 3; i += 3) {
-    glm::vec3 normal =
-        -1.0f * glm::triangleNormal(vertices[indices[i + 1]].position,
-                                    vertices[indices[i]].position,
-                                    vertices[indices[i + 2]].position);
-
-    vertices[indices[i]].normal += normal;
-    vertices[indices[i + 1]].normal += normal;
-    vertices[indices[i + 2]].normal += normal;
-  }
-}
-
-NormalVertices Mesh::generateNormalVertices(const std::vector<VertexType>& vertices)const{
-  NormalVertices normalVertices;
-  int i = 0 ;
-  for( VertexType vertex: vertices){
-    glm::vec4 normalColor({1.0f,0.0f,0.0f,1.0f});
-    VertexType vertex1{.position=vertex.position,.normal=glm::vec3{0.0f,0.0f,0.0f},.color = normalColor};
-    normalVertices.vertices.push_back(vertex1);
-    VertexType vertex2{.position=vertex.position - glm::normalize(vertex.normal), .normal = glm::vec3{0.0f,0.0f,0.0f},.color = normalColor};
-    normalVertices.vertices.push_back(vertex2);
-    normalVertices.indices.push_back(i);
-    normalVertices.indices.push_back(i+1);
-    i+=2;
-  }
-  return normalVertices;
-
-  // bind to the appropriate buffer
 }
 
 std::vector<GLuint> Mesh::generateTriangularIndices(int aSize)const{
@@ -268,14 +203,14 @@ std::vector<GLuint> Mesh::generateWireframeIndices(int aSize)const{
 
 void Mesh::setVertexAttributes()const{
   // position attribute
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)nullptr); // why 10* sizeof(float)
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position)); 
   glEnableVertexAttribArray(0);
   
   // normal attribute
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)(3 * sizeof(float)));
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
   glEnableVertexAttribArray(1);
 
   // color attribute
-  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 10 * sizeof(float), (void*)(6 * sizeof(float)));
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, tangent)));
   glEnableVertexAttribArray(2); 
 }

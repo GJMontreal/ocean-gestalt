@@ -1,20 +1,17 @@
-#ifndef __WAVE_GENERATOR_HPP
-#define __WAVE_GENERATOR_HPP
+#pragma once
 
-#include "Wave.hpp"
+#include "ApiAdapter.hpp"
+#include <glm/glm.hpp>
 
-#include <memory>
-#include <vector>
 
-using std::shared_ptr;
-using std::vector;
-
+struct Wind{
+  glm::vec2 direction;
+  float speed;
+};
 class WaveGenerator {
  public:
-  WaveGenerator(vector<shared_ptr<Wave>>& waves,
-                float stdDev,
-                float medianWavelength,
-                float medianAmplitude);
+  WaveGenerator(int numWaves, Wind& wind, std::shared_ptr<ApiAdapter> api) ;
 };
 
-#endif
+float randf(float min, float max);
+

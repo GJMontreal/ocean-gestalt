@@ -12,22 +12,23 @@ Model::Model(std::shared_ptr<Configuration> configuration)
     : meshes({Mesh(configuration->meshSize,configuration->meshSubdivisions,configuration->meshColor)}), Drawable(glm::vec3(0.0f,0.0f,0.0f),configuration) {
   this->configuration = configuration;
   calculateNormalMatrix(getTransform(), normalMatrix);
+  setIfShouldDrawMesh(true);
 }
 
 // specify different shaders for mesh, wireframe, and normals
 void Model::draw(Uniforms& uniforms) {
-{
-    if (shouldDrawWireframe) {
+  {
+    if (getIfShouldDrawWireframe()) {
       drawWireframe(uniforms);
     }
 
 #ifndef __EMSCRIPTEN__
-    if (shouldDrawNormals) {
-      drawNormals(uniforms,Transform());
+    if (getIfShouldDrawNormals()) {
+      drawNormals(uniforms, Transform());
     }
 #endif
 
-    if (shouldDrawMesh) {
+    if (getIfShouldDrawMesh()) {
       drawMesh(uniforms, Transform());
     }
   }
@@ -86,7 +87,7 @@ void Model::drawMesh(Uniforms& uniforms, Transform _) {
     if (drawTriangles) {
       mesh.draw();
     }
-    if (drawLines) {
+    if (getIfShouldDrawLines()) {
       //offset the wireframe ever so slightly so it doesn't draw on top of our shaded mesh
       shader->setUniform("model", glm::translate(this->getTransform(),glm::vec3(0.f,-.1f,0.f)));
       mesh.drawWireframe();
@@ -96,34 +97,6 @@ void Model::drawMesh(Uniforms& uniforms, Transform _) {
 
 Mesh* Model::getMesh(int index){
   return &(meshes[index]);
-}
-
-void Model::toggleDrawNormals(){
-  shouldDrawNormals = !shouldDrawNormals;
-}
-
-void Model::toggleDrawWireframe(){
-  shouldDrawWireframe = !shouldDrawWireframe;
-}
-
-void Model::toggleDrawMesh(){
-  shouldDrawMesh = !shouldDrawMesh;
-}
-
-void Model::toggleRunning(){
-  running = !running;
-}
-
-void Model::toggleDrawLines(){
-  drawLines = !drawLines;
-}
-
-void Model::toggleDrawTriangles(){
-  drawTriangles = !drawTriangles;
-}
-
-bool Model::isRunning()const{
-  return running;
 }
 
 void Model::calculateNormalMatrix(const glm::mat4& modelTransform, glm::mat3& aNormalMatrix){

@@ -7,19 +7,26 @@ void Moveable::ProcessKeyboard(Movement direction, float deltaTime) {
     moveDirection = getMoveDirection();
   }
   float velocity = movementSpeed * deltaTime;
-  if (direction == Movement::FORWARD)
-    position += moveDirection.forward * velocity;
-  if (direction == Movement::BACKWARD)
-    position -= moveDirection.forward * velocity;
-  if (direction == Movement::LEFT)
-    position -= moveDirection.right * velocity;
-  if (direction == Movement::RIGHT)
-    position += moveDirection.right * velocity;
-  if (direction == Movement::UP)
-    position += moveDirection.up * velocity;
-  if (direction == Movement::DOWN)
-    position -= moveDirection.up * velocity;
-
+  switch (direction) {
+    case Movement::FORWARD:
+      position += moveDirection.forward * velocity;
+      break;
+    case Movement::BACKWARD:
+      position -= moveDirection.forward * velocity;
+      break;
+    case Movement::LEFT:
+      position -= moveDirection.right * velocity;
+      break;
+    case Movement::RIGHT:
+      position += moveDirection.right * velocity;
+      break;
+    case Movement::UP:
+      position += moveDirection.up * velocity;
+      break;
+    case Movement::DOWN:
+      position -= moveDirection.up * velocity;
+  }
+  
   if(onPositionChanged){
     onPositionChanged(position);
   }

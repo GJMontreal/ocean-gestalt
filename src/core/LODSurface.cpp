@@ -5,7 +5,7 @@
 #include "glError.hpp"
 #include "Light.hpp"
 #include "Shader.hpp"
-#include <glm/gtx/string_cast.hpp>
+
 
 LODSurface::LODSurface(glm::vec3 origin, std::shared_ptr<Configuration> context)
     : Drawable(origin, context) {
