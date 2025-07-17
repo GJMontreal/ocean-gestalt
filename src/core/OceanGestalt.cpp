@@ -31,6 +31,7 @@ using std::cout;
 using std::endl;
   
 constexpr float TIME_WRAP_WINDOW = 10000.00f;
+constexpr double TEXT_VISIBLE_TIME = 200;
 
 // our application should keep a reference to the OceanApi
 OceanGestalt::OceanGestalt() : Application() {
@@ -144,7 +145,14 @@ void OceanGestalt::loop() {
       (*element.drawable)->draw(uniforms);
     }
   }
-  renderText();
+
+  if(shouldRenderText){
+    renderText();
+    if( ++textVisibleTime > TEXT_VISIBLE_TIME){
+      textVisibleTime = 0;
+      shouldRenderText = false;
+    }
+  }
 }
 
 void OceanGestalt::renderText() {
@@ -221,9 +229,11 @@ void OceanGestalt::toggleFloatingCamera() {
 }
 
 void OceanGestalt::selectNextElement() {
-      if (++currentElement == sceneElements.end()){
-        currentElement = sceneElements.begin();
-      }
+  // temporarily enable text rendering
+  shouldRenderText = true;
+  if (++currentElement == sceneElements.end()) {
+    currentElement = sceneElements.begin();
+  }
 }
 
 void OceanGestalt::loadUniforms() {
