@@ -9,7 +9,7 @@
 #ifndef OPENGL_CMAKE_SKELETON_GLERROR_HPP
 #define OPENGL_CMAKE_SKELETON_GLERROR_HPP
 
-#define DEBUG_GL
+// #define DEBUG_GL
 
 // Ask Opengl for errors:
 // Result is printed on the standard output

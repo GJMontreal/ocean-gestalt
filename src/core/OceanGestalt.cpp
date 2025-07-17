@@ -61,7 +61,9 @@ OceanGestalt::OceanGestalt() : Application() {
 
 void OceanGestalt::buildScene() {
   this->camera = configuration->camera;
+  this->camera->setConfiguration(configuration);
   this->camera->getMoveable().movementSpeed = 10.f;
+
   sceneElements.emplace_back(SceneElement{"camera",std::nullopt,this->camera});
   
   this->light = std::make_shared<Light>(configuration->lightPosition, configuration);
@@ -119,19 +121,11 @@ void OceanGestalt::loop() {
   double anchor = std::floor(elapsedTime/TIME_WRAP_WINDOW) * TIME_WRAP_WINDOW;
   auto uniformTime = static_cast<float>(elapsedTime - anchor);
 
-  projection = glm::perspective(glm::radians(getCamera()->Zoom),
+  projection = glm::perspective(glm::radians(getCamera()->getZoom()),
                                 getWindowRatio(), 0.1f, 200.f);
 
+  view = camera->getViewMatrix(elapsedTime);
   
-  //TODO: move this into the camera
-  if(floatingCamera){
-    auto position = camera->getPosition();
-    auto waveOffset = evaluateGerstnerWaves(configuration->getWaves(), glm::vec2(position.x,position.z),uniformTime);
-    view = glm::lookAt(position + waveOffset, position + waveOffset + camera->Front, camera->Up);
-  } else {
-    view = camera->getViewMatrix();
-  }
-
   Uniforms uniforms{.projection = projection, .view = view, .time = uniformTime};
 
 #ifndef __EMSCRIPTEN__
@@ -223,7 +217,7 @@ void OceanGestalt::toggleDrawLines() {
 }
 
 void OceanGestalt::toggleFloatingCamera() {
-  floatingCamera = !floatingCamera;
+  camera->setIsFloating(!camera->getIsFloating());
 }
 
 void OceanGestalt::selectNextElement() {

@@ -62,10 +62,14 @@ void Configuration::loadCamera(const string& fileName) {
   json data;
   loadJSON(fileName, data);
 
-  auto aCamera = make_shared<Camera>();
   auto j = data.at("camera");
-  j.get_to(*(aCamera.get()));
-  camera = std::move(aCamera);
+  auto position = j.at("position").get<glm::vec3>();
+  auto up = j.at("up").get<glm::vec3>();
+  auto yaw = j.at("yaw").get<float>();
+  auto pitch = j.at("pitch").get<float>();
+  auto zoom = j.at("zoom").get<float>();
+
+  camera = make_shared<Camera>(position, up, yaw, pitch, zoom);
 }
 
 void Configuration::loadJSON(const string& fileName, json& data) const {

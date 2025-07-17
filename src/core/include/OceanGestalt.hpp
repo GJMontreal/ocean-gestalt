@@ -95,7 +95,6 @@ class OceanGestalt : public OceanGestaltInterface,
   double lastTime;
   bool isRunning = true;
 
-  bool floatingCamera = true;
   FPSCounter fps;
 
   KeyBindings keyBindings;

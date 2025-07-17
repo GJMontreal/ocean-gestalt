@@ -35,21 +35,12 @@ void to_json(json& j, const WaveSerialized& wave) {
 }
 
 // Camera
-void from_json(const json& j, Camera& camera) {
-  j.at("position").get_to(camera.getPosition());
-  j.at("up").get_to(camera.getMoveDirection().up);
-  j.at("yaw").get_to(camera.Yaw);
-  j.at("pitch").get_to(camera.Pitch);
-  j.at("zoom").get_to(camera.Zoom);
-  camera.updateCameraVectors();
-}
-
 void to_json(json& j, const Camera& camera) {
   j = json{{"position", camera.getPosition()},
            {"up", camera.getMoveDirection().up},
-           {"yaw", camera.Yaw},
-           {"pitch", camera.Pitch},
-           {"zoom", camera.Zoom}};
+           {"yaw", camera.getYaw()},
+           {"pitch", camera.getPitch()},
+           {"zoom", camera.getZoom()}};
 }
 
 namespace glm {

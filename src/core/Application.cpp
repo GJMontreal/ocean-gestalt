@@ -210,7 +210,7 @@ void Application::scrollCallback(GLFWwindow* window,
                                  double yoffset) {
   auto app = (Application*)glfwGetWindowUserPointer(window);
   auto camera = app->getCamera();
-  camera->ProcessMouseScroll(static_cast<float>(yoffset));
+  camera->processMouseScroll(static_cast<float>(yoffset));
 }
 
 void Application::cursorCallback(GLFWwindow* window,
