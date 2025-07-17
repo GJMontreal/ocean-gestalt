@@ -1,6 +1,7 @@
-in vec3 aPosition; 
-in vec4 aColor;
+in vec3 aPosition;
 in vec2 aTexCoord;
+in vec3 aTangent;
+in vec4 aColor;
 
 out vec4 color;
 out vec2 texCoord;
