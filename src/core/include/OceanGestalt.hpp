@@ -116,6 +116,7 @@ class OceanGestalt : public OceanGestaltInterface,
   void generateUniforms();
 
   void buildScene();
+  void renderText();
   
   std::vector<std::function<void()>> onReadyCallbacks;
   std::vector<std::function<void()>> renderThreadCallbacks;
