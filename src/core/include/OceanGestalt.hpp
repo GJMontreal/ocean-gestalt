@@ -97,7 +97,7 @@ class OceanGestalt : public OceanGestaltInterface,
 
   bool shouldRenderText = false;
   double textVisibleTime = 0;
-  
+
   FPSCounter fps;
 
   KeyBindings keyBindings;
@@ -111,6 +111,7 @@ class OceanGestalt : public OceanGestaltInterface,
   void toggleFloatingCamera();
   void selectNextElement();
   void toggleFullscreen(GLFWwindow*);
+  void toggleDisplayText();
 
   void initUniformBuffers();
   void setUniformBuffers(mat4& projection, mat4& view) const;
