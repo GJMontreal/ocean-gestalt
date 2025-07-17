@@ -228,6 +228,10 @@ void OceanGestalt::toggleFloatingCamera() {
   camera->setIsFloating(!camera->getIsFloating());
 }
 
+void OceanGestalt::toggleDisplayText() {
+  shouldRenderText = true;
+}
+
 void OceanGestalt::selectNextElement() {
   // temporarily enable text rendering
   shouldRenderText = true;
