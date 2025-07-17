@@ -12,7 +12,6 @@ Model::Model(std::shared_ptr<Configuration> configuration)
     : meshes({Mesh(configuration->meshSize,configuration->meshSubdivisions,configuration->meshColor)}), Drawable(glm::vec3(0.0f,0.0f,0.0f),configuration) {
   this->configuration = configuration;
   calculateNormalMatrix(getTransform(), normalMatrix);
-  setIfShouldDrawMesh(true);
 }
 
 // specify different shaders for mesh, wireframe, and normals
