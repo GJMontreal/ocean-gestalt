@@ -5,6 +5,7 @@ Finch, M. (2004). Simulating Ocean Water. In GPU Gems (Chapter 1). NVIDIA Corpor
 in vec3 aPosition;
 in vec2 aTexCoord;
 in vec3 aTangent;
+in vec3 aColor;
 
 uniform mat4 projection;
 uniform mat4 view;

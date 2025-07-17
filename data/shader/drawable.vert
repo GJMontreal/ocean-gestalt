@@ -19,7 +19,6 @@ out VS_OUT {
 } vs_out;
 
 void main() {
-
   vs_out.FragPos = vec3(model * vec4(aPosition, 1.0));
   vs_out.Normal = mat3(model) * normalize(aPosition); 
   gl_Position = projection * view * vec4(vs_out.FragPos,1.0);

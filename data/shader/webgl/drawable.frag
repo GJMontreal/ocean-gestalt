@@ -17,20 +17,15 @@ out vec4 FragColor;
 
 void main(void)
 {    
-   vec3 _ = viewPos;
-   
-    // Normalize interpolated normal
-    vec3 normal = normalize(oNormal);
-    
-    // Compute lighting direction
-    vec3 lightDir = normalize(lightPos - oFragPos);
+vec3 lightDir = normalize(viewPos - oFragPos);
+  vec3 norm = normalize(oNormal);
 
-    // Lambertian diffuse term
-    float diff = max(dot(normal, lightDir), 0.0);
+  // fake diffuse shading based on view angle
+  float diff = max(dot(norm, lightDir), 0.0);
 
-    // Final color is base color modulated by diffuse term
-    vec3 color = oColor * diff;
-
-    color = mix(color, oColor, ambientStrength);
-    FragColor = vec4(color, 1.0);
+  // ambient + view-aligned diffuse
+  float ambientStrength = 0.2;
+  vec3 color = (ambientStrength + diff) * oColor;
+  FragColor = vec4(color, 1.0);
+  FragColor.rgb += lightPos * 0.0; // To keep our uniforms consistent between shaders
 }

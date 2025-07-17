@@ -1,6 +1,7 @@
 in vec3 aPosition;
 in vec2 aTexCoord;
 in vec3 aTangent;
+in vec4 aColor;
 
 uniform mat4 projection;
 uniform mat4 view;

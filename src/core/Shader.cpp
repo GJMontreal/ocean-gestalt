@@ -120,6 +120,7 @@ void ShaderProgram::link() {
   glBindAttribLocation(handle, 0, "aPosition");
   glBindAttribLocation(handle, 1, "aTexCoord");
   glBindAttribLocation(handle, 2, "aTangent");
+  glBindAttribLocation(handle, 3, "aColor");
   #endif
   glLinkProgram(handle);
   GLint result;

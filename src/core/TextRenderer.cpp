@@ -63,12 +63,18 @@ void TextRenderer::setupBuffers() {
                         (void*)offsetof(TextVertex, position));
 
   glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(TextVertex),
-                        (void*)offsetof(TextVertex, color));
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(TextVertex),
+                        (void*)offsetof(TextVertex, texCoord));
 
   glEnableVertexAttribArray(2);
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(TextVertex),
-                        (void*)offsetof(TextVertex, texCoord));
+                        (void*)offsetof(TextVertex, tangent));
+  
+  glEnableVertexAttribArray(3);
+  glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(TextVertex),
+                        (void*)offsetof(TextVertex, color));
+
+
 
   glBindVertexArray(0);
   glCheckError(__FILE__, __LINE__);
@@ -133,8 +139,16 @@ void TextRenderer::setShader(std::shared_ptr<ShaderProgram> shader) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, ATLAS_WIDTH, ATLAS_HEIGHT, 0, GL_RED,
-               GL_UNSIGNED_BYTE, atlas.data());
+  std::vector<uint8_t> rgbAtlas;
+  rgbAtlas.reserve(atlas.size() * 3);
+
+  for (uint8_t gray : atlas) {
+    rgbAtlas.push_back(gray);  // R
+    rgbAtlas.push_back(gray);  // G
+    rgbAtlas.push_back(gray);  // B
+  }
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ATLAS_WIDTH, ATLAS_HEIGHT, 0, GL_RGB,
+               GL_UNSIGNED_BYTE, rgbAtlas.data());
 #ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);
 #endif

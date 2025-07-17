@@ -1,6 +1,7 @@
-in vec3 Position;
-in vec3 Normal;
-in vec4 Color;
+in vec3 aPosition;
+in vec2 aTexCoord;
+in vec3 aTangent;
+in vec4 aColor;
 
 uniform mat4 projection;
 uniform mat4 view;
@@ -15,9 +16,8 @@ out vec3 oColor;
 
 void main() {
 
-  oFragPos = vec3(model * vec4(Position, 1.0));
-  oNormal = mat3(transpose(inverse(model))) * Normal;
-  oColor = vec3(Color.xyz);
-
-  gl_Position = projection * view * model * vec4(Position, 1.0);
+  oFragPos = vec3(model * vec4(aPosition, 1.0)); 
+  oNormal = mat3((model)) * normalize(aPosition);
+  oColor = vec3(1.0);
+  gl_Position = projection * view * model * vec4(aPosition, 1.0);
 }

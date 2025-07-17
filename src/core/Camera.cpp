@@ -86,7 +86,6 @@ void Camera::updateCameraVectors() {
   forward.x = cos(radians(Yaw));
   forward.y = sin(radians(0.0f));
   forward.z = sin(radians(Yaw));
-    // if we did this with lambda
     
   moveDirection.forward = glm::normalize(forward);
   moveDirection.right = glm::normalize(glm::cross(moveDirection.forward, moveDirection.up));
