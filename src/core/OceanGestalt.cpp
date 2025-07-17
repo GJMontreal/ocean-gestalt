@@ -64,6 +64,7 @@ void OceanGestalt::buildScene() {
   this->camera = configuration->camera;
   this->camera->setConfiguration(configuration);
   this->camera->getMoveable().movementSpeed = 10.f;
+  this->camera->setIsFloating(true);
 
   sceneElements.emplace_back(SceneElement{"camera",std::nullopt,this->camera});
   
@@ -76,17 +77,21 @@ void OceanGestalt::buildScene() {
   auto drawableNormalShader = configuration->getShader("drawable_normal");
 #endif
   lightDrawable->setShader(drawableMeshShader);
+  lightDrawable->setIfShouldDrawMesh(false);
 #ifndef __EMSCRIPTEN__
   lightDrawable->setNormalShader(drawableNormalShader);
 #endif
   sceneElements.emplace_back(SceneElement{"light",lightDrawable, this->light});  //TODO: light should have a moveable, not be a moveable
 
   auto ocean = std::make_shared<Ocean>(configuration);
+  ocean->setIfShouldDrawMesh(true);
+  ocean->setIfShouldDrawLines(true);
   sceneElements.emplace_back(SceneElement{"waves",ocean,std::nullopt});
   
   auto buoy = std::make_shared<Buoy>(glm::vec3(5.0f,0.f,5.0f), configuration);
   auto buoyDrawable = buoy->getDrawable();
   buoyDrawable->setShader(configuration->getShader("buoy_mesh"));
+  buoyDrawable->setIfShouldDrawMesh(true);
 #ifndef __EMSCRIPTEN__
   buoyDrawable->setNormalShader(drawableNormalShader);
 #endif
