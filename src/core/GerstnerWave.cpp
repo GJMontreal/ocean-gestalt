@@ -47,3 +47,18 @@ glm::vec3 evaluateGerstnerWaves(const std::vector<std::shared_ptr<Wave>> waves, 
     }
     return totalDisplacement;
 }
+
+float getSteepness(std::vector<std::shared_ptr<Wave>> waves, const glm::vec3 &position, float time){
+  float delta = 0.1f;
+  vec3 offsetX =
+      evaluateGerstnerWaves(waves, position + vec3(delta, 0, 0), time);
+  vec3 offsetZ =
+      evaluateGerstnerWaves(waves, position + vec3(0, 0, delta), time);
+  vec3 center = evaluateGerstnerWaves(waves, position, time);
+
+  vec3 dX = offsetX - center;
+  vec3 dZ = offsetZ - center;
+
+  float steepness = glm::length(dX) + glm::length(dZ);  // crude proxy
+  return steepness;
+}

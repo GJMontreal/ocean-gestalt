@@ -28,6 +28,9 @@
       </canvas>
       <div id="title">Here we are, again</div>
       <div id="overlay">
+        
+        <button id="start-audio" type="button"></button>
+        
         <div id="control_grid">
           <div class="button_container">
             <div id="left_button_grid">
@@ -124,6 +127,19 @@
 
   // hide the title text after 5s
   setTimeout(() => { title.style.display = "none"; }, 5000);
+
+document.getElementById('start-audio').addEventListener('click', () => {
+  // optional: resume WebAudio context explicitly if needed
+  const ctx = window.miniaudio?.get_device_by_index(0)?.webaudio;
+  if (ctx && ctx.state === 'suspended') {
+    ctx.resume().then(() => {
+      Module.ccall('startAudio'); // call the exported function
+      document.getElementById('start-audio').classList.add('hidden');
+    }).catch(err => {
+      console.error('resume failed', err);
+    });
+  }
+}, { once: true });
 
   // connect to canvas
   var Module = {
@@ -310,6 +326,21 @@ html, body {
      }  
 } 
 
+#start-audio {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  color: transparent;
+  font-size: 0;
+  cursor: pointer;
+  z-index: 9999;
+  appearance: none;
+  -webkit-appearance: none;
+}
 </style>
 
 </html>

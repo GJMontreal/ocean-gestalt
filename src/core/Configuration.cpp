@@ -275,6 +275,6 @@ std::shared_ptr<WaveInterface> Configuration::getWaveInterface() {
   return nullptr;
 }
 
-std::vector<std::shared_ptr<Wave>> Configuration::getWaves() {
+std::vector<std::shared_ptr<Wave>>& Configuration::getWaves() {
   return waves;
 }

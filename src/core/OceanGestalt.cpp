@@ -58,6 +58,14 @@ OceanGestalt::OceanGestalt() : Application() {
 #ifdef DEBUG_GL
   glDumpTextureBindings();
 #endif
+
+  surfAudio = std::make_shared<SurfAudio>();
+  doOnReady([audio = this->surfAudio]{audio->start();});
+
+  onRender([audio=this->surfAudio,waves = configuration->getWaves(), camera = this->camera](float time) {
+    auto position = camera->getPosition();
+    audio->generateSurf(waves, position, camera->getYaw(), time);
+  });
 }
 
 void OceanGestalt::buildScene() {
@@ -111,9 +119,6 @@ void OceanGestalt::loop() {
     exit();
 
   fps.update();
-  for(auto const& cb : renderThreadCallbacks){
-      cb();
-  }
 
   auto time = glfwGetTime();
   auto interval = time - lastTime;
@@ -122,6 +127,10 @@ void OceanGestalt::loop() {
   //update our time if the simulation is running
   if (isRunning) {
     elapsedTime += interval;
+  }
+
+  for(auto const& cb : renderThreadCallbacks){
+      cb(elapsedTime);
   }
 
   double anchor = std::floor(elapsedTime/TIME_WRAP_WINDOW) * TIME_WRAP_WINDOW;
@@ -315,10 +324,11 @@ void OceanGestalt::doOnReady(const std::function<void()>& callback){
   onReadyCallbacks.push_back(callback);
 }
 
-void OceanGestalt::onRender(const std::function<void()>& callback){
+void OceanGestalt::onRender(const std::function<void(float)>& callback){
   renderThreadCallbacks.push_back(callback);
 }
 
 void OceanGestalt::pauseSimulation(bool){
   toggleSimulation();
 } 
+
