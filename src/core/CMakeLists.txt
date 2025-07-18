@@ -53,6 +53,9 @@ target_link_libraries(app-core
 if (NOT EMSCRIPTEN)
   target_link_libraries(app-core
   PRIVATE libglew_static
+  "-framework CoreAudio"
+  "-framework AudioToolbox"
+  "-framework AVFoundation"
   )
 endif()
 

@@ -22,7 +22,7 @@ int main(int argc, const char* argv[]) {
   auto app = std::make_shared<OceanGestalt>();
   auto uniformState = std::make_shared<UniformState>(app->getContext());
   auto api = std::make_shared<OceanApi>(app,uniformState);
-  app->onRender([&uniformState]{uniformState->renderThreadCallback();});
+  app->onRender([&uniformState](float){uniformState->renderThreadCallback();});
   app->doOnReady([&] {
       app->getContext().setInitialUniformState(*api);
   });

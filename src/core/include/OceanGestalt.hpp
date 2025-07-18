@@ -15,7 +15,6 @@
 #include "InputProcessor.hpp"
 #include "KeyExecutable.hpp"
 #include "OceanGestaltInterface.hpp"
-#include "Shader.hpp"
 #include "Model.hpp"
 #include "WaveUI.hpp"
 #include "Moveable.hpp"
@@ -53,7 +52,7 @@ static const std::vector<std::pair<int, Movement>> movementKeys{
     {GLFW_KEY_A, Movement::LEFT},    {GLFW_KEY_D, Movement::RIGHT},
     {GLFW_KEY_SPACE, Movement::UP},  {GLFW_KEY_LEFT_SHIFT, Movement::DOWN}};
 
-class OceanGestalt : public OceanGestaltInterface,
+class OceanGestalt final : public OceanGestaltInterface,
                      public Application,
                      public Updatable,
                      public KeyExecutable {
@@ -64,8 +63,8 @@ class OceanGestalt : public OceanGestaltInterface,
   void toggleSimulation();
 
   AppContextInterface& getContext() override { return *configuration; };
-  void doOnReady(const std::function<void()>& callback) override;
-  void onRender(const std::function<void()>& callback) override;
+  void doOnReady(const std::function<void()>& callback) final;
+  void onRender(const std::function<void(float)>& callback) final;
   void pauseSimulation(bool) override;
 
  protected:
@@ -122,6 +121,7 @@ class OceanGestalt : public OceanGestaltInterface,
   void renderText();
   
   std::vector<std::function<void()>> onReadyCallbacks;
-  std::vector<std::function<void()>> renderThreadCallbacks;
+  std::vector<std::function<void(double time)>> renderThreadCallbacks;
 
+  std::shared_ptr<SurfAudio> surfAudio;
 };
