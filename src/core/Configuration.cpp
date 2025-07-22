@@ -260,13 +260,9 @@ void Configuration::setInitialUniformState(const ApiAdapter& api){
   emscripten_async_call([](void* arg) {
     auto* self = static_cast<Configuration*>(arg);
     std::cout << "Loading uniforms" << std::endl;
-    self->loadUniforms(CONFIGURATION_DIR "uniforms.json");
+    self->loadUniforms(CONFIGURATION_DIR "uniforms_web.json");
   }, that, 0);  // delay = 0 ms
 #endif
-}
-
-void Configuration::setInitialWaveUniforms(const ApiAdapter& api)const{
-   
 }
 
 std::shared_ptr<WaveInterface> Configuration::getWaveInterface() {
