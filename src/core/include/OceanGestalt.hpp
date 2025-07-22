@@ -76,8 +76,8 @@ class OceanGestalt final : public OceanGestaltInterface,
   // for restoring the window from fullscreen
   int windowXPos;
   int windowYPos;
-  int windowWidth;
-  int windowHeight;
+  int restorationWindowWidth;
+  int restorationWindowHeight;
 
   // shader matrix uniform
   glm::mat4 projection = mat4(1.0);

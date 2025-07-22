@@ -171,11 +171,13 @@ void OceanGestalt::loop() {
 
 void OceanGestalt::renderText() {
   configuration->textRenderer->drawBegin();
+  auto textYLocation = static_cast<float>(getHeight()) - 15.f;
+  auto textColor = glm::vec4(1.0f);
   configuration->textRenderer->drawText(
-      fps.getFPSString(), {10.0f, 10.0f, 0.0f}, {1.f, 0.f, 0.f, 1.f}, 100.0f);
+      fps.getFPSString(), {10.0f,  textYLocation, 0.0f}, textColor, 100.0f);
   configuration->textRenderer->drawText(currentElement->name,
-                                        {200.0f, 10.0f, 0.0f},
-                                        {1.f, 0.f, 0.f, 1.f}, 100.0f);
+                                        {200.0f,  textYLocation, 0.0f},
+                                        textColor, 100.0f);
   configuration->textRenderer->render();
 }
 
@@ -308,7 +310,7 @@ void OceanGestalt::toggleFullscreen(GLFWwindow* window) {
   if (monitor == nullptr) {
     // save position and size
     glfwGetWindowPos(window, &windowXPos, &windowYPos);
-    glfwGetWindowSize(window, &windowWidth, &windowHeight);
+    glfwGetWindowSize(window, &restorationWindowWidth, &restorationWindowHeight);
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     monitor = glfwGetPrimaryMonitor();
@@ -316,8 +318,8 @@ void OceanGestalt::toggleFullscreen(GLFWwindow* window) {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     monitor = nullptr;
   }
-  glfwSetWindowMonitor(window, monitor, windowXPos, windowYPos, windowWidth,
-                       windowHeight, GLFW_DONT_CARE);
+  glfwSetWindowMonitor(window, monitor, windowXPos, windowYPos, restorationWindowWidth,
+                       restorationWindowHeight, GLFW_DONT_CARE);
 }
 
 void OceanGestalt::doOnReady(const std::function<void()>& callback){ 
