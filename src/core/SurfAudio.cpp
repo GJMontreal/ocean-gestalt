@@ -49,55 +49,20 @@ void SurfAudio::setSteepness(float left, float right) {
 
 void SurfAudio::dataCallback(ma_device* device, void* output, const void*, ma_uint32 frameCount) {
 
-    SurfAudio* self = static_cast<SurfAudio*>(device->pUserData);
-    float* out = static_cast<float*>(output);
+    auto self = static_cast<SurfAudio*>(device->pUserData);
+    auto out = static_cast<float*>(output);
     float steepnessLeft = self->steepnessLeft.load(std::memory_order_relaxed);
     float steepnessRight = self->steepnessRight.load(std::memory_order_relaxed);
 
-    float dt = 1.0f / self->sampleRate;
-
     for (ma_uint32 i = 0; i < frameCount; ++i) {
-       self->plopTimer -= dt;
-
-       if (self->plopTimer <= 0.0f) {
-         auto targetLeft = (rand() % 2 == 0);
-
-         float minInterval = 0.1f;  // lower bound to avoid audio spam
-         float maxInterval = targetLeft ? steepnessLeft : steepnessRight;
-         maxInterval = 5.0f - maxInterval * 4.0f;
-         float intervalRange = maxInterval - minInterval;
-         self->plopTimer =
-             minInterval + ((float)rand() / RAND_MAX) * intervalRange;
-
-         auto& target = targetLeft ? self->plopsLeft : self->plopsRight;
-         for (int p = 0; p < MAX_PLOPS; ++p) {
-           if (!target[p].active) {
-             float freq = 300.0f + ((float)rand() / RAND_MAX) * 300.0f;
-             float gain = 0.2f + ((float)rand() / RAND_MAX) * 0.3f;
-             float decay = 40.0f + ((float)rand() / RAND_MAX) * 10.0f;
-             target[p].trigger(freq, gain, decay);
-             break;
-           }
-         }
-       }
-
       float noiseLeft = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
       float noiseRight = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
 
       float bandNoiseLeft = self->leftFilter.process(noiseLeft);
       float bandNoiseRight = self->rightFilter.process(noiseRight);
 
-      float plopL = 0.0f;
-      float plopR = 0.0f;
-
-      for (int p = 0; p < MAX_PLOPS; ++p) {
-        plopL += self->plopsLeft[p].process(dt);
-        plopR += self->plopsRight[p].process(dt);
-      }
-          // std::cout << "sample " << i << " " << plopL << std::endl;
-
-      out[i * 2 + 0] = .1f * plopL + bandNoiseLeft * steepnessLeft;    // Left
-      out[i * 2 + 1] = .1f * plopR + bandNoiseRight * steepnessRight;  // Right
+      out[i * 2 + 0] =  bandNoiseLeft * steepnessLeft;    // Left
+      out[i * 2 + 1] = bandNoiseRight * steepnessRight;  // Right
     }
 }
 

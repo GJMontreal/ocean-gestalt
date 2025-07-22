@@ -97,10 +97,4 @@ private:
 
     Biquad leftFilter;
     Biquad rightFilter;
-    static constexpr int MAX_PLOPS = 10;
-
-    Plop plopsLeft[MAX_PLOPS];
-    Plop plopsRight[MAX_PLOPS];
-    float plopTimer = 0.0f;
-
   };
