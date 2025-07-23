@@ -30,7 +30,7 @@
 using std::cout;
 using std::endl;
   
-constexpr float TIME_WRAP_WINDOW = 10000.00f;
+constexpr float TIME_WRAP_WINDOW = 86400.00f;
 constexpr double TEXT_VISIBLE_TIME = 200;
 
 // our application should keep a reference to the OceanApi
@@ -134,8 +134,7 @@ void OceanGestalt::loop() {
       cb(elapsedTime);
   }
 
-  double anchor = std::floor(elapsedTime/TIME_WRAP_WINDOW) * TIME_WRAP_WINDOW;
-  auto uniformTime = static_cast<float>(elapsedTime - anchor);
+  auto uniformTime = static_cast<float>(std::fmod(elapsedTime, TIME_WRAP_WINDOW));
 
   projection = glm::perspective(glm::radians(getCamera()->getZoom()),
                                 getWindowRatio(), 0.1f, 200.f);
@@ -222,7 +221,7 @@ void OceanGestalt::toggleNormalDisplay() {
 void OceanGestalt::toggleSimulation() {
   std::cout << "Toggle simulation" << std::endl;
   isRunning = !isRunning;
-  isRunning ? surfAudio->start(): surfAudio->stop(); 
+  muteAudio(!isRunning); 
 }
 
 void OceanGestalt::toggleWireframe() {
@@ -338,10 +337,13 @@ void OceanGestalt::doOnReady(const std::function<void()>& callback){
 }
 
 void OceanGestalt::onRender(const std::function<void(float)>& callback){
-  renderThreadCallbacks.push_back(callback);
+  renderThreadCallbacks.emplace_back(callback);
 }
 
 void OceanGestalt::pauseSimulation(bool){
   toggleSimulation();
 } 
 
+void OceanGestalt::muteAudio(bool mute) {
+  mute ? surfAudio->stop() : surfAudio->start();
+}

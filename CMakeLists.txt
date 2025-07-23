@@ -55,6 +55,10 @@ if (EMSCRIPTEN)
     PRIVATE app-api
   )
 
+  target_link_options(ocean-gestalt PRIVATE
+    "-sEXPORTED_FUNCTIONS+=['_onPageHidden','_onPageVisible']"
+    "-sEXPORTED_RUNTIME_METHODS=['ccall']"
+  )
 
   # Copy the index.html file.
   foreach(file 

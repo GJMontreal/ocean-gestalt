@@ -4,9 +4,8 @@
 #include "asset.hpp"
 #include "ApiAdapter.hpp"
 #include "Shader.hpp"
-#include "UniformValue.hpp"
-#include "Utilities.hpp"
 #include "TextRenderer.hpp"
+
 #include <memory>
 #include <fstream>
 #include <iostream>
@@ -68,6 +67,7 @@ void Configuration::loadCamera(const string& fileName) {
   auto zoom = j.at("zoom").get<float>();
 
   camera = make_shared<Camera>(position, up, yaw, pitch, zoom);
+  textRenderer = make_shared<TextRenderer>(FONT_DIR "FiraCode-Regular.ttf",64.f);
 }
 
 void Configuration::loadJSON(const string& fileName, json& data) const {

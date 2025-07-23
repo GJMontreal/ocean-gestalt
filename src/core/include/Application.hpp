@@ -62,6 +62,7 @@ class Application: public InputProcessor {
   int getWidth() const;
   int getHeight() const;
   float getWindowRatio() const;
+  bool getIsRunning() const { return running;};
 
   std::shared_ptr<Camera> getCamera();
   std::shared_ptr<Light> getLight();
