@@ -15,8 +15,19 @@
   <meta property="og:url" content="https://geoffreyjones.ca/ocean-gestalt/index.html">
   <meta name="twitter:card" content="summary_large_image">
 
+  {{/*  we want to hide all content until the canvas is ready  */}}
+  <style>
+  html, body {
+    background-color: black;
+  }
+
+  body.hidden {
+    visibility: hidden;
+  }
+
+  </style>
 </head>
-<body id="landscape-container">
+<body id="landscape-container" class="hidden">
     <div id="canvas-container">
       <div id="info">You can move the camera around this patch of simulated ocean water.<br>
         The arrows will move forward/back, side to side, and up/down.<br>
@@ -147,15 +158,18 @@ document.getElementById('start-audio').addEventListener('click', () => {
       return function (text) {
         element.innerHTML = text;
         console.log(text);
-        // element.innerHTML += text.replace('\n', '<br>', 'g') + '<br>';
+        //element.innerHTML += text.replace('\n', '<br>', 'g') + '<br>';
       };
     })(),
+    // I don't think we need this, it's being done in our c++
     canvas: document.getElementById('canvas'),
-    preinitializedWebGLContextAttributes: {
-    majorVersion: 2,
-    minorVersion: 0
-  }   
+    onRuntimeInitialized : () => 
+      {
+        document.body.classList.remove('hidden');
+        window.scrollBy(0,20);
+      }   
   };
+
 
   function setViewportHeight() {
   const vh = window.innerHeight * 0.01;
