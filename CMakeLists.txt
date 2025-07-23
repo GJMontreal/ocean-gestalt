@@ -94,6 +94,7 @@ if (EMSCRIPTEN)
     "github-mark-white.png"
     "favicon.ico"
     "thumbnail.jpg"
+    "apple-touch-icon.png"
   )
   configure_file(${file} ${file} COPYONLY)
   endforeach(file)

@@ -47,10 +47,7 @@ OceanGestalt::OceanGestalt() : Application() {
 #ifndef __EMSCRIPTEN__
   initUniformBuffers();
 #endif
-
-  // onRender([&]{surfAudio->setFoamLevel(float foam);});
-  currentElement = sceneElements.begin(); //we should have selectable, which could be drawable moveable one or the other or both
-
+  currentElement = sceneElements.begin(); 
   configuration->textRenderer->setShader(configuration->getShader("text"));
 #ifdef DEBUG_GL
   glDumpTextureBindings();
@@ -59,7 +56,11 @@ OceanGestalt::OceanGestalt() : Application() {
   surfAudio = std::make_shared<SurfAudio>();
   doOnReady([audio = this->surfAudio]{audio->start();});
 
-  onRender([audio=this->surfAudio,waves = configuration->getWaves(), camera = this->camera](float time) {
+  onRender([audio = this->surfAudio, waves = configuration->getWaves(),
+            camera = this->camera, running = this->isRunning](float time) {
+    if (!running) {
+      return;
+    }
     auto position = camera->getPosition();
     audio->generateSurf(waves, position, camera->getYaw(), time);
   });
@@ -221,6 +222,7 @@ void OceanGestalt::toggleNormalDisplay() {
 void OceanGestalt::toggleSimulation() {
   std::cout << "Toggle simulation" << std::endl;
   isRunning = !isRunning;
+  isRunning ? surfAudio->start(): surfAudio->stop(); 
 }
 
 void OceanGestalt::toggleWireframe() {
