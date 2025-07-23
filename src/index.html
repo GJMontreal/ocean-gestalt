@@ -154,14 +154,8 @@ document.getElementById('start-audio').addEventListener('click', () => {
     preinitializedWebGLContextAttributes: {
     majorVersion: 2,
     minorVersion: 0
-  }
+  }   
   };
-window.addEventListener('load', function () {
-  setTimeout(function () {
-    window.scrollTo(0, 100); // scroll by 1px to hide address bar
-    window.dispatchEvent(new Event('resize'));
-  }, 100);
-  });
 
   function setViewportHeight() {
   const vh = window.innerHeight * 0.01;
@@ -282,19 +276,21 @@ setViewportHeight();
     }
 
   #canvas {
-    flex-grow: 1;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    position: absolute;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
   }
 
 html, body {
   margin: 0;
   padding-bottom:10%;
   height: 100%;
-  overflow-y: scroll; 
+ 
   background-color: black;
 }
 
