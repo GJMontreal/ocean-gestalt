@@ -51,9 +51,6 @@ OceanGestalt::OceanGestalt() : Application() {
   // onRender([&]{surfAudio->setFoamLevel(float foam);});
   currentElement = sceneElements.begin(); //we should have selectable, which could be drawable moveable one or the other or both
 
-  auto screenHeight = static_cast<float>(getHeight());
-  configuration->textRenderer->setScreenHeight(screenHeight);
-  configuration->textRenderer->setProjection(glm::ortho(0.0f, static_cast<float>(getWidth()),0.0f,screenHeight) );
   configuration->textRenderer->setShader(configuration->getShader("text"));
 #ifdef DEBUG_GL
   glDumpTextureBindings();
@@ -104,6 +101,9 @@ void OceanGestalt::buildScene() {
   buoyDrawable->setNormalShader(drawableNormalShader);
 #endif
   sceneElements.emplace_back(SceneElement{"buoy",buoyDrawable,buoy});
+  
+
+
 }
 
 void OceanGestalt::runOnce(){
@@ -170,14 +170,23 @@ void OceanGestalt::loop() {
 }
 
 void OceanGestalt::renderText() {
+  // we aren't getting in here enough to worry about optimizing this, yet
+  // be sure to update the projection matrix if the window has changed size
+  auto screenHeight = static_cast<float>(getHeight());
+  configuration->textRenderer->setScreenHeight(screenHeight);
+  configuration->textRenderer->setProjection(glm::ortho(0.0f, static_cast<float>(getWidth()),0.0f,screenHeight) );
+
   configuration->textRenderer->drawBegin();
-  auto textYLocation = static_cast<float>(getHeight()) - 15.f;
+  auto textYLocation = screenHeight - 30.f;
   auto textColor = glm::vec4(1.0f);
+  
+  auto textSize = 300.f; 
+
   configuration->textRenderer->drawText(
-      fps.getFPSString(), {10.0f,  textYLocation, 0.0f}, textColor, 100.0f);
+      fps.getFPSString(), {10.0f,  textYLocation, 0.0f}, textColor, textSize);
   configuration->textRenderer->drawText(currentElement->name,
                                         {200.0f,  textYLocation, 0.0f},
-                                        textColor, 100.0f);
+                                        textColor, textSize);
   configuration->textRenderer->render();
 }
 

@@ -118,6 +118,11 @@ Application::Application()
   glfwSetMouseButtonCallback(window, Application::mouseCallback);
   glfwSetFramebufferSizeCallback(window, Application::framebufferSizeCallback);
   glfwSetErrorCallback(Application::errorCallback);
+
+  float w;
+  float h;
+  glfwGetFramebufferSize(window, &width, &height);
+  glViewport(0, 0, width, height);
 }
 
 GLFWwindow* Application::getWindow() const {
