@@ -67,6 +67,7 @@ class OceanGestalt final : public OceanGestaltInterface,
   void onRender(const std::function<void(float)>& callback) final;
   void pauseSimulation(bool) override;
   void muteAudio(bool);
+  bool getIsRunning() const { return isRunning;};
   
  protected:
   void loop() override;
