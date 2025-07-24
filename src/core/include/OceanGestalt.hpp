@@ -66,7 +66,8 @@ class OceanGestalt final : public OceanGestaltInterface,
   void doOnReady(const std::function<void()>& callback) final;
   void onRender(const std::function<void(float)>& callback) final;
   void pauseSimulation(bool) override;
-
+  void muteAudio(bool);
+  
  protected:
   void loop() override;
   void processInput(GLFWwindow *window, float deltaTime) override;

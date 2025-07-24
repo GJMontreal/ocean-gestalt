@@ -222,7 +222,7 @@ void OceanGestalt::toggleNormalDisplay() {
 void OceanGestalt::toggleSimulation() {
   std::cout << "Toggle simulation" << std::endl;
   isRunning = !isRunning;
-  isRunning ? surfAudio->start(): surfAudio->stop(); 
+  muteAudio(!isRunning); 
 }
 
 void OceanGestalt::toggleWireframe() {
@@ -338,10 +338,13 @@ void OceanGestalt::doOnReady(const std::function<void()>& callback){
 }
 
 void OceanGestalt::onRender(const std::function<void(float)>& callback){
-  renderThreadCallbacks.push_back(callback);
+  renderThreadCallbacks.emplace_back(callback);
 }
 
 void OceanGestalt::pauseSimulation(bool){
   toggleSimulation();
 } 
 
+void OceanGestalt::muteAudio(bool mute) {
+  mute ? surfAudio->stop() : surfAudio->start();
+}
