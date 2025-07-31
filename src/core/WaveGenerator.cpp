@@ -16,7 +16,7 @@ constexpr float MAX_WAVELENGTH = 100.0f;         // meters
 constexpr float MAX_PHYSICAL_STEEPNESS = 0.44f;  // stability limit
 constexpr float BASE_STEEPNESS = 0.01f;
 constexpr float WIND_STEEPNESS_SCALE = 0.02f;
-constexpr float SPREAD_ANGLE_DEGREES = 30.0f;  // total angular spread
+constexpr float SPREAD_ANGLE_DEGREES = 90.0f;  // total angular spread
 constexpr float GRAVITY = 9.81f;
 }  // namespace
 
@@ -29,16 +29,23 @@ WaveGenerator::WaveGenerator(int numWaves, Wind& wind, std::shared_ptr<ApiAdapte
 
   float maxSteepness = steepnessFromWind(wind.speed);
   float spread = glm::radians(SPREAD_ANGLE_DEGREES);
+  
+  // Use log spacing for wavelengths
+  float logMin = std::log(MIN_WAVELENGTH);
+  float logMax = std::log(MAX_WAVELENGTH);
+  float logStep = (logMax - logMin) / (numWaves - 1);
 
   for (int i = 0; i < numWaves; i++) {
-    float lambda = MIN_WAVELENGTH *
-                   std::pow(MAX_WAVELENGTH / MIN_WAVELENGTH, randf(0.0f, 1.0f));
+    float logLambda = logMin + i * logStep;
+    float lambda = std::exp(logLambda);
     float k = 2.0f * glm::pi<float>() / lambda;
     float omega = std::sqrt(GRAVITY * k);
-    float steepness = randf(0.1f, maxSteepness);
+    
+    // Scale steepness linearly or sinusoidally across waves
+    float steepness = maxSteepness * (0.5f + 0.5f * std::sin(glm::pi<float>() * i / (numWaves - 1)));
     float amplitude = (steepness * lambda) / (2.0f * glm::pi<float>());
 
-    float angleOffset = randf(-spread / 2.0f, spread / 2.0f);
+    float angleOffset = -spread / 2.0f + spread * (float(i) / float(numWaves - 1));
     glm::vec2 direction = glm::rotate(wind.direction, angleOffset);
     float phase = randf(0.0f, glm::two_pi<float>());
 
@@ -46,12 +53,11 @@ WaveGenerator::WaveGenerator(int numWaves, Wind& wind, std::shared_ptr<ApiAdapte
     api->setValue(pathPrefix + "amplitude", amplitude);
     api->setValue(pathPrefix + "wavelength", lambda);
     api->setValue(pathPrefix + "phase", phase);
-    // TODO: remind me why we're using a vec3 for direction
-    api->setValue(pathPrefix + "direction",
-                 std::vector<float>{direction.x, direction.y,0.0f});
-    api->setValue(pathPrefix + "steepness",steepness);
+    api->setValue(pathPrefix + "direction", std::vector<float>{direction.x, direction.y, 0.0f});
+    api->setValue(pathPrefix + "steepness", steepness);
   }
 }
+
 
 inline float randf(float min, float max) {
   static thread_local std::mt19937 rng(std::random_device{}());
