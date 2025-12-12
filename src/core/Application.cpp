@@ -58,7 +58,6 @@ Application::Application()
 #ifdef __EMSCRIPTEN__
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-  emscripten::glfw3::SetNextWindowCanvasSelector("#canvas");
 #else
   int major = 3;
   int minor = 2;

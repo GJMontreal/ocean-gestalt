@@ -34,7 +34,7 @@ class Configuration: public AppContextInterface, public std::enable_shared_from_
     const string &generator,
     const string& apiConfig);  //why is api a string here?
 
-  void setInitialUniformState(const ApiAdapter& api) override;
+  void setInitialUniformState(const ApiAdapter& api, const std::string& url) override;
   vector<shared_ptr<Wave>> waves;
 
   shared_ptr<Camera> camera;
@@ -60,7 +60,7 @@ class Configuration: public AppContextInterface, public std::enable_shared_from_
 
   void save(const string& fileName);
   void dumpUniforms(const string& fileName);
-  void loadUniforms(const string& fileName);
+  void loadUniformsFromFile(const string& fileName);
 
   std::unordered_map<std::string, shared_ptr<ShaderProgram>>& getShaders() override;
   std::shared_ptr<ShaderProgram> getShader(const std::string& shaderName) override;
@@ -82,6 +82,8 @@ class Configuration: public AppContextInterface, public std::enable_shared_from_
   void loadMesh(const string& fileName);
   void loadGenerator(const string& fileName);
   void loadAPISettings(const string& fileName);
+
+  void loadUniformsFromJSON(const json& j);
 
   std::weak_ptr<ApiAdapter> api;
   shared_ptr<ShaderProgram> buildShader(json& j, const string& name, vec4& color);

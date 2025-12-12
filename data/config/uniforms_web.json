@@ -1,9 +1,12 @@
-{  "wireframe_shader.baseColor": [
+{ 
+  "wireframe_shader.baseColor": [
         0.15,
         0.36,
         0.25,
         1.0
     ],
+    "wireframe_shader.showMesh": 1,
+    "mesh_shader.showMesh":1,
     "mesh_shader.baseColor": [
         0.0,
         0.03999999910593033,
@@ -33,7 +36,6 @@
     "mesh_shader.normalMapping.scale": 0.010999999940395355,
     "mesh_shader.normalMapping.speed": 0.035999998450279236,
     "mesh_shader.showEnv": 0,
-    "mesh_shader.showMesh": 1,
     "mesh_shader.showNormalMap": 0,
     "mesh_shader.showUVs": 0,
     "mesh_shader.waves[0].amplitude": 1.5950000286102295,
@@ -134,7 +136,6 @@
     "wireframe_shader.gust.scale": 0.004000000189989805,
     "wireframe_shader.gust.speed": 0.023000000044703484,
     "wireframe_shader.gust.strength": 0.003000000026077032,
-    "wireframe_shader.showMesh": 1,
     "wireframe_shader.waves[0].amplitude": 1.5950000286102295,
     "wireframe_shader.waves[0].direction": [
         -1.0,
@@ -224,5 +225,6 @@
     ],
     "wireframe_shader.waves[9].phase": 2.815000057220459,
     "wireframe_shader.waves[9].steepness": 1.0,
-    "wireframe_shader.waves[9].wavelength": 15.222993850708008
+    "wireframe_shader.waves[9].wavelength": 15.222993850708008,
+    "buoy_mesh.showMesh":0
 }

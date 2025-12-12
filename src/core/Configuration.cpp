@@ -14,6 +14,7 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+#include <emscripten/fetch.h>
 #endif
 
 using nlohmann::json;
@@ -201,10 +202,15 @@ void Configuration::dumpUniforms(const string& fileName) {
   }
 }
 
-void Configuration::loadUniforms(const string& fileName) {
-  if (auto locked = api.lock()) {
+void Configuration::loadUniformsFromFile(const string& fileName) {
+
     json j;
     loadJSON(fileName, j);
+    loadUniformsFromJSON(j);
+}
+
+void Configuration::loadUniformsFromJSON (const json& j){
+  if (auto locked = api.lock()) {
     for (auto it = j.begin(); it != j.end(); ++it) {
       const std::string& key = "uniforms." + it.key() ;
       const json& value = it.value();
@@ -247,21 +253,42 @@ void dispatch_async(F&& task) {
   std::thread(std::forward<F>(task)).detach();  //fire and forget
 }
 
-
-// TODO: this looks like a duplication of code in app with the exception of the file names
-void Configuration::setInitialUniformState(const ApiAdapter& api){
+void Configuration::setInitialUniformState(const ApiAdapter& api, const std::string& url){
 #ifndef __EMSCRIPTEN__
   dispatch_async([this, &api] {
       std::cout << "Loading uniforms" << std::endl;
-      this->loadUniforms(CONFIGURATION_DIR "uniforms_min.json");
+      this->loadUniformsFromFile(CONFIGURATION_DIR "uniforms_min.json");
     });
 #else
-    auto* that = this;
-  emscripten_async_call([](void* arg) {
-    auto* self = static_cast<Configuration*>(arg);
-    std::cout << "Loading uniforms" << std::endl;
-    self->loadUniforms(CONFIGURATION_DIR "uniforms_web.json");
-  }, that, 0);  // delay = 0 ms
+
+    emscripten_fetch_attr_t attr;
+    emscripten_fetch_attr_init(&attr);
+    strcpy(attr.requestMethod, "GET");
+    attr.userData = this;
+    attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
+    attr.onsuccess = [](emscripten_fetch_t* fetch) {
+
+      std::string data(fetch->data, fetch->numBytes);
+      std::cout << "fetched " << fetch->numBytes << std::endl;
+      auto j = json::parse(data);
+      auto configuration = static_cast<Configuration*>(fetch->userData);
+      configuration->loadUniformsFromJSON(j);
+      emscripten_fetch_close(fetch);
+    };
+
+    attr.onerror   = [](emscripten_fetch_t* fetch) {
+      std::cerr << "Failed to fetch: " << fetch->url << std::endl;
+      auto configuration = static_cast<Configuration*>(fetch->userData);
+      emscripten_fetch_close(fetch);
+
+      // load our defaults
+      configuration->loadUniformsFromFile(CONFIGURATION_DIR "uniforms_web.json");
+    };
+    if( !url.empty()){
+      emscripten_fetch(&attr, url.c_str());
+    }else{
+      loadUniformsFromFile(CONFIGURATION_DIR "uniforms_web.json");
+    }
 #endif
 }
 

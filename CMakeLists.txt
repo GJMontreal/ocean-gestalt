@@ -29,7 +29,10 @@ add_executable(ocean-gestalt
 )
 
 target_compile_features(ocean-gestalt PRIVATE cxx_std_17)
-target_compile_options(ocean-gestalt PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-std=c++17>)
+target_compile_options(ocean-gestalt PRIVATE 
+  $<$<COMPILE_LANGUAGE:CXX>:-std=c++17>
+  $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:Clang>>:-Wall -Wextra -Weffc++ -Wuninitialized>
+  )
 
 set_property(TARGET ocean-gestalt PROPERTY CXX_STANDARD 17)
 add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
@@ -48,8 +51,14 @@ if (EMSCRIPTEN)
   target_compile_options(ocean-gestalt PUBLIC "--use-port=contrib.glfw3")
   target_link_options(ocean-gestalt PUBLIC "--use-port=contrib.glfw3")
 
-  target_compile_options(ocean-gestalt PRIVATE -fexceptions )
-  target_link_options(ocean-gestalt PRIVATE -fexceptions)
+  target_compile_options(ocean-gestalt PRIVATE 
+  -fexceptions
+   )
+
+  target_link_options(ocean-gestalt PRIVATE 
+  -fexceptions
+  -sFETCH=1
+  )
  
   target_link_libraries(ocean-gestalt
     PRIVATE app-core

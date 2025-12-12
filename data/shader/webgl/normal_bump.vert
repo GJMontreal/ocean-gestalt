@@ -7,6 +7,8 @@ uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
 
+uniform int showMesh;
+
 out vec3 FragPos;
 out vec2 TexCoord;
 out mat3 TBN;
@@ -21,5 +23,9 @@ void main() {
     FragPos = vec3(model * vec4(aPosition, 1.0));
     TexCoord = aTexCoord;
 
-    gl_Position = projection * view * vec4(FragPos, 1.0);
+    vec4 projectedPosition = projection * view * vec4(FragPos, 1.0);
+    vec4 offscreen = vec4(2.0, 2.0, 2.0, 1.0);
+    vec4 finalPosition = mix(offscreen, projectedPosition, float(showMesh));
+
+    gl_Position = finalPosition;
 }

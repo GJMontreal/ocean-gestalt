@@ -229,15 +229,15 @@ void OceanGestalt::toggleSimulation() {
 }
 
 void OceanGestalt::toggleWireframe() {
-  std::cout << "Toggle wireframe" << std::endl;
-    if (auto drawable = currentElement->drawable) {
+  if (auto drawable = currentElement->drawable) {
+    std::cout << "Toggle wireframe " << ((*drawable)->getIfShouldDrawWireframe()?"true":"false") << std::endl;
     (*drawable)->setIfShouldDrawWireframe(!(*drawable)->getIfShouldDrawWireframe());
   }
 }
 
 void OceanGestalt::toggleMesh() {
-  std::cout << "Toggle mesh" << std::endl;
   if (auto drawable = currentElement->drawable) {
+    std::cout << "Toggle mesh " << ((*drawable)->getIfShouldDrawMesh()?"true":"false") << std::endl;
     (*drawable)->setIfShouldDrawMesh(!(*drawable)->getIfShouldDrawMesh());
   }
 }
@@ -248,8 +248,8 @@ void OceanGestalt::toggleDrawTriangles() {
 }
 
 void OceanGestalt::toggleDrawLines() {
-  std::cout << "Toggle lines" << std::endl;
   if (auto drawable = currentElement->drawable) {
+    std::cout << "Toggle lines " << ((*drawable)->getIfShouldDrawLines()?"true":"false") << std::endl;
     (*drawable)->setIfShouldDrawLines(!(*drawable)->getIfShouldDrawLines());
   }
 }
@@ -273,24 +273,19 @@ void OceanGestalt::selectNextElement() {
 void OceanGestalt::loadUniforms() {
 #ifndef __EMSCRIPTEN__
     std::thread([this] {
-      configuration->loadUniforms(CONFIGURATION_DIR "uniforms.json");
+      configuration->loadUniformsFromFile(CONFIGURATION_DIR "uniforms.json");
     }).detach();
 #else
-    auto* that = this;
-  emscripten_async_call([](void* arg) {
-    auto* self = static_cast<OceanGestalt*>(arg);
-    std::cout << "Loading uniforms" << std::endl;
-    self->configuration->loadUniforms(CONFIGURATION_DIR "uniforms.json");
-  }, that, 0);  // delay = 0 ms
+    
 #endif
 }
 
 void OceanGestalt::generateUniforms() {
 #ifndef __EMSCRIPTEN__
-   auto api = this->configuration->getApi();
-    glm::vec2 dir{ randf(-1.0f,1.0f),randf(-1.0f,1.0f)};
-    Wind wind{dir,randf(0.1f,100.f)};
-    WaveGenerator(configuration->waves.size(), wind, api);
+  auto api = this->configuration->getApi();
+  glm::vec2 dir{ randf(-1.0f,1.0f),randf(-1.0f,1.0f)};
+  Wind wind{dir,randf(0.1f,100.f)};
+  WaveGenerator(configuration->waves.size(), wind, api);
 #endif
 }
 

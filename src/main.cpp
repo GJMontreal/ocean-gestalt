@@ -29,7 +29,11 @@ int main(int argc, const char* argv[]) {
   auto api = std::make_shared<OceanApi>(app,uniformState);
   app->onRender([&uniformState](float){uniformState->renderThreadCallback();});
   app->doOnReady([&] {
-      app->getContext().setInitialUniformState(*api);
+      std::string url;
+      if(argc > 1){
+          url = argv[1];
+      } 
+      app->getContext().setInitialUniformState(*api, url);
   });
 
   app->getContext().setApi(api);
