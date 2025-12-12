@@ -20,11 +20,14 @@ SurfAudio::SurfAudio() {
     config.sampleRate        = sampleRate;
     config.dataCallback      = SurfAudio::dataCallback;
     config.pUserData         = this;
+    config.notificationCallback = SurfAudio::onNotification;
+
 
     if (ma_device_init(nullptr, &config, &device) != MA_SUCCESS) {
         throw std::runtime_error("Failed to initialize audio device.");
     }
 
+    
     leftFilter.configure(sampleRate, 600.f, 0.7f);
     rightFilter.configure(sampleRate,1200.0f, 1.0f);
 }
@@ -88,4 +91,27 @@ void SurfAudio::getOffsetPoints(glm::vec2 position, float yaw, glm::vec2& leftPo
   // Left/right offsets
   leftPoint = position - right * HORIZONTAL_OFFSET / 2.0f;
   rightPoint = position + right * HORIZONTAL_OFFSET / 2.0f;
+}
+
+void SurfAudio::onNotification(const ma_device_notification* notification){
+  switch(notification->type){
+    case ma_device_notification_type_started:
+            std::cout << "Audio device started" << std::endl;
+            break;
+        case ma_device_notification_type_stopped:
+            std::cout << "Audio device stopped" << std::endl;
+            break;
+        case ma_device_notification_type_rerouted:
+            std::cout << "Audio device rerouted" << std::endl;
+            break;
+        case ma_device_notification_type_interruption_began:
+            std::cout << "Audio device interruption began (e.g. mic access by another app)" << std::endl;
+            break;
+        case ma_device_notification_type_interruption_ended:
+            std::cout << "Audio device interruption ended" << std::endl;
+            break;
+        case ma_device_notification_type_unlocked:
+            std::cout << "Audio device unlocked" << std::endl;
+            break;
+  }
 }

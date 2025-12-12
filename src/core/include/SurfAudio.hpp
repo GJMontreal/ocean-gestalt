@@ -90,6 +90,8 @@ public:
 private:
     float sampleRate = 48000;
     static void dataCallback(ma_device* device, void* output, const void* input, ma_uint32 frameCount);
+    static void onNotification(const ma_device_notification* notification);
+
     void getOffsetPoints(glm::vec2 position, float yaw, glm::vec2& leftPoint, glm::vec2& rightPoint);
     ma_device device;
     std::atomic<float> steepnessLeft = 0.0f;

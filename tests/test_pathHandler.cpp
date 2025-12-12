@@ -45,7 +45,7 @@ TEST_CASE("parseUniformPath handles heading substitution correctly with shaderna
   auto parsed = handler.callParseUniformPath(V{"uniforms","mesh_shader", "wave[0]", "heading"});
 
   CHECK(parsed.shaderName == "mesh_shader");
-  CHECK(parsed.internalPath == "windDirection");
-  CHECK(parsed.externalPath == "heading");
+  CHECK(parsed.internalPath == "wave[0].direction");
+  CHECK(parsed.externalPath == "wave[0].heading");
   CHECK(parsed.convertHeading == true);
 }

@@ -72,12 +72,16 @@ float valueNoise(vec2 p) {
     return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
 }
 
-float fbm(vec2 p) {
+float fbm(vec2 p, float time) {
     float sum = 0.0;
     float amp = 0.5;
     float freq = 1.0;
     for (int i = 0; i < 5; ++i) {
-        sum += amp * valueNoise(p * freq);
+         vec2 timeOffset = vec2(
+            sin(time * freq * 1.3 ), 
+            cos(time * freq * 1.7 )
+        ) * 0.5;
+        sum += amp * valueNoise(p * freq + timeOffset);
         freq *= 2.0;
         amp *= 0.5;
     }
@@ -95,8 +99,10 @@ vec2 slopeDir = normalize(vec2(
 
 
 // --- Flowing foam UVs: move along slope direction over time ---
-  vec2 foamUV = position.xz + slopeDir * time * foamScrollSpeed;
-  float foamNoise = fbm(foamUV * foamScale);
+  float foamCycleTime = foamScale / foamScrollSpeed;
+  float foamWrappedTime = mod(time, foamCycleTime );
+  vec2 foamUV = position.xz + slopeDir * foamWrappedTime * foamScrollSpeed;
+  float foamNoise = fbm(foamUV * foamScale, time);
   // --- Modulate foam by surface slope: appears only on steep regions ---
   float foamMask = smoothstep(foamSlopeMin, foamSlopeMax, slope);
   float foam = foamNoise * foamMask;
@@ -148,12 +154,11 @@ void main() {
 
     vec2 flickerUV = vec2(fs_in.FragPos.x * 2.0, fs_in.FragPos.z * 0.75); // stretched FBM domain
     flickerUV += vec2(time * 0.3, time * 0.1);
-    float causticFlicker = fbm(flickerUV);
+    float causticFlicker = fbm(flickerUV, time);
     causticFlicker = smoothstep(0.55, 0.8, causticFlicker);
 
     float NdotL = max(dot(normalize(fs_in.Normal), normalize(lightPos - fs_in.FragPos)), 0.0);
     causticFlicker *= NdotL;
-
     causticFlicker = pow(causticFlicker, 6.0);
     
     float causticMask = 1.0;

@@ -43,8 +43,6 @@ class Configuration: public AppContextInterface, public std::enable_shared_from_
   vec3 lightPosition;
   std::shared_ptr<Light> light;
   
-  std::shared_ptr<TextRenderer> textRenderer;
-
   int meshSize;
   int meshSubdivisions;
   
@@ -70,6 +68,8 @@ class Configuration: public AppContextInterface, public std::enable_shared_from_
   std::vector<std::shared_ptr<Wave>>& getWaves() override;
 
 
+  std::shared_ptr<TextRenderer> getTextRenderer() { return textRenderer; };
+
   void setWaveParameter(const std::string& key, const ApiValue& value) override;
   void setApi(std::shared_ptr<ApiAdapter> api) override;
   std::shared_ptr<ApiAdapter> getApi() override;
@@ -87,6 +87,8 @@ class Configuration: public AppContextInterface, public std::enable_shared_from_
   shared_ptr<ShaderProgram> buildShader(json& j, const string& name, vec4& color);
 
   std::unordered_map<std::string, shared_ptr<ShaderProgram> > shaders;
+
+  std::shared_ptr<TextRenderer> textRenderer;
 };
 
 #endif

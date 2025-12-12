@@ -69,21 +69,16 @@ const float speedScale = 3.0;
 const float GRAVITY = 9.81; 
 
 vec2 calcUV(vec3 position, vec2 dir, vec2 origin, float speed, float scale, float time){
+  float cycleTime = scale / speed;
+  float tCycle = mod(time, cycleTime);
+  float tOffset = floor(time / cycleTime);
+  float jitter = tOffset * 0.001;
+  float wrappedTime = tCycle + jitter;
   vec2 offset = normalize(dir) * speed * time;
   vec2 uv = (position.xz - origin) * scale;
   uv += offset;
   uv = fract(uv);
   return uv;
-}
-
-vec2 uvLocation(vec3 position, vec2 gustDir){
-    vec2 gustUVOrigin = vec2(-60);  //this should be a uniform
-    vec2 gustUVScale = vec2(gust.scale);
-    vec2 gustOffset = normalize(gustDir) * gust.speed * time;
-    vec2 uv = (position.xz - gustUVOrigin) * gustUVScale;
-    uv += gustOffset;
-    uv = fract(uv);
-    return uv;
 }
 
 float gustDisplacement(

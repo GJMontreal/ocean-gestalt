@@ -24,23 +24,43 @@ Buoy::Buoy(glm::vec3 origin, std::shared_ptr<Configuration> context) : context(c
   };
 
   sphere->preDraw = [this](Drawable& _, float time)->Transform{
+    float dt = 0.01;
+    auto waves = getContext()->getWaves();
     auto& position = getDrawable()->getPosition();
-     auto positionXZ = glm::vec2(position.x, position.z);
-     auto displacement = evaluateGerstnerWaves(getContext()->getWaves(), positionXZ, time);
-    
+    auto positionXZ = glm::vec2(position.x, position.z);
+    auto displacement = evaluateGerstnerWaves(waves, positionXZ, time);
+    auto previous = evaluateGerstnerWaves(waves, position,time - dt);
+    glm::vec3 velocity = (displacement - previous) / dt;
+
     //calculate the normal and use this to drive a rotation
-    auto dx = evaluateGerstnerWaves(getContext()->getWaves(), positionXZ + glm::vec2(0.1f,0.0f), time);
-    auto dz = evaluateGerstnerWaves(getContext()->getWaves(), positionXZ + glm::vec2(0.0f,0.1f), time);
-  
+    auto dx = evaluateGerstnerWaves(waves, positionXZ + glm::vec2(0.1f,0.0f), time);
+    auto dz = evaluateGerstnerWaves(waves, positionXZ + glm::vec2(0.0f,0.1f), time);
+    
     auto tangentX = dx - displacement;
     auto tangentZ = dz - displacement;
     auto normal = glm::cross(tangentX, tangentZ);
     
-    glm::vec3 prevUp = lastRotation * glm::vec3(0, 1, 0);  // what "up" was last frame
+    auto lateralVelocity = glm::vec3(velocity.x,0.0f,velocity.z); 
+    glm::vec3 prevUp =  glm::vec3(0, 1, 0);  // what "up" was last frame
     glm::vec3 newUp  = normal;                      // your computed surface normal
 
     glm::quat rAlign = glm::rotation(prevUp, newUp);       // minimal rotation to match normal
-    glm::quat rotation = glm::normalize(rAlign * lastRotation);
+    glm::quat alignedRotation = glm::normalize(rAlign );
+
+    glm::quat momentumTilt = glm::quat(1, 0, 0, 0); // identity rotation
+
+    float tiltScale = 0.03f;
+    float smoothingAlpha = 0.3f;
+
+    if (glm::length2(lateralVelocity) > 0.0001f) {
+        glm::vec3 tiltAxis = glm::normalize(glm::cross(glm::vec3(0, 1, 0), lateralVelocity));
+        float tiltAmount = glm::length(lateralVelocity) * tiltScale;  // empirical factor
+        momentumTilt = glm::angleAxis(tiltAmount, tiltAxis);
+    }
+
+    // Step 4: combine aligned rotation and tilt
+    glm::quat targetRotation = glm::normalize(momentumTilt * alignedRotation);
+    glm::quat rotation = glm::slerp(lastRotation, targetRotation, smoothingAlpha);
     lastRotation = rotation;
     return {displacement, rotation, glm::vec3(1.0f)};
   };

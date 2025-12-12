@@ -4,6 +4,7 @@ cmake_policy(VERSION 4.0)
 project (ocean-gestalt)
 
 enable_testing()
+include(CTest)
 # cspell: disable
 
 add_subdirectory(src/core)

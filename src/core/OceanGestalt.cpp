@@ -48,7 +48,7 @@ OceanGestalt::OceanGestalt() : Application() {
   initUniformBuffers();
 #endif
   currentElement = sceneElements.begin(); 
-  configuration->textRenderer->setShader(configuration->getShader("text"));
+  configuration->getTextRenderer()->setShader(configuration->getShader("text"));
 #ifdef DEBUG_GL
   glDumpTextureBindings();
 #endif
@@ -64,6 +64,8 @@ OceanGestalt::OceanGestalt() : Application() {
     auto position = camera->getPosition();
     audio->generateSurf(waves, position, camera->getYaw(), time);
   });
+
+  // elapsedTime = 5000.0f;
 }
 
 void OceanGestalt::buildScene() {
@@ -173,21 +175,23 @@ void OceanGestalt::renderText() {
   // we aren't getting in here enough to worry about optimizing this, yet
   // be sure to update the projection matrix if the window has changed size
   auto screenHeight = static_cast<float>(getHeight());
-  configuration->textRenderer->setScreenHeight(screenHeight);
-  configuration->textRenderer->setProjection(glm::ortho(0.0f, static_cast<float>(getWidth()),0.0f,screenHeight) );
 
-  configuration->textRenderer->drawBegin();
+  auto textRenderer = configuration->getTextRenderer();
+  textRenderer->setScreenHeight(screenHeight);
+  textRenderer->setProjection(glm::ortho(0.0f, static_cast<float>(getWidth()),0.0f,screenHeight) );
+
+  textRenderer->drawBegin();
   auto textYLocation = screenHeight - 30.f;
   auto textColor = glm::vec4(1.0f);
   
   auto textSize = 300.f; 
 
-  configuration->textRenderer->drawText(
+  textRenderer->drawText(
       fps.getFPSString(), {10.0f,  textYLocation, 0.0f}, textColor, textSize);
-  configuration->textRenderer->drawText(currentElement->name,
+  textRenderer->drawText(currentElement->name,
                                         {200.0f,  textYLocation, 0.0f},
                                         textColor, textSize);
-  configuration->textRenderer->render();
+  textRenderer->render();
 }
 
 void OceanGestalt::initUniformBuffers() {

@@ -15,7 +15,7 @@ constexpr float MIN_WAVELENGTH = 5.0f;           // meters
 constexpr float MAX_WAVELENGTH = 100.0f;         // meters
 constexpr float MAX_PHYSICAL_STEEPNESS = 0.44f;  // stability limit
 constexpr float BASE_STEEPNESS = 0.01f;
-constexpr float WIND_STEEPNESS_SCALE = 0.02f;
+constexpr float WIND_STEEPNESS_SCALE = 0.03f;
 constexpr float SPREAD_ANGLE_DEGREES = 90.0f;  // total angular spread
 constexpr float GRAVITY = 9.81f;
 }  // namespace
@@ -45,7 +45,8 @@ WaveGenerator::WaveGenerator(int numWaves, Wind& wind, std::shared_ptr<ApiAdapte
     float steepness = maxSteepness * (0.5f + 0.5f * std::sin(glm::pi<float>() * i / (numWaves - 1)));
     float amplitude = (steepness * lambda) / (2.0f * glm::pi<float>());
 
-    float angleOffset = -spread / 2.0f + spread * (float(i) / float(numWaves - 1));
+    // float angleOffset = -spread / 2.0f + spread * (float(i) / float(numWaves - 1));
+    float angleOffset = glm::radians(randf(-SPREAD_ANGLE_DEGREES/2.0f, SPREAD_ANGLE_DEGREES/2.0f));
     glm::vec2 direction = glm::rotate(wind.direction, angleOffset);
     float phase = randf(0.0f, glm::two_pi<float>());
 
