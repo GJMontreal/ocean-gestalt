@@ -37,6 +37,7 @@ add_library(app-core STATIC
   Skybox.cpp
   HeightMapGenerator.cpp
   KeyBindings.cpp
+  SprayParticleSystem.cpp
 )
 
 set_property(TARGET app-core PROPERTY CXX_STANDARD 17)

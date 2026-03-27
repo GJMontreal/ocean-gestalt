@@ -11,6 +11,7 @@
 #include "GerstnerWave.hpp"
 #include "HeightMapGenerator.hpp"
 #include "WaveGenerator.hpp"
+#include "SprayParticleSystem.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -102,9 +103,9 @@ void OceanGestalt::buildScene() {
   buoyDrawable->setNormalShader(drawableNormalShader);
 #endif
   sceneElements.emplace_back(SceneElement{"buoy",buoyDrawable,buoy});
-  
 
-
+  auto spray = std::make_shared<SprayParticleSystem>(configuration);
+  sceneElements.emplace_back(SceneElement{"spray", spray, std::nullopt});
 }
 
 void OceanGestalt::runOnce(){

@@ -67,5 +67,9 @@
     "text": {
         "vertex": "text.vert",
         "fragment": "text.frag"
+    },
+    "spray_particle": {
+        "vertex": "spray_particle.vert",
+        "fragment": "spray_particle.frag"
     }
 }
