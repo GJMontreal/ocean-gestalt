@@ -169,7 +169,7 @@ void SprayParticleSystem::spawnParticles(float time) {
 
             // Probabilistic rate control: more likely the higher the crest
             float spawnProb = (crestWeight - SPAWN_THRESHOLD) / (1.f - SPAWN_THRESHOLD);
-            if (randF(rng) > spawnProb * 0.12f) continue;
+            if (randF(rng) > spawnProb * 0.45f) continue;
 
             SprayParticle* slot = nullptr;
             for (auto& p : particles) {
@@ -194,7 +194,7 @@ void SprayParticleSystem::spawnParticles(float time) {
             slot->maxLifetime = 1.2f + crestWeight * 1.0f + randF(rng) * 1.0f;
             slot->lifetime    = slot->maxLifetime;
             slot->mass        = 0.3f + randF(rng) * 2.2f;
-            slot->size        = 0.03f + slot->mass * 0.04f + randF(rng) * 0.05f;
+            slot->size        = 0.2f + slot->mass * 0.25f + randF(rng) * 0.2f;
             slot->seed        = randF(rng);
             slot->swirl       = (randF(rng) - 0.5f) * 6.0f;
             slot->active      = true;

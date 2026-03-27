@@ -40,7 +40,7 @@ private:
     void uploadInstances();
     void initGPUBuffers();
 
-    static constexpr int   MAX_PARTICLES      = 1500;
+    static constexpr int   MAX_PARTICLES      = 4000;
     static constexpr float SPAWN_THRESHOLD    = 0.45f;
     static constexpr int   GRID_SIZE          = 16;
     static constexpr float OCEAN_HALF_EXTENT  = 40.0f;
