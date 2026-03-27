@@ -91,6 +91,15 @@ void SprayParticleSystem::update(float dt, float time) {
     for (auto& p : particles) {
         if (!p.active) continue;
         p.velocity.y -= GRAVITY * 0.15f * dt;
+
+        // Swirl: rotate horizontal velocity by swirl * dt radians each frame
+        float sa = p.swirl * dt;
+        float cs = std::cos(sa), sn = std::sin(sa);
+        float vx = cs * p.velocity.x - sn * p.velocity.z;
+        float vz = sn * p.velocity.x + cs * p.velocity.z;
+        p.velocity.x = vx;
+        p.velocity.z = vz;
+
         p.worldPos    += p.velocity * dt;
         p.lifetime    -= dt;
         if (p.lifetime <= 0.f) p.active = false;
@@ -178,6 +187,7 @@ void SprayParticleSystem::spawnParticles(float time) {
             slot->lifetime    = slot->maxLifetime;
             slot->size        = 0.04f + crestWeight * 0.08f + randF(rng) * 0.08f;
             slot->seed        = randF(rng);
+            slot->swirl       = (randF(rng) - 0.5f) * 6.0f;
             slot->active      = true;
         }
     }

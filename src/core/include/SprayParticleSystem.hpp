@@ -18,6 +18,7 @@ struct SprayParticle {
     float     maxLifetime = 1.f;
     float     size        = 0.2f;
     float     seed        = 0.f;
+    float     swirl       = 0.f;  // rad/s, sign sets CW vs CCW
     bool      active      = false;
 };
 
