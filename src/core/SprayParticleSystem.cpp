@@ -91,12 +91,12 @@ void SprayParticleSystem::update(float dt, float time) {
     for (auto& p : particles) {
         if (!p.active) continue;
         // Gravity is universal — same acceleration regardless of mass
-        p.velocity.y -= GRAVITY * 0.55f * dt;
+        p.velocity.y -= GRAVITY * 0.9f * dt;
 
         // Drag opposes velocity and scales inversely with mass:
         // light particles (mist) decelerate quickly and linger;
         // heavy particles (droplets) hold speed and arc farther
-        static constexpr float DRAG_K = 0.4f;
+        static constexpr float DRAG_K = 0.30f;
         float drag = 1.0f - (DRAG_K / p.mass) * dt;
         p.velocity *= std::max(drag, 0.0f);
 
@@ -186,8 +186,11 @@ void SprayParticleSystem::spawnParticles(float time) {
                            ? glm::normalize(launchDir)
                            : glm::vec2(0.f, 1.f);
             float ls = (totalWeight > 0.f) ? launchSpeed / totalWeight : 2.f;
-            float lateral  = ls * (0.15f + randF(rng) * 0.15f);
-            float upSpeed  = 3.0f + crestWeight * 6.0f + randF(rng) * 3.0f;
+            // Spray is ejected primarily along the wave's travel direction.
+            // Orbital velocity at the crest is ~A*omega, mostly horizontal.
+            // Upward component is a small fraction — gravity quickly wins.
+            float lateral = ls * (0.8f + randF(rng) * 0.8f);
+            float upSpeed = ls * (0.15f + crestWeight * 0.35f + randF(rng) * 0.2f);
 
             slot->worldPos    = spawnPos;
             slot->velocity    = glm::vec3(ld.x * lateral, upSpeed, ld.y * lateral);
@@ -196,7 +199,7 @@ void SprayParticleSystem::spawnParticles(float time) {
             slot->mass        = 0.3f + randF(rng) * 2.2f;
             slot->size        = 0.2f + slot->mass * 0.25f + randF(rng) * 0.2f;
             slot->seed        = randF(rng);
-            slot->swirl       = (randF(rng) - 0.5f) * 6.0f;
+            slot->swirl       = (randF(rng) - 0.5f) * 8.0f;
             slot->active      = true;
         }
     }
