@@ -90,7 +90,15 @@ void SprayParticleSystem::initGPUBuffers() {
 void SprayParticleSystem::update(float dt, float time) {
     for (auto& p : particles) {
         if (!p.active) continue;
-        p.velocity.y -= GRAVITY * 0.15f * dt;
+        // Gravity is universal — same acceleration regardless of mass
+        p.velocity.y -= GRAVITY * 0.55f * dt;
+
+        // Drag opposes velocity and scales inversely with mass:
+        // light particles (mist) decelerate quickly and linger;
+        // heavy particles (droplets) hold speed and arc farther
+        static constexpr float DRAG_K = 0.4f;
+        float drag = 1.0f - (DRAG_K / p.mass) * dt;
+        p.velocity *= std::max(drag, 0.0f);
 
         // Swirl: rotate horizontal velocity by swirl * dt radians each frame
         float sa = p.swirl * dt;
@@ -179,13 +187,14 @@ void SprayParticleSystem::spawnParticles(float time) {
                            : glm::vec2(0.f, 1.f);
             float ls = (totalWeight > 0.f) ? launchSpeed / totalWeight : 2.f;
             float lateral  = ls * (0.15f + randF(rng) * 0.15f);
-            float upSpeed  = 1.2f + crestWeight * 2.5f + randF(rng) * 1.5f;
+            float upSpeed  = 3.0f + crestWeight * 6.0f + randF(rng) * 3.0f;
 
             slot->worldPos    = spawnPos;
             slot->velocity    = glm::vec3(ld.x * lateral, upSpeed, ld.y * lateral);
             slot->maxLifetime = 1.2f + crestWeight * 1.0f + randF(rng) * 1.0f;
             slot->lifetime    = slot->maxLifetime;
-            slot->size        = 0.04f + crestWeight * 0.08f + randF(rng) * 0.08f;
+            slot->mass        = 0.3f + randF(rng) * 2.2f;
+            slot->size        = 0.03f + slot->mass * 0.04f + randF(rng) * 0.05f;
             slot->seed        = randF(rng);
             slot->swirl       = (randF(rng) - 0.5f) * 6.0f;
             slot->active      = true;

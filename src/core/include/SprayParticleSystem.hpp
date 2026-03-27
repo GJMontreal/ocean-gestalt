@@ -19,6 +19,7 @@ struct SprayParticle {
     float     size        = 0.2f;
     float     seed        = 0.f;
     float     swirl       = 0.f;  // rad/s, sign sets CW vs CCW
+    float     mass        = 1.f;  // relative mass; drag = k/mass, so light particles linger
     bool      active      = false;
 };
 
