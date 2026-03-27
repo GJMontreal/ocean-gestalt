@@ -167,40 +167,45 @@ void SprayParticleSystem::spawnParticles(float time) {
             // Only spawn near actual crests of reasonably steep waves
             if (crestWeight < SPAWN_THRESHOLD) continue;
 
-            // Probabilistic rate control: more likely the higher the crest
             float spawnProb = (crestWeight - SPAWN_THRESHOLD) / (1.f - SPAWN_THRESHOLD);
-            if (randF(rng) > spawnProb * 0.45f) continue;
 
-            SprayParticle* slot = nullptr;
-            for (auto& p : particles) {
-                if (!p.active) { slot = &p; break; }
-            }
-            if (!slot) return;
+            // Burst: spawn several particles per crest cell, scaled by crest strength
+            int burst = 1 + static_cast<int>(spawnProb * 5.f);
 
-            // Actual displaced surface position (Gerstner horizontal shift included)
             glm::vec3 disp = evaluateGerstnerWaves(waves, pos, time);
             glm::vec3 spawnPos(sx + disp.x, disp.y, sz + disp.z);
 
-            // Launch velocity: fraction of wave phase speed along travel dir, plus upward burst
             glm::vec2 ld = (glm::length(launchDir) > 0.001f)
                            ? glm::normalize(launchDir)
                            : glm::vec2(0.f, 1.f);
             float ls = (totalWeight > 0.f) ? launchSpeed / totalWeight : 2.f;
-            // Spray is ejected primarily along the wave's travel direction.
-            // Orbital velocity at the crest is ~A*omega, mostly horizontal.
-            // Upward component is a small fraction — gravity quickly wins.
-            float lateral = ls * (0.8f + randF(rng) * 0.8f);
-            float upSpeed = ls * (0.15f + crestWeight * 0.35f + randF(rng) * 0.2f);
 
-            slot->worldPos    = spawnPos;
-            slot->velocity    = glm::vec3(ld.x * lateral, upSpeed, ld.y * lateral);
-            slot->maxLifetime = 1.2f + crestWeight * 1.0f + randF(rng) * 1.0f;
-            slot->lifetime    = slot->maxLifetime;
-            slot->mass        = 0.3f + randF(rng) * 2.2f;
-            slot->size        = 0.2f + slot->mass * 0.25f + randF(rng) * 0.2f;
-            slot->seed        = randF(rng);
-            slot->swirl       = (randF(rng) - 0.5f) * 8.0f;
-            slot->active      = true;
+            for (int b = 0; b < burst; ++b) {
+                if (randF(rng) > spawnProb) continue;
+
+                SprayParticle* slot = nullptr;
+                for (auto& p : particles) {
+                    if (!p.active) { slot = &p; break; }
+                }
+                if (!slot) return;
+
+                float lateral = ls * (0.8f + randF(rng) * 0.8f);
+                float upSpeed = ls * (0.15f + crestWeight * 0.35f + randF(rng) * 0.2f);
+
+                // Scatter spawn position within the cell
+                glm::vec3 jitter(( randF(rng) - 0.5f) * step,  0.f,
+                                  (randF(rng) - 0.5f) * step);
+
+                slot->worldPos    = spawnPos + jitter;
+                slot->velocity    = glm::vec3(ld.x * lateral, upSpeed, ld.y * lateral);
+                slot->maxLifetime = 1.2f + crestWeight * 1.0f + randF(rng) * 1.0f;
+                slot->lifetime    = slot->maxLifetime;
+                slot->mass        = 0.3f + randF(rng) * 2.2f;
+                slot->size        = 0.08f + slot->mass * 0.10f + randF(rng) * 0.08f;
+                slot->seed        = randF(rng);
+                slot->swirl       = (randF(rng) - 0.5f) * 8.0f;
+                slot->active      = true;
+            }
         }
     }
 }
