@@ -51,6 +51,7 @@ Ocean Gestalt is an interactive Gerstner wave ocean simulation that compiles to 
 **Dual-build differences:**
 - Native: OpenGL 4.x, compute shaders, normal maps, REST API active.
 - Web: WebGL2, GLSL ES shaders (`data/shader/webgl/`), no REST server; the HTML/JS UI (`src/index.html`, `src/keypress.js`) drives the API directly.
+- **Shader sync rule:** any output added to `data/shader/gerstner.vert` (uses `out VS_OUT {...} vs_out` interface blocks) must be manually mirrored in `data/shader/webgl/gerstner.vert` (uses flat `out` declarations, e.g. `out float oCrestness`). Same applies to `water.frag` — native uses `fs_in.X`, webgl uses `oX`.
 
 **Configuration:** All wave, shader, rendering, and API parameters are JSON files under `data/config/`. Shader sources are in `data/shader/webgl/`.
 
