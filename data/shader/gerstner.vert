@@ -61,6 +61,7 @@ out VS_OUT {
     vec3 Tangent;
     vec3 Bitangent;
     vec2 FragUV;
+    float Crestness;
 } vs_out;
     
 const float PI = 3.14159265358979323;
@@ -156,6 +157,24 @@ void main(void)
     vec3 bitangent;
 
     vec3 normalFD = calcNormal(aPosition, newPosition, gustUV, NORMAL_OFFSET, tangent, bitangent);
+
+    // Accumulate amplitude*steepness-weighted crestness across all waves.
+    // cos(phase)=1 at a Gerstner crest; we normalise so output is 0-1.
+    float crestnessSum = 0.0;
+    float crestnessWeight = 0.0;
+    for (int i = 0; i < NUM_WAVES; i++) {
+        float safeWL = max(waves[i].wavelength, 0.01);
+        float k_c    = 2.0 * PI / safeWL;
+        float w_c    = VELOCITY_SCALE * sqrt(GRAVITY * k_c);
+        vec2  D_c    = normalize(waves[i].direction.xy);
+        float ph_c   = dot(D_c * k_c, aPosition.xz) - w_c * time + waves[i].phase;
+        float wgt    = waves[i].amplitude * waves[i].steepness;
+        crestnessSum    += max(0.0, cos(ph_c)) * wgt;
+        crestnessWeight += wgt;
+    }
+    vs_out.Crestness = crestnessWeight > 0.001
+                       ? crestnessSum / crestnessWeight
+                       : 0.0;
 
     vec4 projectedPosition = projection * view * model * vec4(newPosition, 1.0);
     vec4 offscreen = vec4(2.0, 2.0, 2.0, 1.0);

@@ -4,6 +4,7 @@ in vec3 oColor;
 in vec3 oTangent;
 in vec3 oBitangent;
 in vec2 oFragUV;
+in float oCrestness;
 
 
 uniform mat4 projection;
@@ -163,10 +164,17 @@ void main() {
     diffuse  +
     causticLight; 
 
-    // Foam blend
+    // Slope-based surface foam
     float foam = calcFoam(oFragPos);
+
+    // Crest-driven whitecap: brighter, FBM-textured white at wave crests.
+    // Uses the same FBM field as the spray particles so they read as
+    // the same substance.
+    float whitecapNoise = fbm(oFragPos.xz * 1.8);
+    float whitecap = smoothstep(0.45, 0.75, oCrestness) * whitecapNoise;
+
     vec3 foamColor = vec3(1.0);
-    finalColor = mix(finalColor, foamColor, foam);
+    finalColor = mix(finalColor, foamColor, clamp(foam + whitecap, 0.0, 1.0));
 
     // Fog
     float fogFactor = clamp(exp(-fogDensity * depth), 0.0, 1.0);

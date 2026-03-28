@@ -5,6 +5,7 @@ in VS_OUT {
     vec3 Tangent;
     vec3 Bitangent;
     vec2 FragUV;
+    float Crestness;
 } fs_in;
 
 layout(std140) uniform Matrices
@@ -167,10 +168,15 @@ void main() {
     diffuse  +
     causticLight; 
 
-    // Foam blend
+    // Slope-based surface foam
     float foam = calcFoam(fs_in.FragPos);
+
+    // Crest-driven whitecap: brighter, FBM-textured white at wave crests.
+    float whitecapNoise = fbm(fs_in.FragPos.xz * 1.8, time);
+    float whitecap = smoothstep(0.45, 0.75, fs_in.Crestness) * whitecapNoise;
+
     vec3 foamColor = vec3(1.0);
-    finalColor = mix(finalColor, foamColor, foam);
+    finalColor = mix(finalColor, foamColor, clamp(foam + whitecap, 0.0, 1.0));
 
     // Fog
     float fogFactor = clamp(exp(-fogDensity * depth), 0.0, 1.0);
