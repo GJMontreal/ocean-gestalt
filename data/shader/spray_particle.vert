@@ -11,6 +11,7 @@ uniform mat4 view;
 out float vLifetimeFrac;
 out vec2  vUV;
 out float vSeed;
+out vec3  vWorldPos;
 
 void main() {
     vec3 camRight = vec3(view[0][0], view[1][0], view[2][0]);
@@ -29,4 +30,5 @@ void main() {
     vLifetimeFrac = aLifetimeFrac;
     vUV           = aCorner * 0.5 + 0.5;
     vSeed         = aSeed;
+    vWorldPos     = worldPos;
 }

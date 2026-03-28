@@ -1,56 +1,65 @@
 in float vLifetimeFrac;
 in vec2  vUV;
 in float vSeed;
+in vec3  vWorldPos;
 
 out vec4 FragColor;
 
-// Rotate a 2D vector by angle a
-vec2 rot(vec2 v, float a) {
-    return vec2(cos(a)*v.x - sin(a)*v.y, sin(a)*v.x + cos(a)*v.y);
+// Shared with water.frag — same foam texture character
+float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
 }
 
-// Elongated gaussian blob: aspect > 1 stretches along local x
-float blob(vec2 p, float aspect, float tightness) {
-    return exp(-(p.x*p.x*aspect*aspect + p.y*p.y) * tightness);
+float valueNoise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    float a = hash(i);
+    float b = hash(i + vec2(1.0, 0.0));
+    float c = hash(i + vec2(0.0, 1.0));
+    float d = hash(i + vec2(1.0, 1.0));
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+}
+
+float fbm(vec2 p) {
+    float sum = 0.0;
+    float amp = 0.5;
+    float freq = 1.0;
+    for (int i = 0; i < 5; ++i) {
+        sum += amp * valueNoise(p * freq);
+        freq *= 2.0;
+        amp  *= 0.5;
+    }
+    return sum;
 }
 
 void main() {
     vec2 c = vUV * 2.0 - 1.0;
+    float r = dot(c, c);
+    if (r > 1.0) discard;
 
-    float s1 = fract(vSeed * 7.319);
-    float s2 = fract(vSeed * 13.271);
-    float s3 = fract(vSeed * 3.617);
-    float s4 = fract(vSeed * 19.431);
-    float s5 = fract(vSeed * 5.111);
+    // Soft circular billboard boundary
+    float edgeMask = 1.0 - smoothstep(0.5, 1.0, sqrt(r));
 
-    // Overall rotation
-    vec2 rc = rot(c, vSeed * 6.2832);
+    // Sample FBM at world XZ so the texture is spatially continuous
+    // with the surface foam. Seed offsets each particle to a different
+    // patch of the foam field rather than all sampling the same spot.
+    vec2 foamUV = vWorldPos.xz * 1.8 + vec2(vSeed * 6.1, vSeed * 3.7);
+    float foam = fbm(foamUV);
+    foam = pow(foam, 0.7);
 
-    float spread = mix(0.05, 0.6, 1.0 - vLifetimeFrac);
-    float tight  = mix(1.8, 5.5, vLifetimeFrac);
-
-    // Main blob: large, moderately elongated
-    vec2 p1  = rc + vec2(s1 - 0.5, s2 - 0.5) * spread * 0.3;
-    float b1 = blob(rot(p1, s1 * 3.14), mix(1.2, 2.5, s3), tight);
-
-    // Tendril 1: narrow and long, rotated differently
-    vec2 p2  = rc + vec2(s2 - 0.5, s3 - 0.5) * spread;
-    float b2 = blob(rot(p2, s2 * 6.28), mix(2.5, 5.0, s4), tight * 0.7) * mix(0.4, 0.85, s1);
-
-    // Tendril 2: smaller, different angle
-    vec2 p3  = rc - vec2(s4 - 0.5, s5 - 0.5) * spread * 0.8;
-    float b3 = blob(rot(p3, s5 * 4.71), mix(1.8, 4.0, s2), tight * 0.55) * mix(0.2, 0.6, s3);
-
-    float shape = b1 + b2 + b3;
-    if (shape < 0.02) discard;
+    float shape = foam * edgeMask;
+    if (shape < 0.04) discard;
 
     float birthFade = 1.0 - smoothstep(0.85, 1.0, vLifetimeFrac);
     float deathFade = smoothstep(0.0, 0.12, vLifetimeFrac);
-    float ageFade   = mix(0.10, 0.70, vLifetimeFrac);
+    float ageFade   = mix(0.10, 0.80, vLifetimeFrac);
 
-    float alpha = min(shape, 1.0) * birthFade * deathFade * ageFade;
+    float alpha = shape * birthFade * deathFade * ageFade;
 
-    vec3 color = mix(vec3(0.70, 0.86, 1.0), vec3(1.0), vLifetimeFrac * b1 * 0.9);
+    // Young = bright white foam; old = pale blue-grey spray
+    vec3 color = mix(vec3(0.70, 0.87, 1.0), vec3(1.0),
+                     foam * vLifetimeFrac * 0.9);
 
     FragColor = vec4(color, alpha);
 }
