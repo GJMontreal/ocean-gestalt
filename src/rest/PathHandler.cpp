@@ -5,9 +5,37 @@ using json = nlohmann::json;
 
 static const int BUFFER_SIZE = 1024;
 
+// ---- Pure logic helpers ----
+
+std::string PathHandler::normalisePath(const std::string& rawPath) {
+  const std::string prefix("/api/");
+  std::string path = rawPath.substr(prefix.length());
+  std::replace(path.begin(), path.end(), '/', '.');
+  return path;
+}
+
+std::optional<PathHandler::PostRequest> PathHandler::parsePost(const std::string& body) {
+  try {
+    json request = json::parse(body);
+    if (!request.contains("value") || !request.contains("path")) {
+      return std::nullopt;
+    }
+    PostRequest req;
+    req.path = request["path"].get<std::string>();
+    req.value = request["value"];
+    if (request.contains("duration") && request["duration"].is_number()) {
+      req.duration = request["duration"].get<float>();
+    }
+    return req;
+  } catch (const json::parse_error&) {
+    return std::nullopt;
+  }
+}
+
+// ---- CivetWeb adapters ----
+
 void PathHandler::writeCORSHeaders(struct mg_connection* conn,
                                    const char* contentType) {
-  const struct mg_request_info* req_info = mg_get_request_info(conn);
   const char* origin = mg_get_header(conn, "Origin");
 
   mg_printf(conn, "HTTP/1.1 200 OK\r\n");
@@ -19,93 +47,45 @@ void PathHandler::writeCORSHeaders(struct mg_connection* conn,
   if (origin) {
     mg_printf(conn, "Access-Control-Allow-Origin: %s\r\n", origin);
   } else {
-    mg_printf(conn, "Access-Control-Allow-Origin: *\r\n");  // fallback
+    mg_printf(conn, "Access-Control-Allow-Origin: *\r\n");
   }
 
-  // Optional caching and security headers
   mg_printf(conn,
             "Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n"
             "Access-Control-Allow-Headers: Content-Type\r\n"
             "Access-Control-Max-Age: 86400\r\n");
-};
-
-std::string replaceSeparator(const std::string& input, char oldSep, char newSep) {
-    std::string result = input;
-    std::replace(result.begin(), result.end(), oldSep, newSep);
-    return result;
 }
 
-std::string PathHandler::getSubPath(
-    const struct mg_request_info* req_info) const {
-  std::string fullPath = req_info->local_uri;
-
-  const std::string prefix("/api/");
-  std::string subPath = fullPath.substr(prefix.length());
-  return subPath;
-}
-
-bool PathHandler::handleGet(CivetServer* server, struct mg_connection* conn) {
+bool PathHandler::handleGet(CivetServer*, struct mg_connection* conn) {
   const struct mg_request_info* req_info = mg_get_request_info(conn);
-
-  auto subPath = getSubPath(req_info);
-  subPath = replaceSeparator(subPath, '/', '.');
-  auto result = handleGet(subPath);
+  auto path = normalisePath(req_info->local_uri);
+  auto result = handleGet(path);
   if (result) {
-    std::string value = *result;
     writeCORSHeaders(conn);
-    mg_printf(conn,
-              "\r\n"
-              "{\"value\": %s }\n",
-              value.c_str());
+    mg_printf(conn, "\r\n{\"value\": %s }\n", result->c_str());
     return true;
   }
   return false;
 }
 
-bool PathHandler::handlePost(CivetServer* server, struct mg_connection* conn) {
-  const struct mg_request_info* req_info = mg_get_request_info(conn);
+bool PathHandler::handlePost(CivetServer*, struct mg_connection* conn) {
   char buffer[BUFFER_SIZE];
   int len = mg_read(conn, buffer, sizeof(buffer) - 1);
   buffer[len] = '\0';
 
-  auto subPath = getSubPath(req_info);
-
-  try {
-    json request = json::parse(buffer);
-
-    // we should probably verify that "value" is a valid type as well
-    if (!request.contains("value") || !request.contains("path")) {
-      mg_printf(conn,
-                "HTTP/1.1 400 Bad Request\r\nContent-Type: "
-                "text/plain\r\n\r\nMissing or invalid json\n");
-      return false;
-    }
-
-    auto value = request["value"];
-    auto path = request["path"];
-
-    std::optional<float> duration;
-    if (request.contains("duration") && request["duration"].is_number()) {
-      duration = request["duration"].get<float>();
-    }
-
-    auto result = handlePost(path, value, duration);
-    if (result) {
-      std::string returnValue = *result;
-      writeCORSHeaders(conn);
-      mg_printf(conn,
-                "\r\n"
-                "{\"value\": %s }\n",
-                returnValue.c_str());
-      return true;
-    } else {
-      // error case so returnBadRequest(errorString);
-      return false;
-    }
-  } catch (const json::parse_error& e) {
+  auto req = parsePost(std::string(buffer, len));
+  if (!req) {
     mg_printf(conn,
               "HTTP/1.1 400 Bad Request\r\nContent-Type: "
-              "text/plain\r\n\r\nInvalid JSON\n");
+              "text/plain\r\n\r\nMissing or invalid json\n");
+    return false;
+  }
+
+  auto result = handlePost(req->path, req->value, req->duration);
+  if (result) {
+    writeCORSHeaders(conn);
+    mg_printf(conn, "\r\n{\"value\": %s }\n", result->c_str());
+    return true;
   }
   return false;
 }
