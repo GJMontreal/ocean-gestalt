@@ -10,6 +10,17 @@
 
 <body>
   <h1>Ocean Gestalt</h1>
+  <nav>
+    <a href="index.html">Params</a>
+    <a href="gust.html">Gust</a>
+<a href="surface.html">Surface</a>
+  </nav>
+  <div id="global-controls">
+    <label for="transition-duration">Transition</label>
+    <input type="range" id="transition-duration" min="0" max="10" step="0.1" value="0">
+    <input type="number" id="transition-duration-number" min="0" max="10" step="0.1" value="0">
+    <span>s</span>
+  </div>
   <div id="controls"></div>
   <script>
     window.apiConfig = {
@@ -21,6 +32,16 @@
       port: 8000,
       json: "buoy.json"
     };
+  </script>
+  <script>
+    const slider = document.getElementById('transition-duration');
+    const number = document.getElementById('transition-duration-number');
+    slider.addEventListener('input', () => {
+      number.value = parseFloat(slider.value).toFixed(1);
+    });
+    number.addEventListener('input', () => {
+      slider.value = number.value;
+    });
   </script>
   <script type="module" src="main.js"></script>
 </body>

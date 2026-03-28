@@ -51,14 +51,5 @@
             }
         }
         }
-          ,"ambientStrength":{
-            "type": "float",
-            "min": 0,
-            "max": 1,
-            "_meta": {
-                "display": "Ambient Strength",
-                "control": "slider"
-            }
-          }
     }
-  }
+}

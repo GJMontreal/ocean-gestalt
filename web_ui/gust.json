@@ -41,24 +41,6 @@
             }
         },
        
-            "causticScale": {
-                "type": "float",
-                "min": 0,
-                "max": 1,
-                "_meta": {
-                    "display": "Caustic Scale",
-                    "control": "slider"
-                }
-            },
-            "causticSpeed": {
-                "type": "float",
-                "min": 0,
-                "max": 1,
-                "_meta": {
-                    "display": "Caustic Speed",
-                    "control": "slider"
-                }
-            },
             "causticIntensity": {
                 "type": "float",
                 "min": 0,
@@ -113,17 +95,6 @@
                     "control": "slider"
                 }
             },
-            "fogColor": {
-                "type": "vec4",
-                "_meta": {
-                    "display": "Line Colour",
-                    "control": "color",
-                    "range": [
-                        0,
-                        1
-                    ]
-                }
-            },
             "showNormalMap": {
                 "type": "bool",
                 "_meta": {
@@ -159,22 +130,8 @@
                     "control": "toggle"
                 }
             }
-        },
-        
-        "_meta": {
-            "display": "Light"
-        },            "lineColor": {
-                "type": "vec4",
-                "_meta": {
-                    "display": "Colour",
-                    "control": "color",
-                    "range": [
-                        0,
-                        1
-                    ]
-                }
-            }
-          
+        }
     }
+
 
 

@@ -1,8 +1,35 @@
-{  "wireframe_shader.baseColor": [
-        0.15,
-        0.36,
-        0.25,
-        1.0
+{
+    "buoy_mesh.bumpFactor": 0.0,
+    "buoy_mesh.lightPos": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "buoy_mesh.specularFactor": 0.0,
+    "buoy_mesh.viewPos": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "drawable_mesh.lightPos": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "drawable_mesh.viewPos": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "drawable_normal.lightPos": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "drawable_normal.viewPos": [
+        0.0,
+        0.0,
+        0.0
     ],
     "mesh_shader.baseColor": [
         0.0,
@@ -11,6 +38,9 @@
         1.0
     ],
     "mesh_shader.causticIntensity": 0.3540000021457672,
+    "mesh_shader.debugDiffuse": 0,
+    "mesh_shader.debugFragPos": 0,
+    "mesh_shader.debugLightPos": 0,
     "mesh_shader.foamScale": 0.4009999930858612,
     "mesh_shader.foamScrollSpeed": 0.0010000000474974513,
     "mesh_shader.foamSlopeAmplifier": 72.68000030517578,
@@ -25,6 +55,11 @@
     "mesh_shader.gust.scale": 0.004000000189989805,
     "mesh_shader.gust.speed": 0.023000000044703484,
     "mesh_shader.gust.strength": 0.003000000026077032,
+    "mesh_shader.lightPos": [
+        0.0,
+        0.0,
+        0.0
+    ],
     "mesh_shader.normalMapping.direction": [
         1.0,
         1.0,
@@ -36,6 +71,12 @@
     "mesh_shader.showMesh": 1,
     "mesh_shader.showNormalMap": 0,
     "mesh_shader.showUVs": 0,
+    "mesh_shader.time": 0.0,
+    "mesh_shader.viewPos": [
+        0.0,
+        0.0,
+        0.0
+    ],
     "mesh_shader.waves[0].amplitude": 1.5950000286102295,
     "mesh_shader.waves[0].direction": [
         -1.0,
@@ -126,6 +167,12 @@
     "mesh_shader.waves[9].phase": 2.815000057220459,
     "mesh_shader.waves[9].steepness": 1.0,
     "mesh_shader.waves[9].wavelength": 15.222993850708008,
+    "normal_shader.baseColor": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+    ],
     "normal_shader.gust.direction": [
         0.9608904123306274,
         0.27692896127700806,
@@ -134,7 +181,25 @@
     "normal_shader.gust.scale": 0.004000000189989805,
     "normal_shader.gust.speed": 0.023000000044703484,
     "normal_shader.gust.strength": 0.003000000026077032,
+    "normal_shader.lightPos": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "normal_shader.normalMapping.direction": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "normal_shader.normalMapping.scale": 0.0,
+    "normal_shader.normalMapping.speed": 0.0,
     "normal_shader.showMesh": 1,
+    "normal_shader.time": 0.0,
+    "normal_shader.viewPos": [
+        0.0,
+        0.0,
+        0.0
+    ],
     "normal_shader.waves[0].amplitude": 1.5950000286102295,
     "normal_shader.waves[0].direction": [
         -1.0,
@@ -225,6 +290,12 @@
     "normal_shader.waves[9].phase": 2.815000057220459,
     "normal_shader.waves[9].steepness": 1.0,
     "normal_shader.waves[9].wavelength": 15.222993850708008,
+    "wireframe_shader.baseColor": [
+        0.15000000596046448,
+        0.36000001430511475,
+        0.25,
+        1.0
+    ],
     "wireframe_shader.gust.direction": [
         0.9608904123306274,
         0.27692896127700806,
@@ -233,7 +304,25 @@
     "wireframe_shader.gust.scale": 0.004000000189989805,
     "wireframe_shader.gust.speed": 0.023000000044703484,
     "wireframe_shader.gust.strength": 0.003000000026077032,
+    "wireframe_shader.lightPos": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "wireframe_shader.normalMapping.direction": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "wireframe_shader.normalMapping.scale": 0.0,
+    "wireframe_shader.normalMapping.speed": 0.0,
     "wireframe_shader.showMesh": 1,
+    "wireframe_shader.time": 0.0,
+    "wireframe_shader.viewPos": [
+        0.0,
+        0.0,
+        0.0
+    ],
     "wireframe_shader.waves[0].amplitude": 1.5950000286102295,
     "wireframe_shader.waves[0].direction": [
         -1.0,
