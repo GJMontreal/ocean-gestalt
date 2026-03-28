@@ -1,6 +1,7 @@
 #include "doctest.h"
 #include "PathHandler.hpp"
 
+#include <cmath>
 #include <string>
 #include <vector>
 
@@ -38,14 +39,19 @@ TEST_CASE("parseUniformPath handles heading substitution correctly with shaderna
   CHECK(parsed.convertHeading == true);
 }
 
-TEST_CASE("parseUniformPath handles heading substitution correctly with shadername") {
-  using V = std::vector<std::string>;
-  auto handler = TestableUniformPathHandler();
+TEST_CASE("vecToHeading and headingToVec3 round-trip") {
+  const float headings[] = {0.f, 45.f, 90.f, 135.f, 180.f, 270.f, 359.f};
+  for (float h : headings) {
+    auto vec = headingToVec3(h);
+    float recovered = vecToHeading(vec[0], vec[1]);
+    CHECK(recovered == doctest::Approx(h).epsilon(0.01));
+  }
+}
 
-  auto parsed = handler.callParseUniformPath(V{"uniforms","mesh_shader", "wave[0]", "heading"});
-
-  CHECK(parsed.shaderName == "mesh_shader");
-  CHECK(parsed.internalPath == "windDirection");
-  CHECK(parsed.externalPath == "heading");
-  CHECK(parsed.convertHeading == true);
+TEST_CASE("headingToVec3 produces unit vector with zero z") {
+  auto vec = headingToVec3(45.f);
+  REQUIRE(vec.size() == 3);
+  float len = std::sqrt(vec[0]*vec[0] + vec[1]*vec[1]);
+  CHECK(len == doctest::Approx(1.f).epsilon(0.001));
+  CHECK(vec[2] == doctest::Approx(0.f));
 }

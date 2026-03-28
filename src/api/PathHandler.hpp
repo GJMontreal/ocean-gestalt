@@ -1,8 +1,20 @@
 #pragma once
 
 #include "UniformState.hpp"
+#include <cmath>
 
 class buoy;
+
+inline float vecToHeading(float x, float y) {
+    float rad = std::atan2(y, x);
+    float deg = rad * 180.0f / M_PI;
+    return (deg < 0.0f) ? deg + 360.0f : deg;
+}
+
+inline std::vector<float> headingToVec3(float deg) {
+    float rad = deg * M_PI / 180.0f;
+    return {std::cos(rad), std::sin(rad), 0.0f};
+}
 
 struct ParsedUniformPath {
   std::optional<std::string> shaderName = std::nullopt;

@@ -56,7 +56,7 @@ std::optional<std::string> UniformHandler::handlePost(
       animator->animateTo(from, parsed, *duration,
                           [this, path](const ApiValue& v) {
                             api.setValue(path, v, false);
-                          });
+                          }, path);
       return std::visit(
           [](auto&& val) -> std::string { return nlohmann::json(val).dump(); },
           parsed);

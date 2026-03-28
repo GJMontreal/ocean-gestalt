@@ -4,9 +4,10 @@
 #include <cmath>
 
 void UniformAnimator::animateTo(ApiValue from, ApiValue to, float duration,
-                                std::function<void(const ApiValue&)> apply) {
+                                std::function<void(const ApiValue&)> apply,
+                                std::string key) {
     std::lock_guard<std::mutex> lock(mutex);
-    pending.push_back({std::move(from), std::move(to), duration, std::move(apply)});
+    pending.push_back({std::move(key), std::move(from), std::move(to), duration, std::move(apply)});
 }
 
 void UniformAnimator::tick(float time) {
@@ -20,7 +21,24 @@ void UniformAnimator::tick(float time) {
     {
         std::lock_guard<std::mutex> lock(mutex);
         for (auto& p : pending) {
-            active.push_back({p.from, p.to, 0.f, p.duration, std::move(p.apply)});
+            bool replaced = false;
+            if (!p.key.empty()) {
+                for (auto& a : active) {
+                    if (a.key == p.key) {
+                        float t = easeInOut(std::min(a.elapsed / a.duration, 1.f));
+                        a.from     = lerpValue(a.from, a.to, t);
+                        a.to       = p.to;
+                        a.elapsed  = 0.f;
+                        a.duration = p.duration;
+                        a.apply    = std::move(p.apply);
+                        replaced   = true;
+                        break;
+                    }
+                }
+            }
+            if (!replaced) {
+                active.push_back({p.key, p.from, p.to, 0.f, p.duration, std::move(p.apply)});
+            }
         }
         pending.clear();
     }

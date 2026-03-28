@@ -8,6 +8,7 @@
 class UniformState;
 
 struct PendingAnimation {
+    std::string key;  // empty = no replacement check
     ApiValue from;
     ApiValue to;
     float duration;
@@ -15,6 +16,7 @@ struct PendingAnimation {
 };
 
 struct ActiveAnimation {
+    std::string key;
     ApiValue from;
     ApiValue to;
     float elapsed = 0.f;
@@ -24,9 +26,12 @@ struct ActiveAnimation {
 
 class UniformAnimator {
 public:
-    // Thread-safe — may be called from any thread
+    // Thread-safe — may be called from any thread.
+    // If key is non-empty and an animation with the same key is already
+    // running, it is replaced (starting from its current interpolated value).
     void animateTo(ApiValue from, ApiValue to, float duration,
-                   std::function<void(const ApiValue&)> apply);
+                   std::function<void(const ApiValue&)> apply,
+                   std::string key = {});
 
     // Render thread only — advances all active animations and fires apply callbacks
     void tick(float time);

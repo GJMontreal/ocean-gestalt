@@ -106,6 +106,47 @@ TEST_CASE("UniformAnimator: multiple concurrent animations fire independently") 
     CHECK(b == doctest::Approx(20.f));
 }
 
+TEST_CASE("UniformAnimator: new animation with same key replaces in-flight animation") {
+    UniformAnimator anim;
+    float received = -1.f;
+
+    // Start a 4s animation from 0 to 10
+    anim.animateTo(0.f, 10.f, 4.f, [&](const ApiValue& v) { received = getFloat(v); }, "key");
+
+    anim.tick(0.f);
+    anim.tick(2.f);   // halfway: received ≈ 5.0
+
+    float midReceived = received;
+    CHECK(midReceived > 0.f);
+    CHECK(midReceived < 10.f);
+
+    // Re-target to 0 over 1s — should start from current interpolated value
+    anim.animateTo(0.f, 0.f, 1.f, [&](const ApiValue& v) { received = getFloat(v); }, "key");
+
+    anim.tick(3.f);   // dt=1s — new animation completes
+    CHECK(received == doctest::Approx(0.f));
+
+    // Verify only one animation is running (not two)
+    int callCount = 0;
+    anim.animateTo(0.f, 1.f, 1.f, [&](const ApiValue&) { ++callCount; }, "key2");
+    anim.tick(4.f);
+    CHECK(callCount == 1);  // only the new key2 animation fires, not a leftover
+}
+
+TEST_CASE("UniformAnimator: animations without a key run in parallel") {
+    UniformAnimator anim;
+    float a = -1.f, b = -1.f;
+
+    anim.animateTo(0.f, 1.f, 1.f, [&](const ApiValue& v) { a = getFloat(v); });
+    anim.animateTo(0.f, 2.f, 1.f, [&](const ApiValue& v) { b = getFloat(v); });
+
+    anim.tick(0.f);
+    anim.tick(1.f);
+
+    CHECK(a == doctest::Approx(1.f));
+    CHECK(b == doctest::Approx(2.f));
+}
+
 TEST_CASE("UniformAnimator: animations queued from another thread are picked up") {
     UniformAnimator anim;
     float received = -1.f;

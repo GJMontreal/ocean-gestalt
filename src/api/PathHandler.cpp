@@ -2,17 +2,6 @@
 #include "AppContextInterface.hpp"
 
 
-float vecToHeading(float x, float y) {
-  float rad = std::atan2(y, x);
-  float deg = rad * 180.0f / M_PI;
-  return (deg < 0.0f) ? deg + 360.0f : deg;
-}
-
-std::vector<float> headingToVec3(float deg) {
-  float rad = deg * M_PI / 180.0f;
-  return {std::cos(rad), std::sin(rad), 0.0f};
-}
-
 
 bool UniformPathHandler::matches(const std::vector<std::string>& parts) const{
     return !parts.empty() && parts.size() >= 2 && parts[0] == "uniforms";

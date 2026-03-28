@@ -232,7 +232,7 @@ void Configuration::loadUniforms(const string& fileName) {
         anim->animateTo(from, target, duration,
                         [apiPtr, key](const ApiValue& v) {
                           apiPtr->setValue(key, v, false);
-                        });
+                        }, key);
       } else {
         ApiValue apiVal = value.get<ApiValue>();
         locked->setValue(key, apiVal);

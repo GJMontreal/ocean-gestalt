@@ -7,6 +7,8 @@ add_executable(unit_tests
   test_uniformhandler.cpp
   test_pathHandler.cpp
   test_uniformAnimator.cpp
+  test_uniformValue.cpp
+  test_wave.cpp
 )
 
 set_property(TARGET unit_tests PROPERTY CXX_STANDARD 17)
