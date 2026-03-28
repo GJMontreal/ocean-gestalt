@@ -73,6 +73,8 @@ class Configuration: public AppContextInterface, public std::enable_shared_from_
   void setWaveParameter(const std::string& key, const ApiValue& value) override;
   void setApi(std::shared_ptr<ApiAdapter> api) override;
   std::shared_ptr<ApiAdapter> getApi() override;
+  void setAnimator(std::shared_ptr<UniformAnimator> animator) override;
+  std::shared_ptr<UniformAnimator> getAnimator() override;
 
   private:
   void loadJSON(const string& fileName, json& data)const;
@@ -84,6 +86,7 @@ class Configuration: public AppContextInterface, public std::enable_shared_from_
   void loadAPISettings(const string& fileName);
 
   std::weak_ptr<ApiAdapter> api;
+  std::weak_ptr<UniformAnimator> animator;
   shared_ptr<ShaderProgram> buildShader(json& j, const string& name, vec4& color);
 
   std::unordered_map<std::string, shared_ptr<ShaderProgram> > shaders;

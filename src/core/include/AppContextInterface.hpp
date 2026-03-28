@@ -8,6 +8,7 @@ class ApiAdapter;
 class ShaderProgram;
 class WaveInterface;
 class Wave;
+class UniformAnimator;
 
 class AppContextInterface{
   public:
@@ -19,5 +20,7 @@ class AppContextInterface{
     virtual void setInitialUniformState(const ApiAdapter& api) = 0;
     virtual void setApi(std::shared_ptr<ApiAdapter> api) = 0;
     virtual std::shared_ptr<ApiAdapter> getApi() = 0;
+    virtual void setAnimator(std::shared_ptr<UniformAnimator> animator) = 0;
+    virtual std::shared_ptr<UniformAnimator> getAnimator() = 0;
     virtual ~AppContextInterface() = default;
 };

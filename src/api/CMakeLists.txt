@@ -8,6 +8,7 @@ add_library(app-api STATIC
   OceanApi.cpp
   PathHandler.cpp
   UniformState.cpp
+  UniformAnimator.cpp
 )
 
 set_property(TARGET app-api PROPERTY CXX_STANDARD 17)

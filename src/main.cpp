@@ -16,6 +16,7 @@
 
 #include "OceanApi.hpp"
 #include "UniformState.hpp"
+#include "UniformAnimator.hpp"
 
 #include <memory>
 #include <iostream>
@@ -27,7 +28,12 @@ int main(int argc, const char* argv[]) {
 
   auto uniformState = std::make_shared<UniformState>(app->getContext());
   auto api = std::make_shared<OceanApi>(app,uniformState);
-  app->onRender([&uniformState](float){uniformState->renderThreadCallback();});
+  auto animator = std::make_shared<UniformAnimator>();
+  app->getContext().setAnimator(animator);
+  app->onRender([&animator, &uniformState](float time){
+    animator->tick(time);
+    uniformState->renderThreadCallback();
+  });
   app->doOnReady([&] {
       app->getContext().setInitialUniformState(*api);
   });

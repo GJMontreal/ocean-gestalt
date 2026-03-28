@@ -7,6 +7,7 @@
 #include "UniformValue.hpp"
 #include "Utilities.hpp"
 #include "TextRenderer.hpp"
+#include "UniformAnimator.hpp"
 #include <memory>
 #include <fstream>
 #include <iostream>
@@ -56,6 +57,14 @@ void Configuration::setApi(std::shared_ptr<ApiAdapter> api) {
 std::shared_ptr<ApiAdapter> Configuration::getApi() {
   auto locked = api.lock();
   return locked;
+}
+
+void Configuration::setAnimator(std::shared_ptr<UniformAnimator> a) {
+  animator = a;
+}
+
+std::shared_ptr<UniformAnimator> Configuration::getAnimator() {
+  return animator.lock();
 }
 
 void Configuration::loadCamera(const string& fileName) {
@@ -207,11 +216,27 @@ void Configuration::loadUniforms(const string& fileName) {
   if (auto locked = api.lock()) {
     json j;
     loadJSON(fileName, j);
+    auto anim = animator.lock();
     for (auto it = j.begin(); it != j.end(); ++it) {
-      const std::string& key = "uniforms." + it.key() ;
+      const std::string key = "uniforms." + it.key();
       const json& value = it.value();
-      ApiValue apiVal = value.get<ApiValue>();
-      locked->setValue(key, apiVal);
+
+      if (anim && value.is_object() && value.contains("value") && value.contains("duration")) {
+        ApiValue target = value["value"].get<ApiValue>();
+        float duration  = value["duration"].get<float>();
+        ApiValue from   = 0.0f;
+        if (auto current = locked->getValue(key)) {
+          from = *current;
+        }
+        std::shared_ptr<ApiAdapter> apiPtr = locked;
+        anim->animateTo(from, target, duration,
+                        [apiPtr, key](const ApiValue& v) {
+                          apiPtr->setValue(key, v, false);
+                        });
+      } else {
+        ApiValue apiVal = value.get<ApiValue>();
+        locked->setValue(key, apiVal);
+      }
     }
   }
 }
