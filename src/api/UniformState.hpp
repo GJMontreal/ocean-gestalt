@@ -3,6 +3,7 @@
 #include "AppContextInterface.hpp"
 
 #include "ApiValue.hpp"
+#include "IUniformStore.hpp"
 #include "UniformValue.hpp"
 #include <future>
 #include <optional>
@@ -14,7 +15,7 @@ struct PendingUniformUpdate {
     std::promise<bool> ack;
 };
 
-class UniformState{
+class UniformState : public IUniformStore {
   public:
   UniformState(AppContextInterface& context) : context(context){};
 
@@ -22,12 +23,12 @@ class UniformState{
       const std::string& shaderName,
       const std::string& uniformName,
       ApiValue value,
-      bool block = false);
+      bool block = false) override;
 
   std::optional<ApiValue> getUniform(const std::string& shaderName,
-                                     const std::string& uniformName);
+                                     const std::string& uniformName) override;
 
-  std::unique_ptr<UniformMap> dumpUniforms();
+  std::unique_ptr<UniformMap> dumpUniforms() override;
   
   void renderThreadCallback();
 
