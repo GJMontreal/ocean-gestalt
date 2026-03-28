@@ -13,7 +13,8 @@
   <div id="global-controls">
     <label for="transition-duration">Transition</label>
     <input type="range" id="transition-duration" min="0" max="10" step="0.1" value="0">
-    <span id="transition-duration-value">0.0s</span>
+    <input type="number" id="transition-duration-number" min="0" max="10" step="0.1" value="0">
+    <span>s</span>
   </div>
   <div id="controls"></div>
   <script>
@@ -29,9 +30,12 @@
   </script>
   <script>
     const slider = document.getElementById('transition-duration');
-    const display = document.getElementById('transition-duration-value');
+    const number = document.getElementById('transition-duration-number');
     slider.addEventListener('input', () => {
-      display.textContent = parseFloat(slider.value).toFixed(1) + 's';
+      number.value = parseFloat(slider.value).toFixed(1);
+    });
+    number.addEventListener('input', () => {
+      slider.value = number.value;
     });
   </script>
   <script type="module" src="main.js"></script>

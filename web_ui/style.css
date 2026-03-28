@@ -24,9 +24,9 @@ h1 {
   width: 160px;
 }
 
-#transition-duration-value {
+#transition-duration-number {
+  width: 4em;
   font-family: monospace;
-  min-width: 3em;
 }
 
 #controls {
@@ -60,7 +60,6 @@ label {
   white-space: nowrap;
 }
 
-input[type="range"],
 input[type="color"],
 input[type="checkbox"] {
   width: 100%;

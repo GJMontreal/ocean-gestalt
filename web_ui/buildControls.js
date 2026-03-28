@@ -146,12 +146,33 @@ function createControl(label, node, path, valueElem) {
       input.min = node.min ?? 0;
       input.max = node.max ?? 1;
       input.step = 0.001;
-      
+      input.style.flex = "1";
+
+      wrapper.style.display = "flex";
+      wrapper.style.alignItems = "center";
+      wrapper.style.gap = "8px";
+
+      const numberInput = document.createElement("input");
+      numberInput.type = "number";
+      numberInput.min = node.min ?? 0;
+      numberInput.max = node.max ?? 1;
+      numberInput.step = 0.001;
+      numberInput.style.width = "5em";
+      numberInput.style.fontFamily = "monospace";
+      numberInput.style.flexShrink = "0";
+
+      input.addEventListener("input", () => { numberInput.value = Number(input.value).toFixed(3); });
+      numberInput.addEventListener("input", () => {
+        input.value = numberInput.value;
+        input.dispatchEvent(new Event("input"));
+      });
+
       wrapper.appendChild(input);
+      wrapper.appendChild(numberInput);
       getValue = () => Number(input.value);
       setValue = (value) => {
         input.value = value;
-        valueElem.textContent = value.toFixed(3);
+        numberInput.value = value.toFixed(3);
       }
       break;
 
