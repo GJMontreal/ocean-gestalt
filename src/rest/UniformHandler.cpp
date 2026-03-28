@@ -14,7 +14,7 @@ ApplyFunc makeApplyFunc(){
 UniformHandler::UniformHandler(ApiAdapter& api, std::shared_ptr<UniformAnimator> animator)
     : PathHandler(api), animator(std::move(animator)) {
   handlers = {
-      {[](auto& v) { return v.is_number_float(); },
+      {[](auto& v) { return v.is_number(); },
        makeApplyFunc<float>(),
        {"float"}},
       {[](auto& v) {
@@ -62,6 +62,7 @@ std::optional<std::string> UniformHandler::handlePost(
           parsed);
     }
 
+    if (animator) animator->cancel(path);
     if (auto result = api.setValue(path, parsed, true)) {
       return std::visit(
           [](auto&& val) -> std::string { return nlohmann::json(val).dump(); },

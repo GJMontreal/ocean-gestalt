@@ -166,6 +166,12 @@ function createControl(label, node, path, valueElem) {
         input.value = numberInput.value;
         input.dispatchEvent(new Event("input"));
       });
+      numberInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          input.value = numberInput.value;
+          input.dispatchEvent(new Event("input"));
+        }
+      });
 
       wrapper.appendChild(input);
       wrapper.appendChild(numberInput);
