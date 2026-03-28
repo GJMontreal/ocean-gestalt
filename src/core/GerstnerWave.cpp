@@ -23,7 +23,7 @@ glm::vec3 computeGerstnerDisplacement(std::shared_ptr<Wave> wave, const glm::vec
     
     auto direction = glm::normalize(wave->direction); // this could be done once in the wave
     
-    float phase = glm::dot(direction * k, positionXZ) - omega * time + wave->phase;
+    float phase = glm::dot(direction * k, positionXZ) - std::fmod(omega * time, 2.0f * PI) + wave->phase;
 
     float sinPhase = sin(phase);
     float cosPhase = cos(phase);

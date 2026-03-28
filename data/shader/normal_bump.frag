@@ -17,6 +17,76 @@ uniform vec3 lightPos;
 
 uniform float specularFactor;
 uniform float bumpFactor;
+uniform float time;
+uniform float causticIntensity;
+
+struct WAVE {
+    vec3 direction;
+    float amplitude;
+    float wavelength;
+    float steepness;
+    float phase;
+};
+
+#define NUM_WAVES 10
+uniform WAVE waves[NUM_WAVES];
+
+const float PI = 3.14159265358979323;
+const float GRAVITY = 9.81;
+
+vec2 waveXZDispAt(vec2 xz) {
+    vec2 disp = vec2(0.0);
+    for (int i = 0; i < NUM_WAVES; i++) {
+        float k = 2.0 * PI / max(waves[i].wavelength, 0.01);
+        float w = sqrt(GRAVITY * k);
+        vec2 D = normalize(waves[i].direction.xy);
+        float phase = dot(D * k, xz) - mod(w * time, 2.0 * PI) + waves[i].phase;
+        disp -= waves[i].steepness * D * sin(phase) * waves[i].amplitude;
+    }
+    return disp;
+}
+
+float waveHeightAt(vec2 worldXZ) {
+    // Approximate rest XZ by subtracting the XZ displacement at the query point
+    vec2 restXZ = worldXZ - waveXZDispAt(worldXZ);
+
+    float h = 0.0;
+    for (int i = 0; i < NUM_WAVES; i++) {
+        float k = 2.0 * PI / max(waves[i].wavelength, 0.01);
+        float w = sqrt(GRAVITY * k);
+        vec2 D = normalize(waves[i].direction.xy);
+        float phase = dot(D * k, restXZ) - mod(w * time, 2.0 * PI) + waves[i].phase;
+        h += waves[i].amplitude * cos(phase);
+    }
+    return h;
+}
+
+float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+float valueNoise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    float a = hash(i);
+    float b = hash(i + vec2(1.0, 0.0));
+    float c = hash(i + vec2(0.0, 1.0));
+    float d = hash(i + vec2(1.0, 1.0));
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+}
+
+float fbm(vec2 p) {
+    float sum = 0.0;
+    float amp = 0.5;
+    float freq = 1.0;
+    for (int i = 0; i < 5; ++i) {
+        sum += amp * valueNoise(p * freq);
+        freq *= 2.0;
+        amp *= 0.5;
+    }
+    return sum;
+}
 
 void main() {
     // Base color
@@ -51,5 +121,17 @@ void main() {
 
     vec3 diffuse = 0.6 * diff * albedo;
    
-    FragColor = vec4(ambient + diffuse + specular, 1.0);
+    // Waterline effect
+    float surfaceY = waveHeightAt(fs_in.FragPos.xz);
+    float belowWater = smoothstep(surfaceY + 0.1, surfaceY - 0.3, fs_in.FragPos.y);
+    float waterlineBand = 1.0 - smoothstep(0.0, 0.25, abs(fs_in.FragPos.y - surfaceY));
+
+    // Wet hull darkening below waterline
+    vec3 wetTint = vec3(0.05, 0.08, 0.1);
+    vec3 color = mix(ambient + diffuse + specular, wetTint, belowWater * 0.5);
+
+    // Foam rim at waterline
+    color = mix(color, vec3(0.9, 0.95, 1.0), waterlineBand * 0.6);
+
+    FragColor = vec4(color, 1.0);
 }
