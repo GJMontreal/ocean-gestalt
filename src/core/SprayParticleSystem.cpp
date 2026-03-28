@@ -91,7 +91,7 @@ void SprayParticleSystem::update(float dt, float time) {
     for (auto& p : particles) {
         if (!p.active) continue;
         // Gravity is universal — same acceleration regardless of mass
-        p.velocity.y -= GRAVITY * 0.9f * dt;
+        p.velocity.y -= GRAVITY * 3.0f * dt;
 
         // Drag opposes velocity and scales inversely with mass:
         // light particles (mist) decelerate quickly and linger;
@@ -204,7 +204,7 @@ void SprayParticleSystem::spawnParticles(float time) {
                 slot->maxLifetime = 1.2f + crestWeight * 1.0f + randF(rng) * 1.0f;
                 slot->lifetime    = slot->maxLifetime;
                 slot->mass        = 0.3f + randF(rng) * 2.2f;
-                slot->size        = 0.08f + slot->mass * 0.10f + randF(rng) * 0.08f;
+                slot->size        = 0.04f + slot->mass * 0.04f + randF(rng) * 0.03f;
                 slot->seed        = randF(rng);
                 slot->swirl       = (randF(rng) - 0.5f) * 8.0f;
                 slot->active      = true;

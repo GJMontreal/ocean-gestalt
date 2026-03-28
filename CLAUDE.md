@@ -55,3 +55,18 @@ Ocean Gestalt is an interactive Gerstner wave ocean simulation that compiles to 
 **Configuration:** All wave, shader, rendering, and API parameters are JSON files under `data/config/`. Shader sources are in `data/shader/webgl/`.
 
 **Key libraries** (vendored under `lib/`): GLFW, GLEW, GLM, miniaudio, CivetWeb, stb. `nlohmann/json` is fetched via CMake FetchContent. Tests use `doctest`.
+
+## Spray Particle System
+
+`src/core/SprayParticleSystem` is a CPU-simulated, GPU-instanced particle system for ocean spray at wave crests.
+
+**Goal:** A convincing mist/spray cloud that rises from breaking wave crests and falls back to the surface. The effect should read as a group — individual particles should not be recognisable as distinct shapes. Accumulation of many semi-transparent soft sprites (additive blending) builds the cloud brightness, not per-particle opacity.
+
+**How it works:**
+- Each frame, a `GRID_SIZE×GRID_SIZE` grid is swept across the ocean. At each cell, per-wave `cos(phase)` detects crests (=1 at crest). Amplitude×steepness-weighted crestness drives both spawn probability and launch velocity (derived from wave phase speed).
+- Particles are launched with a mostly-horizontal velocity matching wave propagation direction, plus a small upward component. Physics: gravity (~3× real for visual speed), mass-based drag, per-particle swirl.
+- GPU side: instanced `GL_TRIANGLE_STRIP` quads, camera-aligned billboards. Each particle uploads `{worldPos, lifetimeFrac, size, velocityDir, seed}`.
+- Fragment shader: simple radial soft-disc gradient, very low per-particle alpha. Additive blending (`GL_SRC_ALPHA, GL_ONE`) accumulates to bright white at dense crests.
+- The same `crestness` value computed in `gerstner.vert` also drives a whitecap layer directly on the water surface (`water.frag`), so surface foam and airborne spray read as the same substance.
+
+**Known tension:** particle density vs. visual subtlety. More particles → more convincing cloud but higher CPU cost (the grid sweep and pool search are O(N²) and O(MAX_PARTICLES) respectively).

@@ -17,9 +17,7 @@ void main() {
     vec3 camRight = vec3(view[0][0], view[1][0], view[2][0]);
     vec3 camUp    = vec3(view[0][1], view[1][1], view[2][1]);
 
-    // Fast initial shrink: foam chunk → fine spray
-    // pow < 1 would hold size; pow > 1 drops it quickly at first
-    float sizeScale = 0.12 + 0.88 * pow(aLifetimeFrac, 1.8);
+    float sizeScale = 0.45 + 0.55 * pow(aLifetimeFrac, 1.8);
     float size = aSize * sizeScale;
 
     vec3 worldPos = aWorldPos
@@ -28,7 +26,7 @@ void main() {
 
     gl_Position   = projection * view * vec4(worldPos, 1.0);
     vLifetimeFrac = aLifetimeFrac;
-    vUV           = aCorner * 0.5 + 0.5;
+    vUV           = aCorner;
     vSeed         = aSeed;
     vWorldPos     = worldPos;
 }
