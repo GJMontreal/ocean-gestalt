@@ -57,6 +57,7 @@ out vec3 oColor;
 out vec3 oTangent;
 out vec3 oBitangent;
 out vec2 oFragUV;
+out float oCrestness;
     
 const float PI = 3.14159265358979323;
 const float speedScale = 3.0;
@@ -160,6 +161,20 @@ void main(void)
 
     gl_Position = finalPosition;
    
+    float crestnessSum = 0.0;
+    float crestnessWeight = 0.0;
+    for (int i = 0; i < NUM_WAVES; i++) {
+        float safeWL = max(waves[i].wavelength, 0.01);
+        float k_c    = 2.0 * PI / safeWL;
+        float w_c    = VELOCITY_SCALE * sqrt(GRAVITY * k_c);
+        vec2  D_c    = normalize(waves[i].direction.xy);
+        float ph_c   = dot(D_c * k_c, aPosition.xz) - w_c * time + waves[i].phase;
+        float wgt    = waves[i].amplitude * waves[i].steepness;
+        crestnessSum    += max(0.0, cos(ph_c)) * wgt;
+        crestnessWeight += wgt;
+    }
+    oCrestness = crestnessWeight > 0.001 ? crestnessSum / crestnessWeight : 0.0;
+
     oFragPos = newPosition;
     oNormal = normalize(normalFD);
     oColor = baseColor.rgb;
