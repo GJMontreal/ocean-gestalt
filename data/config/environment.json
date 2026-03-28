@@ -25,5 +25,8 @@
     },
     "reflection": {
         "size": 512
+    },
+    "shadow": {
+        "size": 2048
     }
 }

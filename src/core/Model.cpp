@@ -90,6 +90,12 @@ void Model::drawMesh(Uniforms& uniforms, Transform _) {
       shader->setUniform("reflectionTex", 3);
       shader->setUniform("reflectionMatrix", uniforms.reflectionMatrix);
     }
+    if (uniforms.shadowTexture) {
+      glActiveTexture(GL_TEXTURE4);
+      glBindTexture(GL_TEXTURE_2D, uniforms.shadowTexture);
+      shader->setUniform("shadowMap", 4);
+      shader->setUniform("lightSpaceMatrix", uniforms.lightSpaceMatrix);
+    }
 #endif
 
     if (drawTriangles) {

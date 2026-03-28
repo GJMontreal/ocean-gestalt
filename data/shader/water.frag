@@ -18,6 +18,8 @@ uniform samplerCube envMap;
 uniform sampler2D reflectionTex;
 uniform mat4 reflectionMatrix;
 uniform float reflectionDistortion;
+uniform sampler2D shadowMap;
+uniform mat4 lightSpaceMatrix;
 
 uniform vec3 lightPos;
 uniform vec3 viewPos;
@@ -107,6 +109,27 @@ vec2 slopeDir = normalize(vec2(
   return foam;
 }
 
+float shadowPCF(vec3 fragPos, vec3 normal, vec3 lightDir) {
+    vec4 fragPosLightSpace = lightSpaceMatrix * vec4(fragPos, 1.0);
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
+    if (projCoords.z > 1.0) return 1.0;
+
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    float currentDepth = projCoords.z - bias;
+
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / vec2(textureSize(shadowMap, 0));
+    for (int x = -1; x <= 1; x++) {
+        for (int y = -1; y <= 1; y++) {
+            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+            shadow += currentDepth < pcfDepth ? 1.0 : 0.0;
+        }
+    }
+    return shadow / 9.0;
+}
+
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
@@ -128,6 +151,7 @@ void main() {
 
     // Lighting terms
     float diff    = max(dot(normal, lightDir), 0.0);
+    float shadow  = shadowPCF(fs_in.FragPos, normal, lightDir);
 
     vec3 reflectedDir = reflect(-viewDir, normal);
     vec3 envReflection = texture(envMap, reflectedDir).rgb;
@@ -147,7 +171,7 @@ void main() {
 
     vec3 reflection = fresnel * combinedReflection;
  
-    vec3 diffuse  = (1.0 - fresnel) * diff * fs_in.Color;
+    vec3 diffuse  = (1.0 - fresnel) * diff * shadow * fs_in.Color;
 
     // Depth-based colour modulation
     float depth = length(viewPos - fs_in.FragPos);

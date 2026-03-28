@@ -105,6 +105,7 @@ void OceanGestalt::buildScene() {
 
 #ifndef __EMSCRIPTEN__
   reflectionPass = std::make_unique<ReflectionPass>(configuration->reflectionSize, configuration->reflectionSize);
+  shadowPass = std::make_unique<ShadowPass>(configuration->shadowSize);
 #endif
 }
 
@@ -149,6 +150,35 @@ void OceanGestalt::loop() {
 #endif
 
 #ifndef __EMSCRIPTEN__
+  // --- Shadow pre-pass ---
+  {
+    glm::vec3 lightPos = configuration->light->getPosition();
+    float halfSize = configuration->meshSize * 0.5f;
+    glm::mat4 lightProj = glm::ortho(-halfSize, halfSize, -halfSize, halfSize, 0.1f, 50.0f);
+    glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 lightSpaceMatrix = lightProj * lightView;
+
+    setUniformBuffers(lightProj, lightView);
+    shadowPass->beginCapture();
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(2.0f, 4.0f);
+
+    Uniforms shadowUniforms{.projection = lightProj, .view = lightView, .time = uniformTime};
+    for (auto& element : sceneElements) {
+      if (element.name == "waves" || element.name == "camera") continue;
+      if (element.drawable) {
+        (*element.drawable)->draw(shadowUniforms);
+      }
+    }
+
+    glDisable(GL_POLYGON_OFFSET_FILL);
+    shadowPass->endCapture(getWidth(), getHeight());
+    setUniformBuffers(projection, view);
+
+    uniforms.lightSpaceMatrix = lightSpaceMatrix;
+    uniforms.shadowTexture = shadowPass->getDepthTextureID();
+  }
+
   // --- Reflection pre-pass ---
   {
     glm::mat4 reflectY = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, -1.0f, 1.0f));

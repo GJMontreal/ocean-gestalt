@@ -23,6 +23,7 @@
 
 #include "FPSCounter.hpp"
 #include "ReflectionPass.hpp"
+#include "ShadowPass.hpp"
 
 using std::unique_ptr;
 using std::string;
@@ -128,4 +129,5 @@ class OceanGestalt final : public OceanGestaltInterface,
 
   std::shared_ptr<SurfAudio> surfAudio;
   std::unique_ptr<ReflectionPass> reflectionPass;
+  std::unique_ptr<ShadowPass> shadowPass;
 };

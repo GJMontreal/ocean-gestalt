@@ -181,6 +181,9 @@ void Configuration::loadMesh(const string& fileName) {
   if (data.contains("reflection")) {
     reflectionSize = data.at("reflection").at("size");
   }
+  if (data.contains("shadow")) {
+    shadowSize = data.at("shadow").at("size");
+  }
 }
 
 void Configuration::loadGenerator(const string& fileName) {
