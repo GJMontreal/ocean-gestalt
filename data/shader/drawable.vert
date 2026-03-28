@@ -23,4 +23,5 @@ void main() {
   vs_out.Normal = mat3(model) * normalize(aPosition); 
   gl_Position = projection * view * vec4(vs_out.FragPos,1.0);
   vs_out.Color = vec3(1.0);
+  gl_ClipDistance[0] = vs_out.FragPos.y;
 }

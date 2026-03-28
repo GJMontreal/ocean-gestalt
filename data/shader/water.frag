@@ -17,6 +17,7 @@ uniform sampler2D normalMap;
 uniform samplerCube envMap;
 uniform sampler2D reflectionTex;
 uniform mat4 reflectionMatrix;
+uniform float reflectionDistortion;
 
 uniform vec3 lightPos;
 uniform vec3 viewPos;
@@ -134,12 +135,13 @@ void main() {
     // Planar reflection
     vec4 clipSpaceRefl = reflectionMatrix * vec4(fs_in.FragPos, 1.0);
     vec2 reflUV = (clipSpaceRefl.xy / clipSpaceRefl.w) * 0.5 + 0.5;
-    reflUV += vec2(normal.x, normal.z) * 0.03;
+    reflUV += vec2(normal.x, normal.z) * reflectionDistortion;
     reflUV = clamp(reflUV, 0.001, 0.999);
     vec3 planarRefl = texture(reflectionTex, reflUV).rgb;
-    vec3 combinedReflection = mix(envReflection, planarRefl, 0.8);
 
     float cosTheta = max(dot(viewDir, normal), 0.0);
+    float planarWeight = 1.0 - cosTheta;
+    vec3 combinedReflection = mix(envReflection, planarRefl, planarWeight);
 
     vec3 fresnel = fresnelSchlick(cosTheta, F0);
 

@@ -104,7 +104,7 @@ void OceanGestalt::buildScene() {
   sceneElements.emplace_back(SceneElement{"buoy",buoyDrawable,buoy});
 
 #ifndef __EMSCRIPTEN__
-  reflectionPass = std::make_unique<ReflectionPass>(512, 512);
+  reflectionPass = std::make_unique<ReflectionPass>(configuration->reflectionSize, configuration->reflectionSize);
 #endif
 }
 
@@ -157,6 +157,7 @@ void OceanGestalt::loop() {
 
     setUniformBuffers(projection, reflectedView);
     reflectionPass->beginCapture();
+    glEnable(GL_CLIP_DISTANCE0);
     glFrontFace(GL_CW);
 
     Uniforms reflUniforms{.projection = projection, .view = reflectedView, .time = uniformTime};
@@ -168,6 +169,7 @@ void OceanGestalt::loop() {
     }
 
     glFrontFace(GL_CCW);
+    glDisable(GL_CLIP_DISTANCE0);
     reflectionPass->endCapture(getWidth(), getHeight());
     setUniformBuffers(projection, view);
 

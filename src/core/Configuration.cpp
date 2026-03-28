@@ -178,6 +178,9 @@ void Configuration::loadMesh(const string& fileName) {
   auto mesh = data.at("mesh");
   meshSize = mesh.at("size");
   meshSubdivisions = mesh.at("subdivisions");
+  if (data.contains("reflection")) {
+    reflectionSize = data.at("reflection").at("size");
+  }
 }
 
 void Configuration::loadGenerator(const string& fileName) {

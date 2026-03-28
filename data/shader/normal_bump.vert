@@ -27,4 +27,5 @@ void main() {
     vs_out.TexCoord = aTexCoord;
 
     gl_Position = projection * view * vec4(vs_out.FragPos, 1.0);
+    gl_ClipDistance[0] = vs_out.FragPos.y;
 }

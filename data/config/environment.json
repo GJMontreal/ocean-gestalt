@@ -22,5 +22,8 @@
     "mesh": {
         "size": 60,
         "subdivisions": 2
+    },
+    "reflection": {
+        "size": 512
     }
 }
