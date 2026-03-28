@@ -119,3 +119,5 @@ build
 build
 build_emscripten
 __pycache__
+build-cov
+.claude
