@@ -1,0 +1,13 @@
+namespace asset {
+#ifdef __EMSCRIPTEN__
+#define SHADER_DIR "/shader/webgl/"
+#define TEXTURE_DIR "/shader/texture/"
+#define CONFIGURATION_DIR "/config/"
+#define FONT_DIR "/font/"
+#else
+#define TEXTURE_DIR "@CMAKE_SOURCE_DIR@/data/shader/texture/"
+#define SHADER_DIR "@CMAKE_SOURCE_DIR@/data/shader/"
+#define CONFIGURATION_DIR "@CMAKE_SOURCE_DIR@/data/config/"
+#define FONT_DIR "@CMAKE_SOURCE_DIR@/data/font/"
+#endif
+}  // namespace asset

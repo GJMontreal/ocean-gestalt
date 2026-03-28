@@ -22,12 +22,50 @@
     },
     "mesh_shader": {
         "vertex": "gerstner.vert",
-        "fragment": "shader.frag",
+        "fragment": "water.frag",
+        "texture": {
+            "gustNoise": "gust_noise_512.png",
+            "normalMap": "fbm_normalmap.png"
+        },
+        "cubemap": {
+            "envMap": "skybox"
+        },
         "color": {
-            "r": 0.18,
-            "g": 0.24,
-            "b": 0.28,
+            "r": 0.1,
+            "g": 0.2,
+            "b": 0.25,
             "a": 1
         }
+    },
+    "drawable_mesh": {
+        "vertex": "drawable.vert",
+        "fragment": "drawable.frag",
+        "color": {
+            "r": 0,
+            "g": 1,
+            "b": 1,
+            "a": 1
+        }
+    },"drawable_normal": {
+        "vertex": "drawable.vert",
+        "fragment": "simple.frag",
+        "geometry": "drawable_normal.gs"
+    },
+    "buoy_mesh": {
+        "vertex": "normal_bump.vert",
+        "fragment": "normal_bump.frag",
+        "texture": {
+            "normalMap": "metal_normal.png",
+            "bumpMap": "metal_bump.png",
+            "colorMap": "metal_color.png",
+            "roughnessMap": "metal_bump.png"
+        },
+        "cubemap": {
+            "envMap": "skybox"
+        }
+    },
+    "text": {
+        "vertex": "text.vert",
+        "fragment": "text.frag"
     }
 }

@@ -1,0 +1,26 @@
+layout(location = 0) in vec3 aPosition;
+layout(location = 1) in vec2 aTexCoord;
+layout(location = 2) in vec3 aTangent;
+
+layout(std140) uniform Matrices
+{
+    uniform mat4 projection;
+    uniform mat4 view;
+};
+
+uniform mat4 model;
+
+uniform float time;
+
+out VS_OUT {
+    vec3 FragPos;
+    vec3 Normal;
+    vec3 Color;
+} vs_out;
+
+void main() {
+  vs_out.FragPos = vec3(model * vec4(aPosition, 1.0));
+  vs_out.Normal = mat3(model) * normalize(aPosition); 
+  gl_Position = projection * view * vec4(vs_out.FragPos,1.0);
+  vs_out.Color = vec3(1.0);
+}

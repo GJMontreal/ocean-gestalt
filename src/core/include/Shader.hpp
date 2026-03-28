@@ -1,0 +1,137 @@
+/**
+ * Shader.hpp
+ * Contributors:
+ *      * Arthur Sonzogni (author)
+ *      * Geoffrey Jones
+ * Licence:
+ *      * MIT
+ */
+#pragma once
+
+#define GLM_FORCE_RADIANS
+#include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <initializer_list>
+#include <map>
+#include <string>
+
+enum class TextureType{
+  TEXTURE,
+  CUBEMAP
+};
+struct TextureBinding{
+  GLuint textureID;
+  GLuint unit;
+  TextureType textureType;
+  std::string uniform;
+};
+
+class Shader;
+class ShaderProgram;
+
+// Loads a shader from a file into OpenGL.
+class Shader {
+ public:
+  // Load Shader from a file
+  Shader(const std::string& filename, GLenum type);
+
+  // provide opengl shader identifiant.
+  GLuint getHandle() const;
+
+  ~Shader();
+
+ private:
+  // opengl program identifiant
+  GLuint handle;
+
+  friend class ShaderProgram;
+};
+
+// A shader program is a set of shader (for instance vertex shader + pixel
+// shader) defining the rendering pipeline.
+//
+// This class provide an interface to define the OpenGL uniforms and attributes
+// using GLM objects.
+
+struct TexBinding { GLuint texID; std::string uniform; };
+class ShaderProgram {
+ public:
+  // constructor
+  ShaderProgram(const std::string& name, std::initializer_list<Shader> shaderList);
+
+  // bind the program
+  void activate() const;
+  void deactivate() const;
+
+  // provide the opengl identifiant
+  GLuint getHandle() const;
+
+  const std::string& getName();
+  // clang-format off
+  // provide attributes informations.
+  GLint attribute(const std::string& name);
+  void setAttribute(const std::string& name, GLint size, GLsizei stride, GLuint offset, GLboolean normalize, GLenum type);
+  void setAttribute(const std::string& name, GLint size, GLsizei stride, GLuint offset, GLboolean normalize);
+  void setAttribute(const std::string& name, GLint size, GLsizei stride, GLuint offset, GLenum type); 
+  void setAttribute(const std::string& name, GLint size, GLsizei stride, GLuint offset);
+  // clang-format on
+
+  // provide uniform location
+  GLint uniform(const std::string& name);
+  GLint operator[](const std::string& name);
+
+  // affect uniform
+  // TODO: these should all return whether they were successful or not
+  GLint setUniform(const std::string& name, float x, float y, float z);
+  GLint setUniform(const std::string& name, const glm::vec2& v);
+  GLint setUniform(const std::string& name, const glm::vec3& v);
+  GLint setUniform(const std::string& name, const glm::dvec3& v);
+  GLint setUniform(const std::string& name, const glm::vec4& v);
+  GLint setUniform(const std::string& name, const glm::dvec4& v);
+  GLint setUniform(const std::string& name, const glm::dmat4& m);
+  GLint setUniform(const std::string& name, const glm::mat4& m);
+  GLint setUniform(const std::string& name, const glm::mat3& m);
+  GLint setUniform(const std::string& name, float val);
+  GLint setUniform(const std::string& name, int val);
+
+  // TODO: get rid of these two
+  void listUniforms() const;
+  std::optional<std::string> getUniform(const std::string& name) const;
+
+  GLuint loadTexture(const std::string& path, const std::string& uniformName, GLuint unit = 0);
+
+  GLuint loadCubemap(const std::string& path, const std::string& uniformName, GLuint unit = 1);
+
+  ~ShaderProgram();
+
+ private:
+  ShaderProgram();
+
+  std::map<std::string, GLint> uniforms;
+  std::map<std::string, GLint> attributes;
+  
+  std::vector<TextureBinding> textures;
+  std::string name;
+
+  void bindTexture( TextureBinding& binding) const;
+  void bind2DTexture( TextureBinding& binding) const;
+  void bind3DTexture( TextureBinding& binding) const;
+  
+  // opengl id
+  GLuint handle;
+
+  void link();
+};
+
+
+class ShaderScope {
+public:
+    explicit ShaderScope(std::shared_ptr<ShaderProgram>& s) : shader(s) {
+        shader->activate();
+    }
+    ~ShaderScope() {
+        shader->deactivate();
+    }
+private:
+    std::shared_ptr<ShaderProgram>& shader;
+};

@@ -25,5 +25,5 @@ void main(void)
     _ = viewPos;
 
     // FragColor = vec4(.25,.25,.25,1.0);
-    FragColor = lineColor;
+    FragColor = vec4(fs_in.Color,1.0);
 }

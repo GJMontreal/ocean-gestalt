@@ -7,9 +7,26 @@ You can try out the results at:
 It's a bit of ocean you can fit in your pocket.  
 
 
-=======================  
+=======================
 
-I am open to any comments and contributions  
+**Running locally (native build)**
+
+Build:
+```
+cmake -B build -G Ninja .
+cmake --build build
+./build/ocean-gestalt
+```
+
+The simulation exposes a REST API on port 8080. To run the parameter control UI, open a second terminal:
+```
+cd web_ui && python3 server.py
+```
+Then open `http://localhost:8000`. The UI connects to the simulation automatically. Use the Transition slider to animate parameter changes over time rather than snapping.
+
+=======================
+
+I am open to any comments and contributions
 
 Jerry Tessendorf's paper on simulating ocean water.  
 https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf  
@@ -21,7 +38,7 @@ I started with the OpenGL CMake Skeleton.
 https://github.com/ArthurSonzogni/OpenGL_CMake_Skeleton.git 
 
 How it's even possible to get C++ running in a browser   
-https://emscripten.orghttps  
+https://emscripten.org  
 
 An updated glfw api  
 https://github.com/pongasoft/emscripten-glfw  

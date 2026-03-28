@@ -1,9 +1,8 @@
 in vec4 fPosition;
 
-
-in  vec3 FragPos;
-in  vec3 Normal;
-in vec3 Color;
+in vec3 oFragPos;
+in vec3 oNormal;
+in vec3 oColor;
 
 uniform mat4 projection;
 uniform mat4 view;
@@ -20,5 +19,5 @@ void main(void)
 {    vec3 _ = lightPos; // To keep our uniforms consistent between shaders
     _ = viewPos;
 
-    FragColor = lineColor;
+    FragColor = vec4(oColor,1.0);
 }

@@ -1,6 +1,6 @@
 # Created by https://www.toptal.com/developers/gitignore/api/cmake,c++,c,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=cmake,c++,c,visualstudiocode
-
+junk/
 ### C ###
 # Prerequisites
 *.d
@@ -116,4 +116,8 @@ build
 .cache
 .vscode
 .venv
-build*
+build
+build_emscripten
+__pycache__
+build-cov
+.claude

@@ -6,14 +6,59 @@
  *      * MIT
  */
 
-#include  "OceanGestalt.hpp"
+#include "OceanGestalt.hpp"
+
+#ifndef __EMSCRIPTEN__
+#include "RestServer.hpp"
+#else
+#include <emscripten/emscripten.h>
+#endif
+
+#include "OceanApi.hpp"
+#include "UniformState.hpp"
+#include "UniformAnimator.hpp"
 
 #include <memory>
-#include <GLFW/glfw3.h>
+#include <iostream>
 
-#include <memory>
+std::shared_ptr<OceanGestalt> app;
+
 int main(int argc, const char* argv[]) {
-  auto app = std::make_shared<OceanGestalt>();
+  app = std::make_shared<OceanGestalt>();
+
+  auto uniformState = std::make_shared<UniformState>(app->getContext());
+  auto api = std::make_shared<OceanApi>(app,uniformState);
+  auto animator = std::make_shared<UniformAnimator>();
+  app->getContext().setAnimator(animator);
+  app->onRender([&animator, &uniformState](float time){
+    animator->tick(time);
+    uniformState->renderThreadCallback();
+  });
+  app->doOnReady([&] {
+      app->getContext().setInitialUniformState(*api);
+  });
+
+  app->getContext().setApi(api);
+  #ifndef __EMSCRIPTEN__
+    auto server = std::make_unique<RestServer>(api, animator, "0.0.0.0:8080");
+    server->addHandlers(); // why does this have to explicit
+  #endif
   app->run();
   return 0;
 }
+
+#ifdef __EMSCRIPTEN__
+extern "C" {
+  EMSCRIPTEN_KEEPALIVE
+  void onPageHidden() {
+    app->muteAudio(true);
+  }
+
+  EMSCRIPTEN_KEEPALIVE
+  void onPageVisible() {
+    if(app->getIsRunning()){
+      app->muteAudio(false);
+    }
+  }
+}
+#endif
