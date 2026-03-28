@@ -5,8 +5,10 @@
 #include <string>
 #include <iostream>
 
-RestServer::RestServer(std::shared_ptr<ApiAdapter>&& api, const std::string& portString)
-    : api(std::move(api)) {
+RestServer::RestServer(std::shared_ptr<ApiAdapter> api,
+                       std::shared_ptr<UniformAnimator> animator,
+                       const std::string& portString)
+    : api(std::move(api)), animator(std::move(animator)) {
   const char* options[] = {
         "listening_ports",portString.c_str(),
         nullptr
@@ -19,6 +21,6 @@ RestServer::RestServer(std::shared_ptr<ApiAdapter>&& api, const std::string& por
 
 void RestServer::addHandlers() {
   server->addHandler(PauseHandler::uri(), new PauseHandler(*api));
-  auto uniformHandler = new UniformHandler(*api);
+  auto uniformHandler = new UniformHandler(*api, animator);
   server->addHandler(uniformHandler->uri(), uniformHandler);
 }

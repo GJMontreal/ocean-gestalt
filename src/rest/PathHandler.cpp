@@ -83,8 +83,13 @@ bool PathHandler::handlePost(CivetServer* server, struct mg_connection* conn) {
 
     auto value = request["value"];
     auto path = request["path"];
-    
-    auto result = handlePost(path, value);
+
+    std::optional<float> duration;
+    if (request.contains("duration") && request["duration"].is_number()) {
+      duration = request["duration"].get<float>();
+    }
+
+    auto result = handlePost(path, value, duration);
     if (result) {
       std::string returnValue = *result;
       writeCORSHeaders(conn);

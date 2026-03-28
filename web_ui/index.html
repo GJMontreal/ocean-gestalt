@@ -10,6 +10,11 @@
 
 <body>
   <h1>Ocean Gestalt</h1>
+  <div id="global-controls">
+    <label for="transition-duration">Transition</label>
+    <input type="range" id="transition-duration" min="0" max="10" step="0.1" value="0">
+    <span id="transition-duration-value">0.0s</span>
+  </div>
   <div id="controls"></div>
   <script>
     window.apiConfig = {
@@ -21,6 +26,13 @@
       port: 8000,
       json: "params.json"
     };
+  </script>
+  <script>
+    const slider = document.getElementById('transition-duration');
+    const display = document.getElementById('transition-duration-value');
+    slider.addEventListener('input', () => {
+      display.textContent = parseFloat(slider.value).toFixed(1) + 's';
+    });
   </script>
   <script type="module" src="main.js"></script>
 </body>

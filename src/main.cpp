@@ -40,8 +40,8 @@ int main(int argc, const char* argv[]) {
 
   app->getContext().setApi(api);
   #ifndef __EMSCRIPTEN__
-    auto server = std::make_unique<RestServer>(api,"0.0.0.0:8080");
-    server->addHandlers(); // why does this have to explicit 
+    auto server = std::make_unique<RestServer>(api, animator, "0.0.0.0:8080");
+    server->addHandlers(); // why does this have to explicit
   #endif
   app->run();
   return 0;

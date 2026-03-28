@@ -194,13 +194,14 @@ function hexToVec4(hex) {
 
 function postUpdate(path, value, apiBase, control) {
   const endpoint = path.join("/");
+  const duration = parseFloat(document.getElementById('transition-duration')?.value ?? 0);
+  const body = { path: path.join("."), value };
+  if (duration > 0) body.duration = duration;
+
   fetch(`${apiBase}/api/${endpoint}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      path: path.join("."),  // flatten path array
-      value
-    })
+    body: JSON.stringify(body)
   })
     .then(res =>{
       if (!res.ok) throw new Error(`Server responded with status ${res.status}`);

@@ -6,6 +6,7 @@ add_executable(unit_tests
   test_main.cpp
   test_uniformhandler.cpp
   test_pathHandler.cpp
+  test_uniformAnimator.cpp
 )
 
 set_property(TARGET unit_tests PROPERTY CXX_STANDARD 17)

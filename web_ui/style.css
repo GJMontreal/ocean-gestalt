@@ -10,6 +10,25 @@ h1 {
   font-size: 1.5rem;
 }
 
+#global-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.75rem 2rem;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  font-size: 0.95rem;
+}
+
+#global-controls input[type="range"] {
+  width: 160px;
+}
+
+#transition-duration-value {
+  font-family: monospace;
+  min-width: 3em;
+}
+
 #controls {
   padding: 1rem 2rem;
 }

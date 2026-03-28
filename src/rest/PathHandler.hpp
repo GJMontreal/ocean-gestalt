@@ -22,7 +22,8 @@ class PathHandler : public CivetHandler {
   bool handlePost(CivetServer*, struct mg_connection* conn) override;
   virtual std::optional<std::string> handlePost(
       const std::string& path,
-      nlohmann::json::value_type value) = 0;
+      nlohmann::json::value_type value,
+      std::optional<float> duration = std::nullopt) = 0;
 
   std::string getSubPath(const struct mg_request_info* req_info) const;
 

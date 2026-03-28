@@ -37,7 +37,7 @@ public:
 
 TEST_CASE("UniformHandler::splitPath handles valid and invalid paths") {
   DummyApi api;
-  TestableUniformHandler handler(api);
+  TestableUniformHandler handler(api, nullptr);
 
   SUBCASE("valid path") {
     auto parsed = handler.callSplitPath("shaderOne/uTime");
