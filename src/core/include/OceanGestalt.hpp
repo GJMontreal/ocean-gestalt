@@ -22,6 +22,7 @@
 #include "SurfAudio.hpp"
 
 #include "FPSCounter.hpp"
+#include "ReflectionPass.hpp"
 
 using std::unique_ptr;
 using std::string;
@@ -126,4 +127,5 @@ class OceanGestalt final : public OceanGestaltInterface,
   std::vector<std::function<void(double time)>> renderThreadCallbacks;
 
   std::shared_ptr<SurfAudio> surfAudio;
+  std::unique_ptr<ReflectionPass> reflectionPass;
 };

@@ -28,6 +28,7 @@ add_library(app-core STATIC
   KeyExecutable.cpp
   SurfAudio.cpp
   FoamRenderPass.cpp
+  ReflectionPass.cpp
   Sphere.cpp
   Identifier.cpp
   Drawable.cpp

@@ -102,9 +102,10 @@ void OceanGestalt::buildScene() {
   buoyDrawable->setNormalShader(drawableNormalShader);
 #endif
   sceneElements.emplace_back(SceneElement{"buoy",buoyDrawable,buoy});
-  
 
-
+#ifndef __EMSCRIPTEN__
+  reflectionPass = std::make_unique<ReflectionPass>(512, 512);
+#endif
 }
 
 void OceanGestalt::runOnce(){
@@ -147,9 +148,37 @@ void OceanGestalt::loop() {
   setUniformBuffers(projection, view);
 #endif
 
+#ifndef __EMSCRIPTEN__
+  // --- Reflection pre-pass ---
+  {
+    glm::mat4 reflectY = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, -1.0f, 1.0f));
+    glm::mat4 reflectedView = view * reflectY;
+    glm::mat4 reflectionMatrix = projection * reflectedView;
+
+    setUniformBuffers(projection, reflectedView);
+    reflectionPass->beginCapture();
+    glFrontFace(GL_CW);
+
+    Uniforms reflUniforms{.projection = projection, .view = reflectedView, .time = uniformTime};
+    for (auto& element : sceneElements) {
+      if (element.name == "waves") continue;
+      if (element.drawable) {
+        (*element.drawable)->draw(reflUniforms);
+      }
+    }
+
+    glFrontFace(GL_CCW);
+    reflectionPass->endCapture(getWidth(), getHeight());
+    setUniformBuffers(projection, view);
+
+    uniforms.reflectionMatrix = reflectionMatrix;
+    uniforms.reflectionTexture = reflectionPass->getTextureID();
+  }
+#endif
+
   // clear
   glClear(GL_COLOR_BUFFER_BIT);
- 
+
   glClearColor(0.0f, 0.05f, 0.1f,
                1.0f);  // TODO: we should set this in the environment
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

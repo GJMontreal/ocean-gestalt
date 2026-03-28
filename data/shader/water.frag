@@ -15,6 +15,8 @@ layout(std140) uniform Matrices
 
 uniform sampler2D normalMap; 
 uniform samplerCube envMap;
+uniform sampler2D reflectionTex;
+uniform mat4 reflectionMatrix;
 
 uniform vec3 lightPos;
 uniform vec3 viewPos;
@@ -129,11 +131,19 @@ void main() {
     vec3 reflectedDir = reflect(-viewDir, normal);
     vec3 envReflection = texture(envMap, reflectedDir).rgb;
 
+    // Planar reflection
+    vec4 clipSpaceRefl = reflectionMatrix * vec4(fs_in.FragPos, 1.0);
+    vec2 reflUV = (clipSpaceRefl.xy / clipSpaceRefl.w) * 0.5 + 0.5;
+    reflUV += vec2(normal.x, normal.z) * 0.03;
+    reflUV = clamp(reflUV, 0.001, 0.999);
+    vec3 planarRefl = texture(reflectionTex, reflUV).rgb;
+    vec3 combinedReflection = mix(envReflection, planarRefl, 0.8);
+
     float cosTheta = max(dot(viewDir, normal), 0.0);
-    
+
     vec3 fresnel = fresnelSchlick(cosTheta, F0);
 
-    vec3 reflection = fresnel * envReflection;
+    vec3 reflection = fresnel * combinedReflection;
  
     vec3 diffuse  = (1.0 - fresnel) * diff * fs_in.Color;
 
