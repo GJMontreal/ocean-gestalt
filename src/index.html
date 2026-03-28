@@ -155,6 +155,7 @@ document.getElementById('start-audio').addEventListener('click', () => {
 
   // connect to canvas
   var Module = {
+    arguments:["uniforms_web.json"],
     print: (function () {
       var element = document.getElementById('console_output');
       return function (text) {

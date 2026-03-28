@@ -105,20 +105,20 @@
         -0.8497298955917358,
         0.0
     ],
-    "mesh_shader.waves[7].phase": 3.5510001182556152,
-    "mesh_shader.waves[7].steepness": 1.0,
-    "mesh_shader.waves[7].wavelength": 4.903873443603516,
-    "mesh_shader.waves[8].amplitude": 0.0,
-    "mesh_shader.waves[8].direction": [
+    "waves[7].phase": 3.5510001182556152,
+    "waves[7].steepness": 1.0,
+    "waves[7].wavelength": 4.903873443603516,
+    "waves[8].amplitude": 0.0,
+    "waves[8].direction": [
         -0.6188002824783325,
         0.7855483293533325,
         0.0
     ],
-    "mesh_shader.waves[8].phase": 2.5360000133514404,
-    "mesh_shader.waves[8].steepness": 1.0,
-    "mesh_shader.waves[8].wavelength": 59.777008056640625,
-    "mesh_shader.waves[9].amplitude": 0.0,
-    "mesh_shader.waves[9].direction": [
+    "waves[8].phase": 2.5360000133514404,
+    "waves[8].steepness": 1.0,
+    "waves[8].wavelength": 59.777008056640625,
+    "waves[9].amplitude": 0.0,
+    "waves[9].direction": [
         -0.060914020985364914,
         0.9981430172920227,
         0.0

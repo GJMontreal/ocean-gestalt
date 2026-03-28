@@ -35,7 +35,12 @@ int main(int argc, const char* argv[]) {
     uniformState->renderThreadCallback();
   });
   app->doOnReady([&] {
-      app->getContext().setInitialUniformState(*api);
+      std::string url;
+      if(argc > 1){
+          url = argv[1];
+      }
+      std::cout << "fetching " << url << std::endl;
+      app->getContext().setInitialUniformState(*api, url);
   });
 
   app->getContext().setApi(api);

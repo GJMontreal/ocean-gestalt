@@ -63,7 +63,6 @@ if (EMSCRIPTEN)
   # Copy the index.html file.
   foreach(file 
    "index.html" 
-   "run_webassembly.py" 
    "keypress.js"
    "manifest.json"
    )
