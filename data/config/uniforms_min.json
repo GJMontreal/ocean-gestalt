@@ -18,9 +18,9 @@
         0.27692896127700806,
         0.0
     ],
-    "mesh_shader.gust.scale": 0.004000000189989805,
-    "mesh_shader.gust.speed": 0.0,
-    "mesh_shader.gust.strength": 0.000000000000001,
+    "mesh_shader.gust.scale": 0.009,
+    "mesh_shader.gust.speed": 0.008,
+    "mesh_shader.gust.strength": 0.008,
     "mesh_shader.normalMapping.scale": 1.0,
     "mesh_shader.normalMapping.speed":0.0,
     "mesh_shader.normalMapping.direction":[1.0,1.0,0.0],
