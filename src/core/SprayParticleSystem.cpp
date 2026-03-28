@@ -190,7 +190,10 @@ void SprayParticleSystem::spawnParticles(float time) {
                 if (!slot) return;
 
                 float lateral = ls * (0.8f + randF(rng) * 0.8f);
-                float upSpeed = ls * (0.15f + crestWeight * 0.35f + randF(rng) * 0.2f);
+                // Wide variance so particles reach a range of heights rather
+                // than all stalling at the same ceiling
+                float upBase  = ls * (0.1f + crestWeight * 0.4f);
+                float upSpeed = upBase * (0.2f + randF(rng) * randF(rng) * 4.0f);
 
                 // Scatter spawn position within the cell
                 glm::vec3 jitter(( randF(rng) - 0.5f) * step,  0.f,
