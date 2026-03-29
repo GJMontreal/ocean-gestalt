@@ -146,7 +146,8 @@ GLint ShaderProgram::uniform(const std::string& name) {
     if (r == GL_INVALID_OPERATION){
       cerr << "[ERROR] GL_INVALID_OPERATION Getting uniform location" << endl;
     } else if( r < 0) {
-      cout << "[Warning] uniform " << name << " doesn't exist in shader " << this->getName() << endl;
+      // TODO: silence these 
+      // cout << "[Warning] uniform " << name << " doesn't exist in shader " << this->getName() << endl;
     }else{
       uniforms[name] = r; // I don't think we should add it if it's not in the program
     }
