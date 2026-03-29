@@ -76,10 +76,11 @@ float hash(vec2 p) {
 float valueNoise(vec2 p) {
     vec2 i = floor(p);
     vec2 f = fract(p);
-    float a = hash(i);
-    float b = hash(i + vec2(1.0, 0.0));
-    float c = hash(i + vec2(0.0, 1.0));
-    float d = hash(i + vec2(1.0, 1.0));
+    // Wrap grid coords to [0,289) so hash inputs stay bounded at all frequencies
+    float a = hash(mod(i,               289.0));
+    float b = hash(mod(i + vec2(1.0, 0.0), 289.0));
+    float c = hash(mod(i + vec2(0.0, 1.0), 289.0));
+    float d = hash(mod(i + vec2(1.0, 1.0), 289.0));
     vec2 u = f * f * (3.0 - 2.0 * f);
     return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
 }
@@ -89,7 +90,8 @@ float fbm(vec2 p) {
     float amp = 0.5;
     float freq = 1.0;
     for (int i = 0; i < 5; ++i) {
-        sum += amp * valueNoise(p * freq);
+        // Wrap per-octave so fract() always operates on small values
+        sum += amp * valueNoise(mod(p * freq, 289.0));
         freq *= 2.0;
         amp *= 0.5;
     }
