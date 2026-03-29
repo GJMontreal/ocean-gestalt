@@ -82,8 +82,8 @@ class Drawable: public MoveableBase<Drawable>  {
   friend MoveableBase<Drawable>;
   Moveable moveable;
 
-  bool shouldDrawWireframe;
-  bool shouldDrawLines;
-  bool shouldDrawNormals;
-  bool shouldDrawMesh;
+  bool shouldDrawWireframe = false;
+  bool shouldDrawLines = false;
+  bool shouldDrawNormals = false;
+  bool shouldDrawMesh = false;
 };

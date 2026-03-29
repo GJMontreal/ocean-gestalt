@@ -78,10 +78,10 @@ class OceanGestalt final : public OceanGestaltInterface,
  
  private:
   // for restoring the window from fullscreen
-  int windowXPos;
-  int windowYPos;
-  int restorationWindowWidth;
-  int restorationWindowHeight;
+  int windowXPos = 0;
+  int windowYPos = 0;
+  int restorationWindowWidth = 0;
+  int restorationWindowHeight = 0;
 
   // shader matrix uniform
   glm::mat4 projection = mat4(1.0);
@@ -95,7 +95,7 @@ class OceanGestalt final : public OceanGestaltInterface,
   std::vector<SceneElement>::iterator currentElement;
 
   double elapsedTime=0;
-  double lastTime;
+  double lastTime = 0.0;
   bool isRunning = true;
 
   bool shouldRenderText = false;
