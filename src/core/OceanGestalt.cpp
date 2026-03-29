@@ -103,10 +103,8 @@ void OceanGestalt::buildScene() {
 #endif
   sceneElements.emplace_back(SceneElement{"buoy",buoyDrawable,buoy});
 
-#ifndef __EMSCRIPTEN__
   reflectionPass = std::make_unique<ReflectionPass>(configuration->reflectionSize, configuration->reflectionSize);
   shadowPass = std::make_unique<ShadowPass>(configuration->shadowSize);
-#endif
 }
 
 void OceanGestalt::runOnce(){
@@ -149,7 +147,6 @@ void OceanGestalt::loop() {
   setUniformBuffers(projection, view);
 #endif
 
-#ifndef __EMSCRIPTEN__
   // --- Shadow pre-pass ---
   {
     glm::vec3 lightPos = configuration->light->getPosition();
@@ -158,7 +155,9 @@ void OceanGestalt::loop() {
     glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 lightSpaceMatrix = lightProj * lightView;
 
+#ifndef __EMSCRIPTEN__
     setUniformBuffers(lightProj, lightView);
+#endif
     shadowPass->beginCapture();
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(2.0f, 4.0f);
@@ -173,7 +172,9 @@ void OceanGestalt::loop() {
 
     glDisable(GL_POLYGON_OFFSET_FILL);
     shadowPass->endCapture(getWidth(), getHeight());
+#ifndef __EMSCRIPTEN__
     setUniformBuffers(projection, view);
+#endif
 
     uniforms.lightSpaceMatrix = lightSpaceMatrix;
     uniforms.shadowTexture = shadowPass->getDepthTextureID();
@@ -185,12 +186,16 @@ void OceanGestalt::loop() {
     glm::mat4 reflectedView = view * reflectY;
     glm::mat4 reflectionMatrix = projection * reflectedView;
 
+#ifndef __EMSCRIPTEN__
     setUniformBuffers(projection, reflectedView);
+#endif
     reflectionPass->beginCapture();
+#ifndef __EMSCRIPTEN__
     glEnable(GL_CLIP_DISTANCE0);
+#endif
     glFrontFace(GL_CW);
 
-    Uniforms reflUniforms{.projection = projection, .view = reflectedView, .time = uniformTime};
+    Uniforms reflUniforms{.projection = projection, .view = reflectedView, .time = uniformTime, .isReflectionPass = 1};
     for (auto& element : sceneElements) {
       if (element.name == "waves") continue;
       if (element.drawable) {
@@ -199,14 +204,17 @@ void OceanGestalt::loop() {
     }
 
     glFrontFace(GL_CCW);
+#ifndef __EMSCRIPTEN__
     glDisable(GL_CLIP_DISTANCE0);
+#endif
     reflectionPass->endCapture(getWidth(), getHeight());
+#ifndef __EMSCRIPTEN__
     setUniformBuffers(projection, view);
+#endif
 
     uniforms.reflectionMatrix = reflectionMatrix;
     uniforms.reflectionTexture = reflectionPass->getTextureID();
   }
-#endif
 
   // clear
   glClear(GL_COLOR_BUFFER_BIT);

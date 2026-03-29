@@ -9,6 +9,17 @@ It's a bit of ocean you can fit in your pocket.
 
 =======================
 
+**Running locally (WebGL build)**
+
+Requires [emsdk](https://emscripten.org/docs/getting_started/downloads.html). Activate it before building:
+```
+source ~/emsdk/emsdk_env.sh
+./web_build.sh
+```
+Then open `http://localhost:8000`. The script builds and serves in one step.
+
+=======================
+
 **Running locally (native build)**
 
 Build:

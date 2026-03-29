@@ -9,32 +9,47 @@ in vec2 oFragUV;
 uniform mat4 projection;
 uniform mat4 view;
 
-uniform sampler2D normalMap; 
+uniform sampler2D normalMap;
 uniform samplerCube envMap;
 
 uniform vec3 lightPos;
 uniform vec3 viewPos;
 uniform float time;
 
-// uniform vec4 fogColor;
-
-// Output
 out vec4 FragColor;
 
 uniform float fogDensity;
+uniform vec3 fogColor;
 
 uniform float causticScale;
 uniform float causticSpeed;
 uniform float causticIntensity;
-
-const vec3 CAUSTIC_COLOUR = vec3(1.0, 0.9, 0.7); //another uniform
+uniform vec3 causticColor;
+uniform float causticTroughMin;
+uniform float causticTroughMax;
+uniform float causticThresholdMin;
+uniform float causticThresholdMax;
+uniform float causticSharpness;
 
 uniform float foamScale;
 uniform float foamScrollSpeed;
 uniform float foamSlopeMin;
 uniform float foamSlopeMax;
 uniform float foamSlopeAmplifier;
+uniform float foamPower;
 
+uniform float depthFadeNear;
+uniform float depthFadeFar;
+uniform vec3 deepWaterTint;
+
+uniform float fresnelF0;
+uniform float gamma;
+
+uniform sampler2D shadowMap;
+uniform mat4 lightSpaceMatrix;
+uniform sampler2D reflectionTex;
+uniform mat4 reflectionMatrix;
+uniform float reflectionDistortion;
 
 uniform int showNormalMap;
 uniform int showUVs;
@@ -43,11 +58,9 @@ uniform int debugFragPos;
 uniform int debugDiffuse;
 uniform int showEnv;
 
-const vec3 F0 = vec3(0.04); // typical for dielectrics, metals use albedo or tuned value
-
 vec3 visualizeLightContribution(vec3 lightPos, vec3 fragPos) {
-    float intensity = 1.0 / distance(lightPos, fragPos); // or squared falloff
-    intensity = clamp(intensity * 0.2, 0.0, 1.0); // optional scale
+    float intensity = 1.0 / distance(lightPos, fragPos);
+    intensity = clamp(intensity * 0.2, 0.0, 1.0);
     vec3 lightColor = vec3(1.0 - intensity, 0.0, intensity);
     return lightColor;
 }
@@ -60,10 +73,11 @@ float hash(vec2 p) {
 float valueNoise(vec2 p) {
     vec2 i = floor(p);
     vec2 f = fract(p);
-    float a = hash(i);
-    float b = hash(i + vec2(1.0, 0.0));
-    float c = hash(i + vec2(0.0, 1.0));
-    float d = hash(i + vec2(1.0, 1.0));
+    // Wrap grid coords to [0,289) so hash inputs stay bounded at all frequencies
+    float a = hash(mod(i,               289.0));
+    float b = hash(mod(i + vec2(1.0, 0.0), 289.0));
+    float c = hash(mod(i + vec2(0.0, 1.0), 289.0));
+    float d = hash(mod(i + vec2(1.0, 1.0), 289.0));
     vec2 u = f * f * (3.0 - 2.0 * f);
     return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
 }
@@ -73,37 +87,49 @@ float fbm(vec2 p) {
     float amp = 0.5;
     float freq = 1.0;
     for (int i = 0; i < 5; ++i) {
-        sum += amp * valueNoise(p * freq);
+        // Wrap per-octave so fract() always operates on small values
+        sum += amp * valueNoise(mod(p * freq, 289.0));
         freq *= 2.0;
         amp *= 0.5;
     }
     return sum;
 }
 
-// TODO: I don't like that we're accessing 
 float calcFoam(vec3 position){
-  
-  float slope = length(vec2(dFdx(oFragPos.y), dFdy(oFragPos.y))) * foamSlopeAmplifier;
-// --- Slope direction approximates foam flow ---
-vec2 slopeDir = normalize(vec2(
-    dFdx(position.y),
-    dFdy(position.y)
-));
-
-
-// --- Flowing foam UVs: move along slope direction over time ---
-  vec2 foamUV = position.xz + slopeDir * time * foamScrollSpeed;
-  float foamNoise = fbm(foamUV * foamScale);
-  // --- Modulate foam by surface slope: appears only on steep regions ---
-  float foamMask = smoothstep(foamSlopeMin, foamSlopeMax, slope);
-  float foam = foamNoise * foamMask;
-  foam = pow(foam, 0.5);
-  return foam;
+    float slope = length(vec2(dFdx(oFragPos.y), dFdy(oFragPos.y))) * foamSlopeAmplifier;
+    vec2 slopeDir = normalize(vec2(dFdx(position.y), dFdy(position.y)));
+    vec2 foamUV = position.xz + slopeDir * time * foamScrollSpeed;
+    float foamNoise = fbm(foamUV * foamScale);
+    float foamMask = smoothstep(foamSlopeMin, foamSlopeMax, slope);
+    float foam = foamNoise * foamMask;
+    foam = pow(foam, foamPower);
+    return foam;
 }
 
-vec3 fresnelSchlick(float cosTheta, vec3 F0)
+float shadowPCF(vec3 fragPos, vec3 normal, vec3 lightDir) {
+    vec4 fragPosLightSpace = lightSpaceMatrix * vec4(fragPos, 1.0);
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
+    if (projCoords.z > 1.0) return 1.0;
+
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    float currentDepth = projCoords.z - bias;
+
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / vec2(textureSize(shadowMap, 0));
+    for (int x = -1; x <= 1; x++) {
+        for (int y = -1; y <= 1; y++) {
+            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+            shadow += currentDepth < pcfDepth ? 1.0 : 0.0;
+        }
+    }
+    return shadow / 9.0;
+}
+
+vec3 fresnelSchlick(float cosTheta, float f0)
 {
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+    return vec3(f0) + (1.0 - vec3(f0)) * pow(1.0 - cosTheta, 5.0);
 }
 
 // Main
@@ -114,54 +140,63 @@ void main() {
 
     vec3 sampledNormalTS = normalize(texture(normalMap, oFragUV).rgb * 2.0 - 1.0);
     vec3 normal = normalize(TBN * sampledNormalTS);
-    
+
     vec3 lightDir = normalize(lightPos - oFragPos);
     vec3 viewDir  = normalize(viewPos - oFragPos);
     vec3 halfway  = normalize(lightDir + viewDir);
 
     // Lighting terms
     float diff    = max(dot(normal, lightDir), 0.0);
+    float shadow  = shadowPCF(oFragPos, normal, lightDir);
 
     vec3 reflectedDir = reflect(-viewDir, normal);
     vec3 envReflection = texture(envMap, reflectedDir).rgb;
 
-    float cosTheta = max(dot(viewDir, normal), 0.0);
-    
-    vec3 fresnel = fresnelSchlick(cosTheta, F0);
+    // Planar reflection
+    vec4 clipSpaceRefl = reflectionMatrix * vec4(oFragPos, 1.0);
+    vec2 reflUV = (clipSpaceRefl.xy / clipSpaceRefl.w) * 0.5 + 0.5;
+    reflUV += vec2(normal.x, normal.z) * reflectionDistortion;
+    reflUV = clamp(reflUV, 0.001, 0.999);
+    vec3 planarRefl = texture(reflectionTex, reflUV).rgb;
 
-    vec3 reflection = fresnel * envReflection;
- 
-    vec3 diffuse  = (1.0 - fresnel) * diff * oColor;
+    float cosTheta = max(dot(viewDir, normal), 0.0);
+    float planarWeight = 1.0 - cosTheta;
+    vec3 combinedReflection = mix(envReflection, planarRefl, planarWeight);
+
+    vec3 fresnel = fresnelSchlick(cosTheta, fresnelF0);
+
+    vec3 reflection = fresnel * combinedReflection;
+
+    vec3 diffuse  = (1.0 - fresnel) * diff * shadow * oColor;
 
     // Depth-based colour modulation
     float depth = length(viewPos - oFragPos);
-    float depthFade = smoothstep(10.0, 80.0, depth);
-    vec3 deepColor = oColor * vec3(0.1, 0.2, 0.3);
+    float depthFade = smoothstep(depthFadeNear, depthFadeFar, depth);
+    vec3 deepColor = oColor * deepWaterTint;
     vec3 shiftedColor = mix(oColor, deepColor, depthFade);
 
     // Caustic flicker in troughs
-    float causticStrength = smoothstep(-0.6, 0.1, - oFragPos.y);
+    float causticStrength = smoothstep(causticTroughMin, causticTroughMax, -oFragPos.y);
 
-    vec2 flickerUV = vec2(oFragPos.x * 2.0, oFragPos.z * 0.75); // stretched FBM domain
-    flickerUV += vec2(time * 0.3, time * 0.1);
+    vec2 flickerUV = oFragPos.xz * causticScale;
+    flickerUV += time * causticSpeed;
     float causticFlicker = fbm(flickerUV);
-    causticFlicker = smoothstep(0.55, 0.8, causticFlicker);
+    causticFlicker = smoothstep(causticThresholdMin, causticThresholdMax, causticFlicker);
 
     float NdotL = max(dot(normalize(oNormal), normalize(lightPos - oFragPos)), 0.0);
     causticFlicker *= NdotL;
 
-    causticFlicker = pow(causticFlicker, 6.0);
-    
-    float causticMask = 1.0;
-    vec3 causticLight = CAUSTIC_COLOUR * causticFlicker * causticMask * causticStrength * causticIntensity;
+    causticFlicker = pow(causticFlicker, causticSharpness);
 
-    //Gamma correction
-    shiftedColor = pow(shiftedColor, vec3(0.45));
+    vec3 causticLight = causticColor * causticFlicker * causticStrength * causticIntensity;
+
+    // Gamma correction
+    shiftedColor = pow(shiftedColor, vec3(gamma));
 
     vec3 finalColor =
     reflection  +
     diffuse  +
-    causticLight; 
+    causticLight;
 
     // Foam blend
     float foam = calcFoam(oFragPos);
@@ -170,9 +205,8 @@ void main() {
 
     // Fog
     float fogFactor = clamp(exp(-fogDensity * depth), 0.0, 1.0);
-    vec3 fogColor = vec3(0.4, 0.6, 0.7); // sky-ish blue
     finalColor = mix(fogColor, finalColor, fogFactor);
-    
+
     finalColor = mix(finalColor, sampledNormalTS * 0.5 + 0.5, float(showNormalMap));
     finalColor = mix(finalColor, vec3(oFragUV,0.0), float(showUVs));
     finalColor = mix(finalColor, diffuse, float(debugDiffuse));

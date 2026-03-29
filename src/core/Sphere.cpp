@@ -127,6 +127,7 @@ void Sphere::drawMesh(Uniforms& uniforms, Transform transform) {
   shader->setUniform("viewPos", this->getContext()->camera->getPosition());
   shader->setUniform("lightPos",this->getContext()->light->getPosition());
   shader->setUniform("time", uniforms.time);
+  shader->setUniform("isReflectionPass", uniforms.isReflectionPass);
 
   const auto& waves = this->getContext()->waves;
   for (int i = 0; i < (int)waves.size(); i++) {

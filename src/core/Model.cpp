@@ -83,7 +83,6 @@ void Model::drawMesh(Uniforms& uniforms, Transform _) {
     glCheckError(__FILE__, __LINE__);
 #endif
 
-#ifndef __EMSCRIPTEN__
     if (uniforms.reflectionTexture) {
       glActiveTexture(GL_TEXTURE3);
       glBindTexture(GL_TEXTURE_2D, uniforms.reflectionTexture);
@@ -96,7 +95,6 @@ void Model::drawMesh(Uniforms& uniforms, Transform _) {
       shader->setUniform("shadowMap", 4);
       shader->setUniform("lightSpaceMatrix", uniforms.lightSpaceMatrix);
     }
-#endif
 
     if (drawTriangles) {
       mesh.draw();

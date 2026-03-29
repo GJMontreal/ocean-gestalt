@@ -11,6 +11,7 @@ struct Uniforms{
   unsigned int reflectionTexture = 0;
   glm::mat4 lightSpaceMatrix = glm::mat4(1.0f);
   unsigned int shadowTexture = 0;
+  int isReflectionPass = 0;
 };
 
 #endif
