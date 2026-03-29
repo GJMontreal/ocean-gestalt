@@ -8,6 +8,15 @@
             "_meta": {
                 "display": "Buoy Hull"
             },
+            "hullDisplacementAmt": {
+                "type": "float",
+                "min": 0,
+                "max": 0.15,
+                "_meta": {
+                    "display": "Hull Displacement",
+                    "control": "slider"
+                }
+            },
             "ambientStrength": {
                 "type": "float",
                 "min": 0,

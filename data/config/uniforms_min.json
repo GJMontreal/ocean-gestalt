@@ -4,6 +4,7 @@
         0.25,
         1.0
     ],
+    "buoy_mesh.hullDisplacementAmt": 0.04,
     "buoy_mesh.ambientStrength": 0.5,
     "buoy_mesh.causticIntensity": 1.0,
     "buoy_mesh.waterlineBias": 0.15,
