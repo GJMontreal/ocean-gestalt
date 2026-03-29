@@ -9,6 +9,26 @@ It's a bit of ocean you can fit in your pocket.
 
 =======================
 
+**Controls**
+
+| Input | Action |
+|-------|--------|
+| W / A / S / D | Move forward / left / back / right |
+| Space / Shift | Move up / down |
+| Drag | Look around |
+| T | Toggle camera attachment to water surface |
+| P | Pause/resume simulation |
+| M | Toggle mesh visibility |
+| L | Toggle wireframe |
+| F | Toggle fullscreen (native only) |
+| B | Dump current uniforms to stdout |
+| O | Save current uniforms to `data/config/output.json` |
+| G | Reload uniforms from config file |
+| R | Generate new random wave uniforms |
+| / | Toggle HUD text |
+
+=======================
+
 **Running locally (WebGL build)**
 
 Requires [emsdk](https://emscripten.org/docs/getting_started/downloads.html). Activate it before building:

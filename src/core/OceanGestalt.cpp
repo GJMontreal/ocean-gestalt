@@ -92,6 +92,7 @@ void OceanGestalt::buildScene() {
   auto ocean = std::make_shared<Ocean>(configuration);
   ocean->setIfShouldDrawMesh(true);
   ocean->setIfShouldDrawLines(true);
+  ocean->setIfShouldDrawWireframe(false);
   sceneElements.emplace_back(SceneElement{"waves",ocean,std::nullopt});
   
   auto buoy = std::make_shared<Buoy>(glm::vec3(5.0f,0.f,5.0f), configuration);
@@ -294,8 +295,7 @@ void OceanGestalt::toggleSimulation() {
 }
 
 void OceanGestalt::toggleWireframe() {
-  std::cout << "Toggle wireframe" << std::endl;
-    if (auto drawable = currentElement->drawable) {
+  if (auto drawable = currentElement->drawable) {
     (*drawable)->setIfShouldDrawWireframe(!(*drawable)->getIfShouldDrawWireframe());
   }
 }

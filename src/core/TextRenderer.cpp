@@ -147,7 +147,7 @@ void TextRenderer::setShader(std::shared_ptr<ShaderProgram> shader) {
     rgbAtlas.push_back(gray);  // G
     rgbAtlas.push_back(gray);  // B
   }
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ATLAS_WIDTH, ATLAS_HEIGHT, 0, GL_RGB,
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, ATLAS_WIDTH, ATLAS_HEIGHT, 0, GL_RGB,
                GL_UNSIGNED_BYTE, rgbAtlas.data());
 #ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);

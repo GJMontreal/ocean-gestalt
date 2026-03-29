@@ -349,7 +349,7 @@ GLuint ShaderProgram::loadTexture(const std::string& path, const std::string& un
         throw std::runtime_error("Failed to load texture: " + path);
     }
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     glCheckError(__FILE__, __LINE__);
     glGenerateMipmap(GL_TEXTURE_2D);
     glCheckError(__FILE__, __LINE__);
@@ -377,7 +377,7 @@ GLuint ShaderProgram::loadCubemap(const std::string& path, const std::string& un
         if (data) {
             glTexImage2D(
                 GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-                0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+                0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
             );
 #ifdef DEBUG_GL
 #ifndef __EMSCRIPTEN__

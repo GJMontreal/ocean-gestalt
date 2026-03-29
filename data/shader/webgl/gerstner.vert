@@ -2,10 +2,10 @@
 Tessendorf, J. (2001). Simulating Ocean Water. In ACM SIGGRAPH Course Notes.
 Finch, M. (2004). Simulating Ocean Water. In GPU Gems (Chapter 1). NVIDIA Corporation.
 */
-in vec3 aPosition;
-in vec2 aTexCoord;
-in vec3 aTangent;
-in vec3 aColor;
+layout(location = 0) in vec3 aPosition;
+layout(location = 1) in vec2 aTexCoord;
+layout(location = 2) in vec3 aTangent;
+layout(location = 3) in vec3 aColor;
 
 uniform mat4 projection;
 uniform mat4 view;

@@ -49,7 +49,8 @@ void Model::drawWireframe(Uniforms& uniforms) {
     auto _guard = ShaderScope(shader);
     shader->setUniform("time", uniforms.time);
     shader->setUniform("model", getTransform());
-      
+    shader->setUniform("showMesh", 1);
+
 #ifdef __EMSCRIPTEN__
     shader->setUniform("projection", uniforms.projection);
     shader->setUniform("view", uniforms.view);

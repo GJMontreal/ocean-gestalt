@@ -1,5 +1,3 @@
-in vec4 fPosition;
-
 in vec3 oFragPos;
 in vec3 oNormal;
 in vec3 oColor;
