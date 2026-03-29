@@ -22,6 +22,7 @@ uniform float causticIntensity;
 uniform float waterlineBias;
 uniform float waterlineWidth;
 uniform float waterlineStrength;
+uniform float waterlineNoise;
 uniform float wetStrength;
 
 struct WAVE {
@@ -130,6 +131,11 @@ void main() {
     float bandCenter = surfaceY - waterlineBias;
     float belowWater = smoothstep(surfaceY + 0.2, surfaceY - 0.5, fs_in.FragPos.y);
     float waterlineBand = 1.0 - smoothstep(0.0, waterlineWidth, abs(fs_in.FragPos.y - bandCenter));
+
+    // Break up the solid ring with noise
+    float bandNoise = fbm(fs_in.FragPos.xz * 2.5 + time * 0.05);
+    float noiseMask = mix(1.0, smoothstep(0.25, 0.75, bandNoise), waterlineNoise);
+    waterlineBand *= noiseMask;
 
     // Wet hull darkening below waterline
     vec3 wetTint = vec3(0.05, 0.08, 0.1);

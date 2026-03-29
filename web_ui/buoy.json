@@ -71,6 +71,15 @@
                     "control": "slider"
                 }
             },
+            "waterlineNoise": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Waterline Noise",
+                    "control": "slider"
+                }
+            },
             "wetStrength": {
                 "type": "float",
                 "min": 0,

@@ -9,6 +9,7 @@
     "buoy_mesh.waterlineBias": 0.15,
     "buoy_mesh.waterlineWidth": 0.5,
     "buoy_mesh.waterlineStrength": 0.45,
+    "buoy_mesh.waterlineNoise": 0.8,
     "buoy_mesh.wetStrength": 0.5,
     "mesh_shader.causticIntensity": 1.0,
     "mesh_shader.causticColor": [1.0, 0.9, 0.7],
