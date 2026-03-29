@@ -74,12 +74,9 @@ https://emscripten.org
 An updated glfw api  
 https://github.com/pongasoft/emscripten-glfw  
 
-
-
 https://learnopengl.com/About  
 
 http://get.webgl.org  
 
 =====================  
 A note for android users; I'm not certain this will work on your device. If there's someone who could give me a hand debugging that I'd really appreciate the help. I've seen it work on some handsets and not others     
-

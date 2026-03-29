@@ -50,7 +50,7 @@
     "mesh_shader.showNormalMap": 0,
     "mesh_shader.showUVs": 0,
     "showMesh": 1,
-    "waves[0].amplitude": {"value": 1.5950000286102295, "duration": 4.0},
+    "waves[0].amplitude": {"value": 1.5950000286102295, "duration": 30.0},
     "waves[0].direction": [
         -1.0,
         -8.742277657347586e-08,
@@ -59,7 +59,7 @@
     "waves[0].phase": 1.0839999914169312,
     "waves[0].steepness": 0.5,
     "waves[0].wavelength": 50.9379997253418,
-    "waves[1].amplitude": {"value": 2.7200000286102295, "duration": 4.0},
+    "waves[1].amplitude": {"value": 2.7200000286102295, "duration": 30.0},
     "waves[1].direction": [
         -0.9327289462089539,
         -0.3605782389640808,
@@ -68,7 +68,7 @@
     "waves[1].phase": 2.1640000343322754,
     "waves[1].steepness": 1.0,
     "waves[1].wavelength": 48.31100082397461,
-    "waves[2].amplitude": {"value": 0.4690000116825104, "duration": 4.0},
+    "waves[2].amplitude": {"value": 0.4690000116825104, "duration": 30.0},
     "waves[2].direction": [
         -0.5766623020172119,
         -0.816982626914978,
@@ -77,7 +77,7 @@
     "waves[2].phase": 3.5510001182556152,
     "waves[2].steepness": 1.0,
     "waves[2].wavelength": 40.14812088012695,
-    "waves[3].amplitude": {"value": 0.4690000116825104, "duration": 4.0},
+    "waves[3].amplitude": {"value": 0.4690000116825104, "duration": 30.0},
     "waves[3].direction": [
         -0.2020975947380066,
         0.9793654084205627,
@@ -86,7 +86,7 @@
     "waves[3].phase": 2.756999969482422,
     "waves[3].steepness": 1.0,
     "waves[3].wavelength": 19.851879119873047,
-    "waves[4].amplitude": {"value": 0.2809999883174896, "duration": 4.0},
+    "waves[4].amplitude": {"value": 0.2809999883174896, "duration": 30.0},
     "waves[4].direction": [
         -0.7554975748062134,
         0.6551514267921448,
@@ -95,7 +95,7 @@
     "waves[4].phase": 2.384999990463257,
     "waves[4].steepness": 1.0,
     "waves[4].wavelength": 41.247901916503906,
-    "waves[5].amplitude": {"value": 0.843999981880188, "duration": 4.0},
+    "waves[5].amplitude": {"value": 0.843999981880188, "duration": 30.0},
     "waves[5].direction": [
         -0.8722195029258728,
         0.4891147017478943,
@@ -104,7 +104,7 @@
     "waves[5].phase": 3.5510001182556152,
     "waves[5].steepness": 1.0,
     "waves[5].wavelength": 34.6150016784668,
-    "waves[6].amplitude": {"value": 0.09399999678134918, "duration": 4.0},
+    "waves[6].amplitude": {"value": 0.09399999678134918, "duration": 30.0},
     "waves[6].direction": [
         -0.43041369318962097,
         -0.9026317596435547,
@@ -113,7 +113,7 @@
     "waves[6].phase": 2.686000108718872,
     "waves[6].steepness": 1.0,
     "waves[6].wavelength": 55.096126556396484,
-    "waves[7].amplitude": {"value": 0.09399999678134918, "duration": 4.0},
+    "waves[7].amplitude": {"value": 0.09399999678134918, "duration": 30.0},
     "waves[7].direction": [
         -0.5272182822227478,
         -0.8497298955917358,

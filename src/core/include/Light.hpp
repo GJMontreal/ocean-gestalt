@@ -7,7 +7,7 @@ class Light;
 class Configuration;
 
 #include <glm/glm.hpp>
-#include "glm/detail/type_vec.hpp"
+
 
 using glm::vec3;
 
@@ -36,4 +36,3 @@ class Light: public MoveableBase<Light>{
     friend MoveableBase<Light>;
     Moveable moveable;
 };
-

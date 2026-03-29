@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/normal.hpp>
 
 using namespace  glm;
