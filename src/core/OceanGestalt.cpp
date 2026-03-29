@@ -353,12 +353,8 @@ void OceanGestalt::loadUniforms() {
 }
 
 void OceanGestalt::generateUniforms() {
-#ifndef __EMSCRIPTEN__
-   auto api = this->configuration->getApi();
-    glm::vec2 dir{ randf(-1.0f,1.0f),randf(-1.0f,1.0f)};
-    Wind wind{dir,randf(0.1f,100.f)};
-    WaveGenerator(configuration->waves.size(), wind, api);
-#endif
+  auto api = this->configuration->getApi();
+  WaveGenerator(configuration, api);
 }
 
 void OceanGestalt::dumpUniforms() {

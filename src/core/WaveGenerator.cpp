@@ -1,56 +1,39 @@
 #include "WaveGenerator.hpp"
+#include "UniformAnimator.hpp"
 
-#include "random.hpp"
+#include <random>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
-
-using Random = effolkronium::random_static;
-
 namespace {
-constexpr float MIN_WAVELENGTH = 5.0f;           // meters
-constexpr float MAX_WAVELENGTH = 100.0f;         // meters
-constexpr float MAX_PHYSICAL_STEEPNESS = 0.44f;  // stability limit
-constexpr float BASE_STEEPNESS = 0.01f;
-constexpr float WIND_STEEPNESS_SCALE = 0.02f;
-constexpr float SPREAD_ANGLE_DEGREES = 30.0f;  // total angular spread
-constexpr float GRAVITY = 9.81f;
-}  // namespace
+constexpr float SPREAD_ANGLE_DEGREES = 30.0f;
+}
 
-// Generate a set of waves
-WaveGenerator::WaveGenerator(int numWaves, Wind& wind, std::shared_ptr<ApiAdapter> api) {
-  auto steepnessFromWind = [](float speed) {
-    float s = BASE_STEEPNESS + WIND_STEEPNESS_SCALE * (speed / 10.0f);
-    return std::min(s, MAX_PHYSICAL_STEEPNESS);
-  };
+WaveGenerator::WaveGenerator(std::shared_ptr<Configuration> configuration,
+                             std::shared_ptr<ApiAdapter> api) {
+  auto anim = configuration->getAnimator();
+  int numWaves = static_cast<int>(configuration->waves.size());
 
-  float maxSteepness = steepnessFromWind(wind.speed);
+  glm::vec2 windDir{randf(-1.0f, 1.0f), randf(-1.0f, 1.0f)};
+  windDir = glm::normalize(windDir);
   float spread = glm::radians(SPREAD_ANGLE_DEGREES);
 
+  constexpr float DURATION = 10.0f;
+
   for (int i = 0; i < numWaves; i++) {
-    float lambda = MIN_WAVELENGTH *
-                   std::pow(MAX_WAVELENGTH / MIN_WAVELENGTH, randf(0.0f, 1.0f));
-    float k = 2.0f * glm::pi<float>() / lambda;
-    float omega = std::sqrt(GRAVITY * k);
-    float steepness = randf(0.1f, maxSteepness);
-    float amplitude = (steepness * lambda) / (2.0f * glm::pi<float>());
-
     float angleOffset = randf(-spread / 2.0f, spread / 2.0f);
-    glm::vec2 direction = glm::rotate(wind.direction, angleOffset);
-    float phase = randf(0.0f, glm::two_pi<float>());
+    glm::vec2 direction = glm::rotate(windDir, angleOffset);
 
-    std::string pathPrefix = "uniforms.waves[" + std::to_string(i) + "].";
-    api->setValue(pathPrefix + "amplitude", amplitude);
-    api->setValue(pathPrefix + "wavelength", lambda);
-    api->setValue(pathPrefix + "phase", phase);
-    
-    // TODO: remind me why we're using a vec3 for direction
-    api->setValue(pathPrefix + "direction",
-                 std::vector<float>{direction.x, direction.y,0.0f});
-    api->setValue(pathPrefix + "steepness",steepness);
+    std::string dirKey = "uniforms.waves[" + std::to_string(i) + "].direction";
+    ApiValue fromDir = api->getValue(dirKey)
+                           .value_or(std::vector<float>{direction.x, direction.y, 0.0f});
+    ApiValue toDir = std::vector<float>{direction.x, direction.y, 0.0f};
+    anim->animateTo(fromDir, toDir, DURATION,
+                    [api, dirKey](const ApiValue& v) { api->setValue(dirKey, v, false); },
+                    dirKey);
   }
 }
 
