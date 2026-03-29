@@ -13,7 +13,7 @@ layout(std140) uniform Matrices
     uniform mat4 view;
 };
 
-uniform sampler2D normalMap; 
+uniform sampler2D normalMap;
 uniform samplerCube envMap;
 uniform sampler2D reflectionTex;
 uniform mat4 reflectionMatrix;
@@ -25,25 +25,34 @@ uniform vec3 lightPos;
 uniform vec3 viewPos;
 uniform float time;
 
-// uniform vec4 fogColor;
-
-// Output
 out vec4 FragColor;
 
 uniform float fogDensity;
+uniform vec3 fogColor;
 
 uniform float causticScale;
 uniform float causticSpeed;
 uniform float causticIntensity;
-
-const vec3 CAUSTIC_COLOUR = vec3(1.0, 0.9, 0.7); //another uniform perhaps
+uniform vec3 causticColor;
+uniform float causticTroughMin;
+uniform float causticTroughMax;
+uniform float causticThresholdMin;
+uniform float causticThresholdMax;
+uniform float causticSharpness;
 
 uniform float foamScale;
 uniform float foamScrollSpeed;
 uniform float foamSlopeMin;
 uniform float foamSlopeMax;
 uniform float foamSlopeAmplifier;
+uniform float foamPower;
 
+uniform float depthFadeNear;
+uniform float depthFadeFar;
+uniform vec3 deepWaterTint;
+
+uniform float fresnelF0;
+uniform float gamma;
 
 uniform int showNormalMap;
 uniform int showUVs;
@@ -52,11 +61,9 @@ uniform int debugFragPos;
 uniform int debugDiffuse;
 uniform int showEnv;
 
-const vec3 F0 = vec3(0.04); // typical for dielectrics, metals use albedo or tuned value
-
 vec3 visualizeLightContribution(vec3 lightPos, vec3 fragPos) {
-    float intensity = 1.0 / distance(lightPos, fragPos); // or squared falloff
-    intensity = clamp(intensity * 0.2, 0.0, 1.0); // optional scale
+    float intensity = 1.0 / distance(lightPos, fragPos);
+    intensity = clamp(intensity * 0.2, 0.0, 1.0);
     vec3 lightColor = vec3(1.0 - intensity, 0.0, intensity);
     return lightColor;
 }
@@ -90,23 +97,14 @@ float fbm(vec2 p) {
 }
 
 float calcFoam(vec3 position){
-  
-  float slope = length(vec2(dFdx(fs_in.FragPos.y), dFdy(fs_in.FragPos.y))) * foamSlopeAmplifier;
-// --- Slope direction approximates foam flow ---
-vec2 slopeDir = normalize(vec2(
-    dFdx(position.y),
-    dFdy(position.y)
-));
-
-
-// --- Flowing foam UVs: move along slope direction over time ---
-  vec2 foamUV = position.xz + slopeDir * time * foamScrollSpeed;
-  float foamNoise = fbm(foamUV * foamScale);
-  // --- Modulate foam by surface slope: appears only on steep regions ---
-  float foamMask = smoothstep(foamSlopeMin, foamSlopeMax, slope);
-  float foam = foamNoise * foamMask;
-  foam = pow(foam, 0.5);
-  return foam;
+    float slope = length(vec2(dFdx(fs_in.FragPos.y), dFdy(fs_in.FragPos.y))) * foamSlopeAmplifier;
+    vec2 slopeDir = normalize(vec2(dFdx(position.y), dFdy(position.y)));
+    vec2 foamUV = position.xz + slopeDir * time * foamScrollSpeed;
+    float foamNoise = fbm(foamUV * foamScale);
+    float foamMask = smoothstep(foamSlopeMin, foamSlopeMax, slope);
+    float foam = foamNoise * foamMask;
+    foam = pow(foam, foamPower);
+    return foam;
 }
 
 float shadowPCF(vec3 fragPos, vec3 normal, vec3 lightDir) {
@@ -130,9 +128,9 @@ float shadowPCF(vec3 fragPos, vec3 normal, vec3 lightDir) {
     return shadow / 9.0;
 }
 
-vec3 fresnelSchlick(float cosTheta, vec3 F0)
+vec3 fresnelSchlick(float cosTheta, float f0)
 {
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+    return vec3(f0) + (1.0 - vec3(f0)) * pow(1.0 - cosTheta, 5.0);
 }
 
 // Main
@@ -143,8 +141,7 @@ void main() {
 
     vec3 sampledNormalTS = normalize(texture(normalMap, fs_in.FragUV).rgb * 2.0 - 1.0);
     vec3 normal = normalize(TBN * sampledNormalTS);
-    // vec3 normal = normalize(mix(fs_in.Normal, normalWS, normalStrength));
-    
+
     vec3 lightDir = normalize(lightPos - fs_in.FragPos);
     vec3 viewDir  = normalize(viewPos - fs_in.FragPos);
     vec3 halfway  = normalize(lightDir + viewDir);
@@ -167,41 +164,40 @@ void main() {
     float planarWeight = 1.0 - cosTheta;
     vec3 combinedReflection = mix(envReflection, planarRefl, planarWeight);
 
-    vec3 fresnel = fresnelSchlick(cosTheta, F0);
+    vec3 fresnel = fresnelSchlick(cosTheta, fresnelF0);
 
     vec3 reflection = fresnel * combinedReflection;
- 
+
     vec3 diffuse  = (1.0 - fresnel) * diff * shadow * fs_in.Color;
 
     // Depth-based colour modulation
     float depth = length(viewPos - fs_in.FragPos);
-    float depthFade = smoothstep(10.0, 80.0, depth);
-    vec3 deepColor = fs_in.Color * vec3(0.1, 0.2, 0.3);
+    float depthFade = smoothstep(depthFadeNear, depthFadeFar, depth);
+    vec3 deepColor = fs_in.Color * deepWaterTint;
     vec3 shiftedColor = mix(fs_in.Color, deepColor, depthFade);
 
     // Caustic flicker in troughs
-    float causticStrength = smoothstep(-0.6, 0.1, -fs_in.FragPos.y);
+    float causticStrength = smoothstep(causticTroughMin, causticTroughMax, -fs_in.FragPos.y);
 
-    vec2 flickerUV = vec2(fs_in.FragPos.x * 2.0, fs_in.FragPos.z * 0.75); // stretched FBM domain
-    flickerUV += vec2(time * 0.3, time * 0.1);
+    vec2 flickerUV = fs_in.FragPos.xz * causticScale;
+    flickerUV += time * causticSpeed;
     float causticFlicker = fbm(flickerUV);
-    causticFlicker = smoothstep(0.55, 0.8, causticFlicker);
+    causticFlicker = smoothstep(causticThresholdMin, causticThresholdMax, causticFlicker);
 
     float NdotL = max(dot(normalize(fs_in.Normal), normalize(lightPos - fs_in.FragPos)), 0.0);
     causticFlicker *= NdotL;
 
-    causticFlicker = pow(causticFlicker, 6.0);
-    
-    float causticMask = 1.0;
-    vec3 causticLight = CAUSTIC_COLOUR * causticFlicker * causticMask * causticStrength * causticIntensity;
+    causticFlicker = pow(causticFlicker, causticSharpness);
 
-    //Gamma correction
-    shiftedColor = pow(shiftedColor, vec3(0.45));
+    vec3 causticLight = causticColor * causticFlicker * causticStrength * causticIntensity;
+
+    // Gamma correction
+    shiftedColor = pow(shiftedColor, vec3(gamma));
 
     vec3 finalColor =
     reflection  +
     diffuse  +
-    causticLight; 
+    causticLight;
 
     // Foam blend
     float foam = calcFoam(fs_in.FragPos);
@@ -210,9 +206,8 @@ void main() {
 
     // Fog
     float fogFactor = clamp(exp(-fogDensity * depth), 0.0, 1.0);
-    vec3 fogColor = vec3(0.4, 0.6, 0.7); // sky-ish blue
     finalColor = mix(fogColor, finalColor, fogFactor);
-    
+
     finalColor = mix(finalColor, sampledNormalTS * 0.5 + 0.5, float(showNormalMap));
     finalColor = mix(finalColor, vec3(fs_in.FragUV,0.0), float(showUVs));
     finalColor = mix(finalColor, diffuse, float(debugDiffuse));

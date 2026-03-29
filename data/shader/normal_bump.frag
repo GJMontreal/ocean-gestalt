@@ -19,6 +19,10 @@ uniform float specularFactor;
 uniform float bumpFactor;
 uniform float time;
 uniform float causticIntensity;
+uniform float waterlineBias;
+uniform float waterlineWidth;
+uniform float waterlineStrength;
+uniform float wetStrength;
 
 struct WAVE {
     vec3 direction;
@@ -123,15 +127,16 @@ void main() {
    
     // Waterline effect
     float surfaceY = waveHeightAt(fs_in.FragPos.xz);
-    float belowWater = smoothstep(surfaceY + 0.1, surfaceY - 0.3, fs_in.FragPos.y);
-    float waterlineBand = 1.0 - smoothstep(0.0, 0.25, abs(fs_in.FragPos.y - surfaceY));
+    float bandCenter = surfaceY - waterlineBias;
+    float belowWater = smoothstep(surfaceY + 0.2, surfaceY - 0.5, fs_in.FragPos.y);
+    float waterlineBand = 1.0 - smoothstep(0.0, waterlineWidth, abs(fs_in.FragPos.y - bandCenter));
 
     // Wet hull darkening below waterline
     vec3 wetTint = vec3(0.05, 0.08, 0.1);
-    vec3 color = mix(ambient + diffuse + specular, wetTint, belowWater * 0.5);
+    vec3 color = mix(ambient + diffuse + specular, wetTint, belowWater * wetStrength);
 
     // Foam rim at waterline
-    color = mix(color, vec3(0.9, 0.95, 1.0), waterlineBand * 0.6);
+    color = mix(color, vec3(0.9, 0.95, 1.0), waterlineBand * waterlineStrength);
 
     FragColor = vec4(color, 1.0);
 }

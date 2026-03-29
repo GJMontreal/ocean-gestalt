@@ -182,6 +182,17 @@ function createControl(label, node, path, valueElem) {
       }
       break;
 
+    case "vec3":
+      input = document.createElement("input");
+      input.type = "color";
+      wrapper.appendChild(input);
+      getValue = () => hexToVec3(input.value);
+      setValue = (value) => {
+        input.value = rgbToHex(value);
+        valueElem.textContent = `[${value.map(v => v.toFixed(2)).join(",")}]`;
+      }
+      break;
+
     case "vec4":
       input = document.createElement("input");
       input.type = "color";
@@ -200,6 +211,14 @@ function createControl(label, node, path, valueElem) {
   }
 
   return {wrapper, input, getValue, setValue };
+}
+
+function hexToVec3(hex) {
+  hex = hex.replace(/^#/, "");
+  const r = parseFloat((parseInt(hex.slice(0, 2), 16) / 255).toFixed(2));
+  const g = parseFloat((parseInt(hex.slice(2, 4), 16) / 255).toFixed(2));
+  const b = parseFloat((parseInt(hex.slice(4, 6), 16) / 255).toFixed(2));
+  return [r, g, b];
 }
 
 function rgbToHex(vec4) {
