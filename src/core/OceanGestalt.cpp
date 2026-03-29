@@ -339,7 +339,8 @@ void OceanGestalt::selectNextElement() {
 void OceanGestalt::loadUniforms() {
 #ifndef __EMSCRIPTEN__
     std::thread([this] {
-      configuration->loadUniforms(CONFIGURATION_DIR "uniforms.json");
+      std::cout << "Loading uniforms" << std::endl;
+      configuration->loadUniforms(CONFIGURATION_DIR "uniforms_min.json");
     }).detach();
 #else
     auto* that = this;
