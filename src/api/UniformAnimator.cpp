@@ -10,6 +10,14 @@ void UniformAnimator::animateTo(ApiValue from, ApiValue to, float duration,
     pending.push_back({std::move(key), std::move(from), std::move(to), duration, std::move(apply)});
 }
 
+void UniformAnimator::cancel(const std::string& key) {
+    std::lock_guard<std::mutex> lock(mutex);
+    pending.erase(std::remove_if(pending.begin(), pending.end(),
+        [&](const PendingAnimation& p) { return p.key == key; }), pending.end());
+    active.erase(std::remove_if(active.begin(), active.end(),
+        [&](const ActiveAnimation& a) { return a.key == key; }), active.end());
+}
+
 void UniformAnimator::tick(float time) {
     float dt = 0.f;
     if (lastTime >= 0.f && time > lastTime) {

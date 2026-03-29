@@ -7,7 +7,7 @@
 #include "GerstnerWave.hpp"
 
 #include <glm/gtc/quaternion.hpp>
-
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/vector_angle.hpp>
 
 Buoy::Buoy(glm::vec3 origin, std::shared_ptr<Configuration> context) : context(context){

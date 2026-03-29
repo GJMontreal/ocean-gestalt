@@ -2,6 +2,7 @@
 #include "UniformDispatcher.hpp"
 #include "glError.hpp"
 #include "Shader.hpp"
+#include <GL/glew.h>
 #include <iostream>
 
 static const int TIMEOUT = 50;
@@ -42,7 +43,79 @@ std::optional<ApiValue> UniformState::getUniform(const std::string& shader, cons
   return std::nullopt;
 }
 
+void UniformState::seedFromShaders() {
+  auto& shaders = context.getShaders();
+  for (auto& [shaderName, shader] : shaders) {
+    GLuint handle = shader->getHandle();
+    shader->activate();
+
+    GLint count = 0;
+    glGetProgramiv(handle, GL_ACTIVE_UNIFORMS, &count);
+
+    for (GLint i = 0; i < count; ++i) {
+      char name[256];
+      GLsizei length;
+      GLint size;
+      GLenum type;
+      glGetActiveUniform(handle, i, sizeof(name), &length, &size, &type, name);
+
+      GLint location = glGetUniformLocation(handle, name);
+      if (location < 0) continue;
+
+      std::string key = shaderName + "." + name;
+      if (uniformStates.count(key)) continue;
+
+      std::optional<UniformValue> val;
+      switch (type) {
+        case GL_FLOAT: {
+          float v;
+          glGetUniformfv(handle, location, &v);
+          val = v;
+          break;
+        }
+        case GL_INT:
+        case GL_BOOL: {
+          GLint v;
+          glGetUniformiv(handle, location, &v);
+          val = static_cast<int>(v);
+          break;
+        }
+        case GL_FLOAT_VEC2: {
+          float v[2];
+          glGetUniformfv(handle, location, v);
+          val = glm::vec2(v[0], v[1]);
+          break;
+        }
+        case GL_FLOAT_VEC3: {
+          float v[3];
+          glGetUniformfv(handle, location, v);
+          val = glm::vec3(v[0], v[1], v[2]);
+          break;
+        }
+        case GL_FLOAT_VEC4: {
+          float v[4];
+          glGetUniformfv(handle, location, v);
+          val = glm::vec4(v[0], v[1], v[2], v[3]);
+          break;
+        }
+        default:
+          break;
+      }
+
+      if (val) {
+        uniformStates[key] = *val;
+      }
+    }
+
+    shader->deactivate();
+  }
+}
+
 void UniformState::renderThreadCallback() {
+  if (!seeded) {
+    seedFromShaders();
+    seeded = true;
+  }
   {
     std::lock_guard lock(updateMutex);
     std::swap(pendingUpdatesFront, pendingUpdatesBack);

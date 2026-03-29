@@ -33,6 +33,9 @@ public:
                    std::function<void(const ApiValue&)> apply,
                    std::string key = {});
 
+    // Thread-safe — cancels any pending or active animation with the given key.
+    void cancel(const std::string& key);
+
     // Render thread only — advances all active animations and fires apply callbacks
     void tick(float time);
 

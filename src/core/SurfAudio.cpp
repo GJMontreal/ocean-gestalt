@@ -55,8 +55,8 @@ void SurfAudio::dataCallback(ma_device* device, void* output, const void*, ma_ui
     float steepnessRight = self->steepnessRight.load(std::memory_order_relaxed);
 
     for (ma_uint32 i = 0; i < frameCount; ++i) {
-      float noiseLeft = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
-      float noiseRight = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
+      float noiseLeft = ((float)rand() / (float)RAND_MAX) * 2.0f - 1.0f;
+      float noiseRight = ((float)rand() / (float)RAND_MAX) * 2.0f - 1.0f;
 
       float bandNoiseLeft = self->leftFilter.process(noiseLeft);
       float bandNoiseRight = self->rightFilter.process(noiseRight);

@@ -2,18 +2,36 @@
     "port": 8080,
     "uniforms": {
         "_meta": {
-            "display": "Shader Uniforms"
+            "display": "Buoy"
         },
         "buoy_mesh": {
             "_meta": {
-                "display": "Buoy"
+                "display": "Buoy Hull"
+            },
+            "hullDisplacementAmt": {
+                "type": "float",
+                "min": 0,
+                "max": 0.15,
+                "_meta": {
+                    "display": "Hull Displacement",
+                    "control": "slider"
+                }
+            },
+            "ambientStrength": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Ambient Strength",
+                    "control": "slider"
+                }
             },
             "specularFactor": {
                 "type": "float",
                 "min": 0,
                 "max": 1,
                 "_meta": {
-                    "display": "Reflection  Strength",
+                    "display": "Specular Strength",
                     "control": "slider"
                 }
             },
@@ -22,38 +40,77 @@
                 "min": 0,
                 "max": 1,
                 "_meta": {
-                    "display": "Bump  Strength",
+                    "display": "Bump Strength",
+                    "control": "slider"
+                }
+            },
+            "causticIntensity": {
+                "type": "float",
+                "min": 0,
+                "max": 3,
+                "_meta": {
+                    "display": "Caustic Intensity",
+                    "control": "slider"
+                }
+            },
+            "waterlineBias": {
+                "type": "float",
+                "min": -1,
+                "max": 1,
+                "_meta": {
+                    "display": "Waterline Bias",
+                    "control": "slider"
+                }
+            },
+            "waterlineWidth": {
+                "type": "float",
+                "min": 0,
+                "max": 2,
+                "_meta": {
+                    "display": "Waterline Width",
+                    "control": "slider"
+                }
+            },
+            "waterlineStrength": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Waterline Strength",
+                    "control": "slider"
+                }
+            },
+            "waterlineNoise": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Waterline Noise",
+                    "control": "slider"
+                }
+            },
+            "wetStrength": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Wet Hull Strength",
                     "control": "slider"
                 }
             }
-        }
-        ,"mesh_shader": {
-            "_meta": {
-                "display": "Water"
-            },"baseColor": {
-                "type": "vec4",
-                "_meta": {
-                    "display": "Base Colour",
-                    "control": "color",
-                    "range": [
-                        0,
-                        1
-                    ]
-                }
-              }},
-               "wireframe_shader": {
+        },
+        "wireframe_shader": {
             "_meta": {
                 "display": "Wireframe"
-            },"baseColor": {
+            },
+            "baseColor": {
                 "type": "vec4",
                 "_meta": {
-                    "display": "Base Colour",
+                    "display": "Colour",
                     "control": "color",
-                    "range": [
-                        0,
-                        1
-                    ]
+                    "range": [0, 1]
                 }
-              }}
+            }
+        }
     }
 }

@@ -2,49 +2,73 @@
     "port": 8080,
     "uniforms": {
         "_meta": {
-            "display": "Water Surface"
+            "display": "Water Effects"
         },
-        "gust.strength": {
-            "type": "float",
-            "min": 0,
-            "max": 1,
+        "mesh_shader": {
             "_meta": {
-                "display": "Strength",
-                "control": "slider"
-            }
-        },
-        "gust.speed": {
-            "type": "float",
-            "min": 0,
-            "max": 0.5,
-            "_meta": {
-                "display": "Speed",
-                "control": "slider"
-            }
-        },
-        "gust.scale": {
-            "type": "float",
-            "min": 0.0,
-            "max": 0.5,
-            "_meta": {
-                "display": "Scale",
-                "control": "slider"
-            }
-        },
-        "gust.heading": {
-            "type": "float",
-            "min": 0,
-            "max": 360,
-            "_meta": {
-                "display": "Heading",
-                "control": "slider"
-            }
-        },
-       
+                "display": "Water Surface"
+            },
+            "gust": {
+                "_meta": {
+                    "display": "Gust"
+                },
+                "strength": {
+                    "type": "float",
+                    "min": 0,
+                    "max": 1,
+                    "_meta": {
+                        "display": "Strength",
+                        "control": "slider"
+                    }
+                },
+                "speed": {
+                    "type": "float",
+                    "min": 0,
+                    "max": 0.5,
+                    "_meta": {
+                        "display": "Speed",
+                        "control": "slider"
+                    }
+                },
+                "scale": {
+                    "type": "float",
+                    "min": 0,
+                    "max": 0.5,
+                    "_meta": {
+                        "display": "Scale",
+                        "control": "slider"
+                    }
+                },
+                "heading": {
+                    "type": "float",
+                    "min": 0,
+                    "max": 360,
+                    "_meta": {
+                        "display": "Heading",
+                        "control": "slider"
+                    }
+                }
+            },
+            "causticIntensity": {
+                "type": "float",
+                "min": 0,
+                "max": 3,
+                "_meta": {
+                    "display": "Caustic Intensity",
+                    "control": "slider"
+                }
+            },
+            "causticColor": {
+                "type": "vec3",
+                "_meta": {
+                    "display": "Caustic Colour",
+                    "control": "color"
+                }
+            },
             "causticScale": {
                 "type": "float",
                 "min": 0,
-                "max": 1,
+                "max": 10,
                 "_meta": {
                     "display": "Caustic Scale",
                     "control": "slider"
@@ -53,18 +77,54 @@
             "causticSpeed": {
                 "type": "float",
                 "min": 0,
-                "max": 1,
+                "max": 2,
                 "_meta": {
                     "display": "Caustic Speed",
                     "control": "slider"
                 }
             },
-            "causticIntensity": {
+            "causticTroughMin": {
+                "type": "float",
+                "min": -3,
+                "max": 0,
+                "_meta": {
+                    "display": "Caustic Trough Min",
+                    "control": "slider"
+                }
+            },
+            "causticTroughMax": {
+                "type": "float",
+                "min": -1,
+                "max": 1,
+                "_meta": {
+                    "display": "Caustic Trough Max",
+                    "control": "slider"
+                }
+            },
+            "causticThresholdMin": {
                 "type": "float",
                 "min": 0,
                 "max": 1,
                 "_meta": {
-                    "display": "Caustic Intensity",
+                    "display": "Caustic Threshold Min",
+                    "control": "slider"
+                }
+            },
+            "causticThresholdMax": {
+                "type": "float",
+                "min": 0,
+                "max": 1,
+                "_meta": {
+                    "display": "Caustic Threshold Max",
+                    "control": "slider"
+                }
+            },
+            "causticSharpness": {
+                "type": "float",
+                "min": 0,
+                "max": 20,
+                "_meta": {
+                    "display": "Caustic Sharpness",
                     "control": "slider"
                 }
             },
@@ -82,7 +142,7 @@
                 "min": 0,
                 "max": 1,
                 "_meta": {
-                    "display": "Foam Speed",
+                    "display": "Foam Scroll Speed",
                     "control": "slider"
                 }
             },
@@ -95,15 +155,6 @@
                     "control": "slider"
                 }
             },
-            "foamSlopeAmplifier": {
-                "type": "float",
-                "min": 0,
-                "max": 1000,
-                "_meta": {
-                    "display": "Foam Slope Amplifier",
-                    "control": "slider"
-                }
-            },
             "foamSlopeMax": {
                 "type": "float",
                 "min": 0,
@@ -113,15 +164,22 @@
                     "control": "slider"
                 }
             },
-            "fogColor": {
-                "type": "vec4",
+            "foamSlopeAmplifier": {
+                "type": "float",
+                "min": 0,
+                "max": 1000,
                 "_meta": {
-                    "display": "Line Colour",
-                    "control": "color",
-                    "range": [
-                        0,
-                        1
-                    ]
+                    "display": "Foam Slope Amplifier",
+                    "control": "slider"
+                }
+            },
+            "foamPower": {
+                "type": "float",
+                "min": 0,
+                "max": 2,
+                "_meta": {
+                    "display": "Foam Power",
+                    "control": "slider"
                 }
             },
             "showNormalMap": {
@@ -159,22 +217,6 @@
                     "control": "toggle"
                 }
             }
-        },
-        
-        "_meta": {
-            "display": "Light"
-        },            "lineColor": {
-                "type": "vec4",
-                "_meta": {
-                    "display": "Colour",
-                    "control": "color",
-                    "range": [
-                        0,
-                        1
-                    ]
-                }
-            }
-          
+        }
     }
-
-
+}
