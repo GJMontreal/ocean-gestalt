@@ -10,6 +10,7 @@ add_executable(unit_tests
   test_uniformValue.cpp
   test_wave.cpp
   test_restPathHandler.cpp
+  test_patternMatch.cpp
 )
 
 set_property(TARGET unit_tests PROPERTY CXX_STANDARD 17)

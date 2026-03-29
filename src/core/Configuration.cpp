@@ -8,6 +8,7 @@
 #include "Utilities.hpp"
 #include "TextRenderer.hpp"
 #include "UniformAnimator.hpp"
+#include "PatternMatch.hpp"
 #include <memory>
 #include <fstream>
 #include <iostream>
@@ -223,25 +224,56 @@ void Configuration::loadUniforms(const string& fileName) {
     json j;
     loadJSON(fileName, j);
     auto anim = animator.lock();
+
+    std::optional<float> globalDuration;
+    if (j.contains("duration") && j["duration"].is_number()) {
+      globalDuration = j["duration"].get<float>();
+    }
+
+    std::vector<std::string> animatePatterns;
+    if (j.contains("animate") && j["animate"].is_array()) {
+      animatePatterns = j["animate"].get<std::vector<std::string>>();
+    }
+
     for (auto it = j.begin(); it != j.end(); ++it) {
+      if (it.key() == "duration" || it.key() == "animate") continue;
+
       const std::string key = "uniforms." + it.key();
       const json& value = it.value();
 
-      if (anim && value.is_object() && value.contains("value") && value.contains("duration")) {
-        ApiValue target = value["value"].get<ApiValue>();
-        float duration  = value["duration"].get<float>();
-        ApiValue from   = 0.0f;
-        if (auto current = locked->getValue(key)) {
-          from = *current;
+      std::optional<float> duration;
+      ApiValue target;
+
+      if (value.is_object() && value.contains("value") && value.contains("duration")) {
+        target   = value["value"].get<ApiValue>();
+        duration = value["duration"].get<float>();
+      } else {
+        target = value.get<ApiValue>();
+        if (!animatePatterns.empty() && matchesAnyPattern(animatePatterns, it.key())) {
+          duration = globalDuration;
         }
+      }
+
+      bool isAnimatable = std::holds_alternative<float>(target) ||
+                          std::holds_alternative<std::vector<float>>(target);
+
+      if (anim && duration && isAnimatable) {
+        // Default from-value must match the type of target so lerpValue doesn't throw.
+        ApiValue zero = std::visit([](auto&& v) -> ApiValue {
+          using T = std::decay_t<decltype(v)>;
+          if constexpr (std::is_same_v<T, std::vector<float>>)
+            return std::vector<float>(v.size(), 0.0f);
+          else
+            return T{};
+        }, target);
+        ApiValue from = locked->getValue(key).value_or(zero);
         std::shared_ptr<ApiAdapter> apiPtr = locked;
-        anim->animateTo(from, target, duration,
+        anim->animateTo(from, target, *duration,
                         [apiPtr, key](const ApiValue& v) {
                           apiPtr->setValue(key, v, false);
                         }, key);
       } else {
-        ApiValue apiVal = value.get<ApiValue>();
-        locked->setValue(key, apiVal);
+        locked->setValue(key, target);
       }
     }
   }
