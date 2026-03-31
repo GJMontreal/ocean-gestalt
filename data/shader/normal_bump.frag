@@ -24,6 +24,8 @@ uniform float waterlineWidth;
 uniform float waterlineStrength;
 uniform float waterlineNoise;
 uniform float wetStrength;
+uniform float waterlineClip;
+uniform vec3 wireframeColor;
 
 struct WAVE {
     vec3 direction;
@@ -94,6 +96,10 @@ float fbm(vec2 p) {
 }
 
 void main() {
+    float surfaceY_clip = waveHeightAt(fs_in.FragPos.xz);
+    if (waterlineClip > 0.5 && fs_in.FragPos.y < surfaceY_clip) discard;
+    if (waterlineClip < -0.5 && fs_in.FragPos.y >= surfaceY_clip) discard;
+
     // Base color
     vec3 albedo = texture(colorMap, fs_in.TexCoord).rgb;
 
@@ -143,6 +149,11 @@ void main() {
 
     // Foam rim at waterline
     color = mix(color, vec3(0.9, 0.95, 1.0), waterlineBand * waterlineStrength);
+
+    if (waterlineClip < -0.5) {
+        FragColor = vec4(wireframeColor, 1.0);
+        return;
+    }
 
     FragColor = vec4(color, 1.0);
 }

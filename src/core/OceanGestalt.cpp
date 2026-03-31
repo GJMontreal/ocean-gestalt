@@ -100,6 +100,7 @@ void OceanGestalt::buildScene() {
   auto buoyDrawable = buoy->getDrawable();
   buoyDrawable->setShader(configuration->getShader("buoy_mesh"));
   buoyDrawable->setIfShouldDrawMesh(true);
+  buoyDrawable->setWaterlineWireframe(true);
 #ifndef __EMSCRIPTEN__
   buoyDrawable->setNormalShader(drawableNormalShader);
 #endif

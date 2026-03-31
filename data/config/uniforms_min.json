@@ -10,6 +10,7 @@
     "buoy_mesh.waterlineStrength": 0.45,
     "buoy_mesh.waterlineNoise": 0.8,
     "buoy_mesh.wetStrength": 0.5,
+    "buoy_mesh.wireframeColor": [0.6, 0.75, 0.85],
     "mesh_shader.causticIntensity": 1.0,
     "mesh_shader.causticColor": [1.0, 0.9, 0.7],
     "mesh_shader.causticScale": 2.0,

@@ -22,6 +22,8 @@ uniform float waterlineWidth;
 uniform float waterlineStrength;
 uniform float waterlineNoise;
 uniform float wetStrength;
+uniform float waterlineClip;
+uniform vec3 wireframeColor;
 uniform int isReflectionPass;
 
 struct WAVE {
@@ -93,6 +95,10 @@ float fbm(vec2 p) {
 }
 
 void main() {
+    float surfaceY_clip = waveHeightAt(FragPos.xz);
+    if (waterlineClip > 0.5 && FragPos.y < surfaceY_clip) discard;
+    if (waterlineClip < -0.5 && FragPos.y >= surfaceY_clip) discard;
+
     if (isReflectionPass == 1 && FragPos.y < 0.0) discard;
 
     // Base color
@@ -144,6 +150,11 @@ void main() {
 
     // Foam rim at waterline
     color = mix(color, vec3(0.9, 0.95, 1.0), waterlineBand * waterlineStrength);
+
+    if (waterlineClip < -0.5) {
+        FragColor = vec4(wireframeColor, 1.0);
+        return;
+    }
 
     FragColor = vec4(color, 1.0);
 }

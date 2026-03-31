@@ -10,6 +10,7 @@ class Sphere : public Drawable {
   void draw(Uniforms& uniforms) override;
   void setShader(std::shared_ptr<ShaderProgram> shader);
   void setNormalShader(std::shared_ptr<ShaderProgram> shader);
+  void setWaterlineWireframe(bool enabled) { waterlineWireframe = enabled; }
 
  protected:
   void drawNormals(Uniforms& uniforms, Transform transform) override;
@@ -21,6 +22,7 @@ class Sphere : public Drawable {
                           unsigned int sectorCount = 36,
                           unsigned int stackCount = 18
                           );
+  void generateEdgeIndices();
   void bindVertices();
 
  private:
@@ -31,17 +33,22 @@ class Sphere : public Drawable {
 
   std::shared_ptr<ShaderProgram> shader;
   std::shared_ptr<ShaderProgram> normalShader;
-  
+
   glm::mat4 modelTransform;
 
   GLuint VAO;
   GLuint VBO;
   GLuint EBO;
-  
+  GLuint edgeVAO;
+  GLuint edgeEBO;
+
+  bool waterlineWireframe = false;
+
   glm::vec4 color;
   std::vector<Vertex> vertices;
   std::vector<glm::vec3> normals;
   std::vector<unsigned int> indices;
+  std::vector<unsigned int> edgeIndices;
 
   glm::mat4 getModelTransform(Transform transform);
 };
