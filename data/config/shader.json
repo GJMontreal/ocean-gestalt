@@ -67,5 +67,12 @@
     "text": {
         "vertex": "text.vert",
         "fragment": "text.frag"
+    },
+    "skybox": {
+      "vertex":"skybox.vert",
+      "fragment":"skybox.frag",
+    "cubemap": {
+            "envMap": "skybox"
     }
+  }
 }

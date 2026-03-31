@@ -105,6 +105,8 @@ void OceanGestalt::buildScene() {
 #endif
   sceneElements.emplace_back(SceneElement{"buoy",buoyDrawable,buoy});
 
+  skybox = std::make_shared<Skybox>(configuration);
+
   reflectionPass = std::make_unique<ReflectionPass>(configuration->reflectionSize, configuration->reflectionSize);
   shadowPass = std::make_unique<ShadowPass>(configuration->shadowSize);
 }
@@ -197,14 +199,20 @@ void OceanGestalt::loop() {
 #endif
     glFrontFace(GL_CW);
 
-    Uniforms reflUniforms{.projection = projection, .view = reflectedView, .time = uniformTime, .isReflectionPass = 1};
+    Uniforms reflUniforms{.projection = projection,
+                          .view = reflectedView,
+                          .time = uniformTime,
+                          .isReflectionPass = 1};
+    
+    skybox->draw(reflUniforms);
+
     for (auto& element : sceneElements) {
       if (element.name == "waves") continue;
       if (element.drawable) {
         (*element.drawable)->draw(reflUniforms);
       }
     }
-
+  
     glFrontFace(GL_CCW);
 #ifndef __EMSCRIPTEN__
     glDisable(GL_CLIP_DISTANCE0);

@@ -4,7 +4,7 @@
 class Skybox : public Drawable {
  public:
 
-  Skybox(std::shared_ptr<Configuration> context);
+  explicit Skybox(std::shared_ptr<Configuration> context);
   void draw(Uniforms& uniforms) override;
   void drawNormals(Uniforms&, Transform) override { /*do nothing*/ } ;
   void activate() override;
