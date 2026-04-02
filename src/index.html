@@ -16,7 +16,6 @@
   <meta property="og:url" content="https://geoffreyjones.ca/ocean-gestalt/index.html">
   <meta name="twitter:card" content="summary_large_image">
 
-  {{/*  we want to hide all content until the canvas is ready  */}}
   <style>
   html, body {
     background-color: black;
@@ -163,8 +162,9 @@ document.getElementById('start-audio').addEventListener('click', () => {
         //element.innerHTML += text.replace('\n', '<br>', 'g') + '<br>';
       };
     })(),
+    arguments: ["uniforms_web.json"],
     canvas: document.getElementById('canvas'),
-    onRuntimeInitialized : () => 
+    onRuntimeInitialized : () =>
       {
         const canvas_container = document.getElementById('canvas-container');
         if( canvas_container){
@@ -176,9 +176,18 @@ document.getElementById('start-audio').addEventListener('click', () => {
            spinner.remove();
         }
 
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            Module.ccall('onPageHidden', null, [], []);
+            console.log("page hidden");
+          } else {
+            Module.ccall('onPageVisible', null, [], []);
+          }
+        });
+
         // hide the title text after 5s
         setTimeout(() => { title.style.display = "none"; }, 10000);
-      }   
+      }
   };
 
 
@@ -189,14 +198,6 @@ document.getElementById('start-audio').addEventListener('click', () => {
 
 window.addEventListener('resize', setViewportHeight);
 window.addEventListener('orientationchange', setViewportHeight);
-
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    Module.ccall('onPageHidden', null, [], []);
-  } else {
-    Module.ccall('onPageVisible', null, [], []);
-  }
-});
 
 
 setViewportHeight();

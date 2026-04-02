@@ -61,19 +61,19 @@ if (EMSCRIPTEN)
   )
 
   # Copy the index.html file.
-  foreach(file 
-   "index.html" 
-   "run_webassembly.py" 
+  foreach(file
+   "index.html"
+   "run_webassembly.py"
    "keypress.js"
    "manifest.json"
    )
-    configure_file(src/${file} ${file})
+    configure_file(src/${file} ${file} COPYONLY)
   endforeach(file)
 
   file(GLOB SHADER_FILES "data/shader/webgl/*")
   foreach(file ${SHADER_FILES})
     get_filename_component(fname "${file}" NAME)
-    configure_file(${file} ${CMAKE_CURRENT_BINARY_DIR}/data/shader/webgl/${fname})
+    configure_file(${file} ${CMAKE_CURRENT_BINARY_DIR}/data/shader/webgl/${fname} COPYONLY)
   endforeach()
 
   file(GLOB TEXTURE_FILES "data/shader/texture/*")
@@ -91,7 +91,7 @@ if (EMSCRIPTEN)
   file(GLOB CONFIG_FILES "data/config/*.json")
   foreach(file ${CONFIG_FILES})
     get_filename_component(fname "${file}" NAME)
-    configure_file(${file} ${CMAKE_CURRENT_BINARY_DIR}/data/config/${fname})
+    configure_file(${file} ${CMAKE_CURRENT_BINARY_DIR}/data/config/${fname} COPYONLY)
   endforeach(file)
 
   foreach(file

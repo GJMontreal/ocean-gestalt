@@ -36,7 +36,30 @@ Requires [emsdk](https://emscripten.org/docs/getting_started/downloads.html). Ac
 source ~/emsdk/emsdk_env.sh
 ./web_build.sh
 ```
-Then open `http://localhost:8000`. The script builds and serves in one step.
+The script builds, deploys artifacts to the Hugo module, stages the changed files, and prints a suggested commit message. The module path defaults to `../web/ocean-gestalt-module` relative to this repo; override it with the `OCEAN_MODULE_DIR` environment variable if your layout differs. It then serves on `http://localhost:8000` for quick standalone testing.
+
+To test through Hugo (needed for template rendering):
+```
+cd ../web/geoffreyjones.ca
+hugo server
+```
+
+**Deploying a build**
+
+After `web_build.sh` completes:
+```
+cd ../web/ocean-gestalt-module
+git commit -m "Update WASM artifacts YYYY-MM-DD"
+git push
+```
+Then update the Hugo project to the new commit:
+```
+cd ../web/geoffreyjones.ca
+hugo mod get github.com/GJMontreal/ocean-gestalt-module@<commit>
+hugo mod tidy
+```
+
+The Hugo project uses a local `replace` directive in `go.mod` pointing at `../ocean-gestalt-module` for development. Remove or update this before publishing the Hugo site against a real tag/commit.
 
 =======================
 
