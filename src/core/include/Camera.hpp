@@ -48,9 +48,6 @@ class Camera : public MoveableBase<Camera> {
 
   void setConfiguration(std::shared_ptr<Configuration> configuration) {context = configuration;};
 
-  void setIsFloating(bool floating) { isFloating = floating; };
-  bool getIsFloating() const { return isFloating; };
-
  private:
   friend class MoveableBase<Camera>;
   Moveable moveable;
@@ -70,6 +67,4 @@ class Camera : public MoveableBase<Camera> {
   // camera options
   float MouseSensitivity;
 
-  // simulation
-  bool isFloating = false;
 };

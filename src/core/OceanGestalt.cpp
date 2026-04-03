@@ -73,7 +73,7 @@ void OceanGestalt::buildScene() {
   this->camera = configuration->camera;
   this->camera->setConfiguration(configuration);
   this->camera->getMoveable().movementSpeed = 10.f;
-  this->camera->setIsFloating(true);
+  this->camera->getMoveable().setIsFloating(true);
 
   sceneElements.emplace_back(SceneElement{"camera",std::nullopt,this->camera});
   
@@ -340,8 +340,11 @@ void OceanGestalt::toggleDrawLines() {
   }
 }
 
+// TODO: this should apply to any drawable / moveable
 void OceanGestalt::toggleFloatingCamera() {
-  camera->setIsFloating(!camera->getIsFloating());
+  if( auto moveable = currentElement->moveable){
+    (*moveable)->getMoveable().setIsFloating(!(*moveable)->getMoveable().getIsFloating());
+  }
 }
 
 void OceanGestalt::toggleDisplayText() {

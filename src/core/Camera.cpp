@@ -25,7 +25,8 @@ Camera::Camera(vec3 position, vec3 up, float yaw, float pitch, float zoom)
 mat4 Camera::getViewMatrix(double time) const {
   glm::mat4 view;
   auto position = getPosition();
-  if(auto locked = context.lock(); isFloating && locked){
+  
+  if(auto locked = context.lock(); moveable.getIsFloating() && locked){
     auto waveOffset = evaluateGerstnerWaves(locked->getWaves(), glm::vec2(position.x,position.z), time);
     view = glm::lookAt(position + waveOffset, position + waveOffset + Front, Up);
   }else{
