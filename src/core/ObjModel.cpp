@@ -121,7 +121,7 @@ ObjModel::~ObjModel() {
 }
 
 void ObjModel::drawMesh(Uniforms& uniforms, Transform transform) {
-  auto shader = configuration->getShader("buoy_mesh");
+  auto shader = meshShader ? meshShader : configuration->getShader("model_obj");
   auto _guard = ShaderScope(shader);
 
   shader->setUniform("model", getModelTransform(transform));
@@ -135,9 +135,13 @@ void ObjModel::drawMesh(Uniforms& uniforms, Transform transform) {
   shader->setUniform("view", uniforms.view);
 #endif
 
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, diffuseTexture);
-  shader->setUniform("colorMap", 0);
+  // Only bind the OBJ's diffuse texture when using the fallback shader.
+  // Custom mesh shaders load their textures from shader.json configuration.
+  if (!meshShader) {
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, diffuseTexture);
+    shader->setUniform("colorMap", 0);
+  }
 
   if (uniforms.shadowTexture) {
     glActiveTexture(GL_TEXTURE4);

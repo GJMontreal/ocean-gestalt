@@ -9,6 +9,7 @@ public:
   ~ObjModel();
 
   void setOrigin(glm::vec3 origin) { Drawable::setOrigin(origin); }
+  void setMeshShader(std::shared_ptr<ShaderProgram> shader) { meshShader = shader; }
   void setNormalShader(std::shared_ptr<ShaderProgram> shader) { normalShader = shader; }
 
 protected:
@@ -19,6 +20,7 @@ protected:
 private:
   static std::vector<Mesh> loadMeshes(const std::string& objPath);
   GLuint diffuseTexture = 0;
+  std::shared_ptr<ShaderProgram> meshShader;
   std::shared_ptr<ShaderProgram> normalShader;
 
   glm::mat4 getModelTransform(Transform transform);

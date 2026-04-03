@@ -110,6 +110,7 @@ void OceanGestalt::buildScene() {
 
   auto mooringMesh = std::make_shared<ObjModel>(MODEL_DIR "buoy_2.obj", glm::vec3(0,0,0), configuration);
   mooringMesh->setIfShouldDrawMesh(true);
+  mooringMesh->setMeshShader(configuration->getShader("mooring_mesh"));
 #ifndef __EMSCRIPTEN__
   mooringMesh->setNormalShader(configuration->getShader("model_obj_normal"));
 #endif

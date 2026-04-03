@@ -64,6 +64,19 @@
             "envMap": "skybox"  
         }
     },
+    "mooring_mesh": {
+        "vertex": "model_obj_pbr.vert",
+        "fragment": "normal_bump.frag",
+        "texture": {
+            "normalMap": "metal_normal.png",
+            "bumpMap": "metal_bump.png",
+            "colorMap": "metal_color.png",
+            "roughnessMap": "metal_bump.png"
+        },
+        "cubemap": {
+            "envMap": "skybox"
+        }
+    },
     "model_obj": {
         "vertex": "model_obj.vert",
         "fragment": "model_obj.frag"
