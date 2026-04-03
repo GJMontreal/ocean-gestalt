@@ -3,6 +3,8 @@
 #include "Configuration.hpp"
 #include "Camera.hpp"
 #include "Light.hpp"
+#include "Utilities.hpp"
+#include "Wave.hpp"
 #include "glError.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -119,7 +121,7 @@ ObjModel::~ObjModel() {
 }
 
 void ObjModel::drawMesh(Uniforms& uniforms, Transform transform) {
-  auto shader = configuration->getShader("model_obj");
+  auto shader = configuration->getShader("buoy_mesh");
   auto _guard = ShaderScope(shader);
 
   shader->setUniform("model", getModelTransform(transform));
@@ -144,9 +146,25 @@ void ObjModel::drawMesh(Uniforms& uniforms, Transform transform) {
     shader->setUniform("lightSpaceMatrix", uniforms.lightSpaceMatrix);
   }
 
-  for (auto& mesh : meshes) {
-    mesh.draw();
+  const auto& waves = configuration->getWaves();
+  for (int i = 0; i < (int)waves.size(); i++) {
+    shader->setUniform(string_format("waves[%d].amplitude",  i), waves[i]->amplitude);
+    shader->setUniform(string_format("waves[%d].wavelength", i), waves[i]->wavelength);
+    shader->setUniform(string_format("waves[%d].steepness",  i), waves[i]->steepness);
+    shader->setUniform(string_format("waves[%d].phase",      i), waves[i]->phase);
+    shader->setUniform(string_format("waves[%d].direction",  i), glm::vec3(waves[i]->direction, 0.0f));
   }
+
+  // Pass 1: shaded mesh above the waterline
+  shader->setUniform("waterlineClip", 1.0f);
+  for (auto& mesh : meshes) mesh.draw();
+
+  // Pass 2: wireframe below the waterline
+  shader->setUniform("waterlineClip", -1.0f);
+  shader->setUniform("wireframeColor", glm::vec3(0.4f, 0.5f, 0.55f));
+  for (auto& mesh : meshes) mesh.drawWireframe();
+
+  shader->setUniform("waterlineClip", 0.0f);
 
 #ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);
