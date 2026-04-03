@@ -67,6 +67,6 @@ class Moveable {
     bool getIsFloating() const { return isFloating; };
 protected:
 
-  // simulation
-    bool isFloating = false;
+    // simulation
+    bool isFloating = true;
 };
