@@ -5,7 +5,7 @@
 #include "Uniforms.hpp"
 #include "asset.hpp"
 #include "glError.hpp"
-#include "ObjModel.hpp"
+#include "GltfModel.hpp"
 #include "Prop.hpp"
 #include "Sphere.hpp"
 #include "Skybox.hpp"
@@ -108,11 +108,11 @@ void OceanGestalt::buildScene() {
   auto buoy = std::make_shared<Prop>(buoyMesh, glm::vec3(5.0f,0.f,5.0f), configuration);
   sceneElements.emplace_back(SceneElement{"buoy", buoyMesh, buoy});
 
-  auto mooringMesh = std::make_shared<ObjModel>(MODEL_DIR "buoy_2.obj", glm::vec3(0,0,0), configuration);
+  auto mooringMesh = std::make_shared<GltfModel>(MODEL_DIR "mooring.glb", glm::vec3(0,0,0), configuration);
   mooringMesh->setIfShouldDrawMesh(true);
   mooringMesh->setMeshShader(configuration->getShader("mooring_mesh"));
 #ifndef __EMSCRIPTEN__
-  mooringMesh->setNormalShader(configuration->getShader("model_obj_normal"));
+  mooringMesh->setNormalShader(configuration->getShader("drawable_normal"));
 #endif
   auto mooring = std::make_shared<Prop>(mooringMesh, glm::vec3(0,0,0), configuration);
   sceneElements.emplace_back(SceneElement{"mooring", mooringMesh, mooring});

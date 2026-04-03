@@ -33,7 +33,7 @@ add_library(app-core STATIC
   Sphere.cpp
   Identifier.cpp
   Drawable.cpp
-  ObjModel.cpp
+  GltfModel.cpp
   Prop.cpp
   GerstnerWave.cpp
   TextRenderer.cpp
@@ -50,7 +50,6 @@ target_link_libraries(app-core
   PRIVATE glfw
   PRIVATE glm
   PRIVATE nlohmann_json::nlohmann_json
-  PRIVATE tinyobjloader
   PRIVATE app-api
 )
 
@@ -63,10 +62,11 @@ if (NOT EMSCRIPTEN)
   )
 endif()
 
-target_include_directories(app-core 
+target_include_directories(app-core
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
   PRIVATE ${CMAKE_BINARY_DIR}/src/core
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
   PUBLIC ${CMAKE_SOURCE_DIR}/lib/stb
   PUBLIC ${CMAKE_SOURCE_DIR}/lib/miniaudio
+  PUBLIC ${CMAKE_SOURCE_DIR}/lib/cgltf
 )
