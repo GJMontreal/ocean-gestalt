@@ -339,6 +339,7 @@ void GltfModel::drawMesh(Uniforms& uniforms, Transform transform) {
   shader->setUniform("lightPos",           configuration->light->getPosition());
   shader->setUniform("time",               uniforms.time);
   shader->setUniform("isReflectionPass",   uniforms.isReflectionPass);
+  shader->setUniform("waterlineY",         getPosition().y + transform.displacement.y);
 
 #ifdef __EMSCRIPTEN__
   shader->setUniform("projection", uniforms.projection);
