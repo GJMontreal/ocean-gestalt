@@ -25,4 +25,8 @@ private:
 
   std::shared_ptr<Drawable> drawable;
   std::weak_ptr<Configuration> context;
+
+  // 0.0 = rigid upright, 1.0 = fully follows wave surface. Will become a
+  // per-prop JSON config field when scene description is added.
+  float rightingWeight = 0.5f;
 };
