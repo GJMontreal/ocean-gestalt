@@ -150,6 +150,11 @@ include(FetchContent)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
 FetchContent_MakeAvailable(json)
 
+FetchContent_Declare(tinyobjloader
+  GIT_REPOSITORY https://github.com/tinyobjloader/tinyobjloader.git
+  GIT_TAG        v2.0.0rc13)
+FetchContent_MakeAvailable(tinyobjloader)
+
 target_link_libraries(ocean-gestalt PRIVATE nlohmann_json::nlohmann_json)
 
 configure_file(

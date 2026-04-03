@@ -61,8 +61,21 @@
             "roughnessMap": "metal_bump.png"
         },
         "cubemap": {
-            "envMap": "skybox"
+            "envMap": "skybox"  
         }
+    },
+    "model_obj": {
+        "vertex": "model_obj.vert",
+        "fragment": "model_obj.frag"
+    },
+    "model_obj_wireframe": {
+        "vertex": "model_obj.vert",
+        "fragment": "simple.frag"
+    },
+    "model_obj_normal": {
+        "vertex": "model_obj.vert",
+        "geometry": "drawable_normal.gs",
+        "fragment": "simple.frag"
     },
     "text": {
         "vertex": "text.vert",

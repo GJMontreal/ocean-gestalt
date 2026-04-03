@@ -5,7 +5,9 @@
 #include "Uniforms.hpp"
 #include "asset.hpp"
 #include "glError.hpp"
-#include "Buoy.hpp"
+#include "ObjModel.hpp"
+#include "Prop.hpp"
+#include "Sphere.hpp"
 #include "Skybox.hpp"
 #include "TextRenderer.hpp"
 #include "GerstnerWave.hpp"
@@ -96,15 +98,23 @@ void OceanGestalt::buildScene() {
   ocean->setIfShouldDrawWireframe(false);
   sceneElements.emplace_back(SceneElement{"waves",ocean,std::nullopt});
   
-  auto buoy = std::make_shared<Buoy>(glm::vec3(5.0f,0.f,5.0f), configuration);
-  auto buoyDrawable = buoy->getDrawable();
-  buoyDrawable->setShader(configuration->getShader("buoy_mesh"));
-  buoyDrawable->setIfShouldDrawMesh(true);
-  buoyDrawable->setWaterlineWireframe(true);
+  auto buoyMesh = std::make_shared<Sphere>(glm::vec3(5.0f,0.f,5.0f), glm::vec4(0.85f,0.31f,0.f,1.f), configuration, 2.0f);
+  buoyMesh->setShader(configuration->getShader("buoy_mesh"));
+  buoyMesh->setIfShouldDrawMesh(true);
+  buoyMesh->setWaterlineWireframe(true);
 #ifndef __EMSCRIPTEN__
-  buoyDrawable->setNormalShader(drawableNormalShader);
+  buoyMesh->setNormalShader(drawableNormalShader);
 #endif
-  sceneElements.emplace_back(SceneElement{"buoy",buoyDrawable,buoy});
+  auto buoy = std::make_shared<Prop>(buoyMesh, glm::vec3(5.0f,0.f,5.0f), configuration);
+  sceneElements.emplace_back(SceneElement{"buoy", buoyMesh, buoy});
+
+  auto mooringMesh = std::make_shared<ObjModel>(MODEL_DIR "buoy_2.obj", glm::vec3(0,0,0), configuration);
+  mooringMesh->setIfShouldDrawMesh(true);
+#ifndef __EMSCRIPTEN__
+  mooringMesh->setNormalShader(configuration->getShader("model_obj_normal"));
+#endif
+  auto mooring = std::make_shared<Prop>(mooringMesh, glm::vec3(0,0,0), configuration);
+  sceneElements.emplace_back(SceneElement{"mooring", mooringMesh, mooring});
 
   skybox = std::make_shared<Skybox>(configuration);
 

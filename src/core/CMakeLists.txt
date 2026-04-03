@@ -33,7 +33,8 @@ add_library(app-core STATIC
   Sphere.cpp
   Identifier.cpp
   Drawable.cpp
-  Buoy.cpp
+  ObjModel.cpp
+  Prop.cpp
   GerstnerWave.cpp
   TextRenderer.cpp
   Skybox.cpp
@@ -49,6 +50,7 @@ target_link_libraries(app-core
   PRIVATE glfw
   PRIVATE glm
   PRIVATE nlohmann_json::nlohmann_json
+  PRIVATE tinyobjloader
   PRIVATE app-api
 )
 

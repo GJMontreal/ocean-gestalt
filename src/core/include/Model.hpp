@@ -31,22 +31,20 @@ class Model : public Drawable{
   Mesh* getMesh(int index);
 
   protected:
+  explicit Model(shared_ptr<Configuration> configuration, std::vector<Mesh> meshes);
+
   void drawNormals(Uniforms& uniforms, Transform transform) override;
   void drawMesh(Uniforms& uniforms, Transform transform) override;
-  void drawWireframe(Uniforms& uniforms);
+  virtual void drawWireframe(Uniforms& uniforms);
 
-// these could all be public, simplifying things
- private:
-  
-  glm::mat3 normalMatrix = glm::mat3(1.0);
-  
-  void calculateNormalMatrix(const glm::mat4& modelTransform, glm::mat3& aNormalMatrix);
- 
-  std::vector<Mesh> meshes; //this is going to be only 1 mesh
- 
+  std::vector<Mesh> meshes;
   bool drawTriangles = true;
-  bool drawLines = false;
 
+ private:
+  glm::mat3 normalMatrix = glm::mat3(1.0);
+  void calculateNormalMatrix(const glm::mat4& modelTransform, glm::mat3& aNormalMatrix);
+
+  bool drawLines = false;
   bool running = true;
 
 };

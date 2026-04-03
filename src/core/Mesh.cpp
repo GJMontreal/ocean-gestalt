@@ -4,6 +4,8 @@
 #include "glError.hpp"
 
 #include <iostream>
+#include <set>
+#include <utility>
 #include <vector>
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -19,6 +21,54 @@ Mesh::Mesh(int meshSize, int meshSubdivisions, glm::vec4 aColor)
   generateMesh(size, subdivisions);
 }
 
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices) {
+  indexCount = static_cast<int>(indices.size());
+
+  glGenBuffers(1, &vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+
+  glGenBuffers(1, &ibo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+  setVertexAttributes();
+  glBindVertexArray(0);
+
+  // Build unique edge list for wireframe
+  std::set<std::pair<unsigned int, unsigned int>> edgeSet;
+  for (size_t i = 0; i + 2 < indices.size(); i += 3) {
+    unsigned int i0 = indices[i], i1 = indices[i+1], i2 = indices[i+2];
+    edgeSet.insert({std::min(i0,i1), std::max(i0,i1)});
+    edgeSet.insert({std::min(i1,i2), std::max(i1,i2)});
+    edgeSet.insert({std::min(i0,i2), std::max(i0,i2)});
+  }
+  std::vector<unsigned int> wireIndices;
+  wireIndices.reserve(edgeSet.size() * 2);
+  for (auto& e : edgeSet) {
+    wireIndices.push_back(e.first);
+    wireIndices.push_back(e.second);
+  }
+  wireframeIndexCount = static_cast<int>(wireIndices.size());
+
+  glGenBuffers(1, &wireframeIbo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wireframeIbo);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, wireIndices.size() * sizeof(unsigned int), wireIndices.data(), GL_STATIC_DRAW);
+
+  glGenVertexArrays(1, &wireframeVao);
+  glBindVertexArray(wireframeVao);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wireframeIbo);
+  setVertexAttributes();
+  glBindVertexArray(0);
+
+  glCheckError(__FILE__, __LINE__);
+}
+
 GLuint Mesh::getVbo()const{
   return vbo;
 }
@@ -27,14 +77,17 @@ std::vector<GLuint> Mesh::getTriangularIndices()const{
   return triangularMeshIndices;
 }
 
+void Mesh::drawAsLines() const {
+  int count = indexCount > 0 ? indexCount : size * subdivisions * size * subdivisions * 2 * 3;
+  glBindVertexArray(vao);
+  glDrawElements(GL_LINES, count, GL_UNSIGNED_INT, nullptr);
+  glBindVertexArray(0);
+}
+
 void Mesh::drawWireframe()const{
-  auto xy = size * subdivisions;
+  int count = wireframeIndexCount > 0 ? wireframeIndexCount : size * subdivisions * (size * subdivisions + 1) * 4;
   glBindVertexArray(wireframeVao);
-  glDrawElements(GL_LINES,         // mode
-                 xy * (xy + 1) * 4 ,  // number of lines * number of directions * number of vertices
-                 GL_UNSIGNED_INT,  // type
-                 nullptr              // element array buffer offset
-  );
+  glDrawElements(GL_LINES, count, GL_UNSIGNED_INT, nullptr);
 
 #ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);
@@ -46,13 +99,13 @@ void Mesh::drawWireframe()const{
 
 
 void Mesh::draw() const {
-  auto xy = size * subdivisions;
   glBindVertexArray(vao);
+  int count = indexCount > 0 ? indexCount : size * subdivisions * size * subdivisions * 2 * 3;
 
-  glDrawElements(GL_TRIANGLES,     // mode
-                 xy * xy * 2 * 3,  // count
-                 GL_UNSIGNED_INT,  // type
-                 nullptr           // element array buffer offset
+  glDrawElements(GL_TRIANGLES,   // mode
+                 count,          // count
+                 GL_UNSIGNED_INT,// type
+                 nullptr         // element array buffer offset
   );
 
 #ifdef DEBUG_GL
