@@ -115,7 +115,7 @@ class OceanGestalt final : public OceanGestaltInterface,
   void toggleDrawTriangles();
   void toggleDrawLines();
   void dumpUniforms();
-  void toggleFloatingCamera();
+  void toggleFloating();
   void selectNextElement();
   void toggleFullscreen(GLFWwindow*);
   void toggleDisplayText();

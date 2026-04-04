@@ -363,8 +363,8 @@ void OceanGestalt::saveScene() {
   configuration->save(CONFIGURATION_DIR "scene.json");
 }
 
-// TODO: this should apply to any drawable / moveable
-void OceanGestalt::toggleFloatingCamera() {
+
+void OceanGestalt::toggleFloating() {
   if( auto moveable = currentElement->moveable){
     (*moveable)->getMoveable().setIsFloating(!(*moveable)->getMoveable().getIsFloating());
   }
