@@ -131,7 +131,11 @@ void main() {
     vec3 specular = specularFactor * shininess * specularSample;
 
     vec3 diffuse = 0.6 * diff * albedo;
-   
+
+    // Water bounce — sunlight reflected off the water surface illuminates downward-facing surfaces
+    float waterFacing = max(dot(finalNormal, vec3(0.0, -1.0, 0.0)), 0.0);
+    vec3 waterBounce = 0.25 * albedo * texture(envMap, vec3(0.0, -1.0, 0.0)).rgb * waterFacing;
+
     // Waterline effect
     float surfaceY      = waveHeightAt(fs_in.FragPos.xz);
     float bandCenter    = surfaceY - waterlineBias;
@@ -145,7 +149,7 @@ void main() {
 
     // Wet hull darkening below waterline
     vec3 wetTint = vec3(0.05, 0.08, 0.1);
-    vec3 color = mix(ambient + diffuse + specular, wetTint, belowWater * wetStrength);
+    vec3 color = mix(ambient + diffuse + specular + waterBounce, wetTint, belowWater * wetStrength);
 
     // Foam rim at waterline
     color = mix(color, vec3(0.9, 0.95, 1.0), waterlineBand * waterlineStrength);
