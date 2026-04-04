@@ -353,6 +353,10 @@ std::vector<GLuint> GltfModel::generateWireframe(std::vector<GLuint>& triangles)
 glm::mat4 GltfModel::getModelTransform(Transform transform) {
   auto m = glm::translate(glm::mat4(1.0f), getPosition() + transform.displacement);
   m = m * glm::mat4_cast(transform.rotation);
+  auto r = getRotation();
+  if (r.x != 0.0f) m = glm::rotate(m, glm::radians(r.x), glm::vec3(1,0,0));
+  if (r.y != 0.0f) m = glm::rotate(m, glm::radians(r.y), glm::vec3(0,1,0));
+  if (r.z != 0.0f) m = glm::rotate(m, glm::radians(r.z), glm::vec3(0,0,1));
   m = m * glm::scale(glm::mat4(1.0f), getScale());
   return m;
 }

@@ -36,8 +36,10 @@ class Drawable: public MoveableBase<Drawable>  {
   inline void setScale(glm::vec3 aScale) {
     scale = aScale;
   }
+  inline void setRotation(glm::vec3 eulerDegrees) { rotation = eulerDegrees; }
   inline const glm::vec3& getPosition()const {return position;};
   inline const glm::vec3& getScale()const { return scale;};
+  inline const glm::vec3& getRotation()const { return rotation; };
 
   inline glm::mat4 getTransform() const { return glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f),scale); };
   

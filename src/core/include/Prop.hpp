@@ -17,6 +17,7 @@ public:
 
   void activate() override {}
   void deactivate() override {}
+  void setRightingWeight(float w) { rightingWeight = w; }
 
 private:
   friend MoveableBase<Prop>;

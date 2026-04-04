@@ -7,7 +7,6 @@
 #include "glError.hpp"
 #include "GltfModel.hpp"
 #include "Prop.hpp"
-#include "Sphere.hpp"
 #include "Skybox.hpp"
 #include "TextRenderer.hpp"
 #include "GerstnerWave.hpp"
@@ -39,7 +38,7 @@ constexpr double TEXT_VISIBLE_TIME = 200;
 // our application should keep a reference to the OceanApi
 OceanGestalt::OceanGestalt() : Application() {
   configuration = std::make_shared<Configuration>(
-      CONFIGURATION_DIR "environment.json", CONFIGURATION_DIR "shader.json",
+      CONFIGURATION_DIR "scene.json", CONFIGURATION_DIR "shader.json",
       CONFIGURATION_DIR "generator.json", CONFIGURATION_DIR "api.json");
   buildScene();
  
@@ -98,24 +97,25 @@ void OceanGestalt::buildScene() {
   ocean->setIfShouldDrawWireframe(false);
   sceneElements.emplace_back(SceneElement{"waves",ocean,std::nullopt});
   
-  auto buoyMesh = std::make_shared<Sphere>(glm::vec3(5.0f,0.f,5.0f), glm::vec4(0.85f,0.31f,0.f,1.f), configuration, 2.0f);
-  buoyMesh->setShader(configuration->getShader("buoy_mesh"));
-  buoyMesh->setIfShouldDrawMesh(true);
-  buoyMesh->setWaterlineWireframe(true);
+  for (auto& cfg : configuration->sceneModels) {
+    auto mesh = std::make_shared<GltfModel>(
+        std::string(MODEL_DIR) + cfg.file, cfg.position, configuration);
+    mesh->setIfShouldDrawMesh(true);
+    mesh->setScale(cfg.scale);
+    mesh->setRotation(cfg.rotation);
+    if (!cfg.shader.empty()) {
+      if (auto shader = configuration->getShader(cfg.shader))
+        mesh->setMeshShader(shader);
+    }
 #ifndef __EMSCRIPTEN__
-  buoyMesh->setNormalShader(drawableNormalShader);
+    mesh->setNormalShader(configuration->getShader("drawable_normal"));
 #endif
-  auto buoy = std::make_shared<Prop>(buoyMesh, glm::vec3(5.0f,0.f,5.0f), configuration);
-  sceneElements.emplace_back(SceneElement{"buoy", buoyMesh, buoy});
-
-  auto mooringMesh = std::make_shared<GltfModel>(MODEL_DIR "cube.glb", glm::vec3(0,0,0), configuration);
-  mooringMesh->setIfShouldDrawMesh(true);
-  mooringMesh->setMeshShader(configuration->getShader("mooring_mesh"));
-#ifndef __EMSCRIPTEN__
-  mooringMesh->setNormalShader(configuration->getShader("drawable_normal"));
-#endif
-  auto mooring = std::make_shared<Prop>(mooringMesh, glm::vec3(0,0,0), configuration);
-  sceneElements.emplace_back(SceneElement{"mooring", mooringMesh, mooring});
+    auto prop = std::make_shared<Prop>(mesh, cfg.position, configuration);
+    prop->getMoveable().setIsFloating(cfg.floating);
+    prop->getMoveable().setIsTethered(cfg.tethered);
+    prop->setRightingWeight(cfg.rightingWeight);
+    sceneElements.emplace_back(SceneElement{cfg.name, mesh, prop});
+  }
 
   skybox = std::make_shared<Skybox>(configuration);
 

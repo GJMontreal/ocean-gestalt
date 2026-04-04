@@ -27,10 +27,22 @@ class TextRenderer;
 // This is our application context
 // With the exception of the application, it should be held only weakly by other classes
 
+struct SceneModelConfig {
+  std::string name;
+  std::string file;
+  std::string shader;
+  glm::vec3   position      = glm::vec3(0.0f);
+  glm::vec3   rotation      = glm::vec3(0.0f); // Euler degrees (X, Y, Z)
+  glm::vec3   scale         = glm::vec3(1.0f);
+  bool        floating      = true;
+  bool        tethered      = false;
+  float       rightingWeight = 0.5f;
+};
+
 class Configuration: public AppContextInterface, public std::enable_shared_from_this<Configuration> {
  public:
-  explicit Configuration(const string& environment, 
-    const string& shader, 
+  explicit Configuration(const string& environment,
+    const string& shader,
     const string &generator,
     const string& apiConfig);  //why is api a string here?
 
@@ -44,6 +56,8 @@ class Configuration: public AppContextInterface, public std::enable_shared_from_
   std::shared_ptr<Light> light;
   
   std::shared_ptr<TextRenderer> textRenderer;
+
+  std::vector<SceneModelConfig> sceneModels;
 
   int meshSize;
   int meshSubdivisions;
@@ -84,6 +98,7 @@ class Configuration: public AppContextInterface, public std::enable_shared_from_
   void loadShaders(const string& fileName);
   void loadLight(const string& fileName);
   void loadMesh(const string& fileName);
+  void loadScene(const string& fileName);
   void loadGenerator(const string& fileName);
   void loadAPISettings(const string& fileName);
 

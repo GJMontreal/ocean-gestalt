@@ -40,6 +40,7 @@ Configuration::Configuration(const string& environment,
   loadCamera(environment);
   loadLight(environment);
   loadMesh(environment);
+  loadScene(environment);
   loadShaders(shader);
   loadAPISettings(api);
 
@@ -184,6 +185,25 @@ void Configuration::loadMesh(const string& fileName) {
   }
   if (data.contains("shadow")) {
     shadowSize = data.at("shadow").at("size");
+  }
+}
+
+void Configuration::loadScene(const string& fileName) {
+  json data;
+  loadJSON(fileName, data);
+  if (!data.contains("models")) return;
+  for (auto& m : data.at("models")) {
+    SceneModelConfig cfg;
+    cfg.name   = m.at("name");
+    cfg.file   = m.at("file");
+    cfg.shader = m.value("shader", std::string{});
+    if (m.contains("position")) cfg.position = m.at("position").get<glm::vec3>();
+    if (m.contains("rotation")) cfg.rotation = m.at("rotation").get<glm::vec3>();
+    if (m.contains("scale"))    cfg.scale    = glm::vec3(m.at("scale").get<float>());
+    cfg.floating       = m.value("floating", true);
+    cfg.tethered       = m.value("tethered", false);
+    cfg.rightingWeight = m.value("rightingWeight", 0.5f);
+    sceneModels.push_back(cfg);
   }
 }
 
