@@ -67,9 +67,11 @@ GltfModel::~GltfModel() {
 // Texture helpers
 // ---------------------------------------------------------------------------
 
-GLuint GltfModel::loadTexture(const unsigned char* data, int w, int h, int channels) {
-  GLenum fmt     = (channels == 4) ? GL_RGBA : GL_RGB;
-  GLenum intfmt  = (channels == 4) ? GL_RGBA8 : GL_RGB8;
+GLuint GltfModel::loadTexture(const unsigned char* data, int w, int h, int channels, bool srgb) {
+  GLenum fmt    = (channels == 4) ? GL_RGBA : GL_RGB;
+  GLenum intfmt = srgb
+      ? ((channels == 4) ? GL_SRGB8_ALPHA8 : GL_SRGB8)
+      : ((channels == 4) ? GL_RGBA8        : GL_RGB8);
   GLuint tex;
   glGenTextures(1, &tex);
   glBindTexture(GL_TEXTURE_2D, tex);
@@ -96,7 +98,7 @@ GLuint GltfModel::fallbackTexture(unsigned char r, unsigned char g, unsigned cha
 }
 
 // Load a texture referenced by a cgltf_texture_view; returns fallback if absent.
-static GLuint loadCgltfTexture(const cgltf_texture_view* tv, bool srgb,
+static GLuint loadCgltfTexture(const cgltf_texture_view* tv,
                                 GLuint fallback,
                                 std::function<GLuint(const unsigned char*, int, int, int)> upload) {
   if (!tv || !tv->texture || !tv->texture->image) return fallback;
@@ -140,8 +142,12 @@ void GltfModel::load(const std::string& glbPath) {
     const cgltf_material& mat = data->materials[mi];
     GltfMaterial gm;
 
-    auto upload = [this](const unsigned char* d, int w, int h, int ch) {
-      return loadTexture(d, w, h, ch);
+    // Color textures are sRGB-encoded; data textures (MR, normal) are linear.
+    auto uploadSRGB   = [this](const unsigned char* d, int w, int h, int ch) {
+      return loadTexture(d, w, h, ch, true);
+    };
+    auto uploadLinear = [this](const unsigned char* d, int w, int h, int ch) {
+      return loadTexture(d, w, h, ch, false);
     };
 
     GLuint normalPixel = fallbackTexture(128, 128, 255);  // flat normal
@@ -149,25 +155,25 @@ void GltfModel::load(const std::string& glbPath) {
     if (mat.has_pbr_metallic_roughness) {
       const auto& pbr = mat.pbr_metallic_roughness;
 
-      // Color fallback: use base_color_factor so solid-color materials render correctly
+      // Color fallback: base_color_factor is linear per glTF spec — stored as GL_RGB8
       const float* c = pbr.base_color_factor;  // [R, G, B, A]
       GLuint colorFallback = fallbackTexture(
           static_cast<unsigned char>(c[0] * 255),
           static_cast<unsigned char>(c[1] * 255),
           static_cast<unsigned char>(c[2] * 255));
-      gm.colorMap = loadCgltfTexture(&pbr.base_color_texture, true, colorFallback, upload);
+      gm.colorMap = loadCgltfTexture(&pbr.base_color_texture, colorFallback, uploadSRGB);
 
       // MR fallback: glTF packs roughness in G, metallic in B
       GLuint mrFallback = fallbackTexture(
           0,
           static_cast<unsigned char>(pbr.roughness_factor  * 255),
           static_cast<unsigned char>(pbr.metallic_factor   * 255));
-      gm.mrMap = loadCgltfTexture(&pbr.metallic_roughness_texture, false, mrFallback, upload);
+      gm.mrMap = loadCgltfTexture(&pbr.metallic_roughness_texture, mrFallback, uploadLinear);
     } else {
       gm.colorMap = fallbackTexture(255, 255, 255);
       gm.mrMap    = fallbackTexture(0, 255, 0);  // full rough, no metal
     }
-    gm.normalMap = loadCgltfTexture(&mat.normal_texture, false, normalPixel, upload);
+    gm.normalMap = loadCgltfTexture(&mat.normal_texture, normalPixel, uploadLinear);
 
     materials.push_back(gm);
   }

@@ -41,7 +41,7 @@ protected:
 
 private:
   void load(const std::string& glbPath);
-  GLuint loadTexture(const unsigned char* data, int w, int h, int channels);
+  GLuint loadTexture(const unsigned char* data, int w, int h, int channels, bool srgb = false);
   GLuint fallbackTexture(unsigned char r, unsigned char g, unsigned char b);
 
   glm::mat4 getModelTransform(Transform transform);
