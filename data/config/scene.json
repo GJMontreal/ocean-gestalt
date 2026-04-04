@@ -2,9 +2,9 @@
     "camera": {
         "pitch": -1.830389142036438,
         "position": {
-            "x": 40.73838806152344,
+            "x": 20.247739791870117,
             "y": 4.08154296875,
-            "z": -14.902788162231445
+            "z": -0.9442388415336609
         },
         "up": {
             "x": 0.0,
@@ -23,40 +23,56 @@
         "size": 60,
         "subdivisions": 2
     },
+    "models": [
+        {
+            "angularDamping": 0.05000000074505806,
+            "file": "duck.glb",
+            "floating": true,
+            "name": "duck",
+            "position": {
+                "x": 6.230735778808594,
+                "y": 0.34759521484375,
+                "z": 4.183797359466553
+            },
+            "rightingWeight": 0.5,
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": 2.0,
+            "shader": "model_gltf_pbr",
+            "spinTorqueScale": 2.0,
+            "tethered": true,
+            "torsionalStiffness": 2.5
+        },
+        {
+            "angularDamping": 1.5,
+            "file": "mooring.glb",
+            "floating": true,
+            "name": "mooring",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rightingWeight": 0.5,
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": 1.0,
+            "shader": "model_gltf_pbr",
+            "spinTorqueScale": 2.0,
+            "tethered": true,
+            "torsionalStiffness": 1.5
+        }
+    ],
     "reflection": {
         "size": 512
     },
     "shadow": {
         "size": 2048
-    },
-    "models": [
-        {
-            "name": "duck",
-            "file": "duck.glb",
-            "shader": "model_gltf_pbr",
-            "position": { "x": 5.0, "y": 0.0, "z": 5.0 },
-            "rotation": { "x": 0.0, "y": 0.0, "z": 0.0 },
-            "scale": 2.0,
-            "floating": true,
-            "tethered": false,
-            "rightingWeight": 0.5,
-            "spinTorqueScale": 2.0,
-            "angularDamping": 1.5,
-            "torsionalStiffness": 0.5
-        },
-        {
-            "name": "mooring",
-            "file": "mooring.glb",
-            "shader": "model_gltf_pbr",
-            "position": { "x": 0.0, "y": 0.0, "z": 0.0 },
-            "rotation": { "x": 0.0, "y": 0.0, "z": 0.0 },
-            "scale": 1.0,
-            "floating": true,
-            "tethered": true,
-            "rightingWeight": 0.5,
-            "spinTorqueScale": 2.0,
-            "angularDamping": 1.5,
-            "torsionalStiffness": 0.5
-        }
-    ]
+    }
 }
