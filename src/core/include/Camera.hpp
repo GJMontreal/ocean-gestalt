@@ -67,4 +67,6 @@ class Camera : public MoveableBase<Camera> {
   // camera options
   float MouseSensitivity;
 
+  // simulation
+  bool isFloating = false;
 };

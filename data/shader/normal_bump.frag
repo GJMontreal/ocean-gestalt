@@ -27,6 +27,7 @@ uniform float wetStrength;
 uniform float waterlineClip;
 uniform vec3 wireframeColor;
 
+
 struct WAVE {
     vec3 direction;
     float amplitude;
@@ -139,6 +140,7 @@ void main() {
     float surfaceY      = waveHeightAt(fs_in.FragPos.xz);
     float bandCenter    = surfaceY - waterlineBias;
     float belowWater    = smoothstep(surfaceY + 0.2, surfaceY - 0.5, fs_in.FragPos.y);
+
     float waterlineBand = 1.0 - smoothstep(0.0, waterlineWidth, abs(fs_in.FragPos.y - bandCenter));
 
     // Break up the solid ring with noise
@@ -150,6 +152,7 @@ void main() {
     vec3 wetTint = vec3(0.05, 0.08, 0.1);
     vec3 color = mix(ambient + diffuse + specular + waterBounce, wetTint, belowWater * wetStrength);
 
+
     // Foam rim at waterline
     color = mix(color, vec3(0.9, 0.95, 1.0), waterlineBand * waterlineStrength);
 
@@ -160,6 +163,7 @@ void main() {
 
     // Gamma correction: linear → sRGB for display
     color = pow(color, vec3(1.0 / 2.2));
+
 
     FragColor = vec4(color, 1.0);
 }

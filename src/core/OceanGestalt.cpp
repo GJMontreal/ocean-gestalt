@@ -125,6 +125,7 @@ void OceanGestalt::buildScene() {
 
   skybox = std::make_shared<Skybox>(configuration);
 
+
   reflectionPass = std::make_unique<ReflectionPass>(configuration->reflectionSize, configuration->reflectionSize);
   shadowPass = std::make_unique<ShadowPass>(configuration->shadowSize);
 }
@@ -224,6 +225,7 @@ void OceanGestalt::loop() {
     
     skybox->draw(reflUniforms);
 
+
     for (auto& element : sceneElements) {
       if (element.name == "waves") continue;
       if (element.drawable) {
@@ -231,6 +233,7 @@ void OceanGestalt::loop() {
       }
     }
   
+
     glFrontFace(GL_CCW);
 #ifndef __EMSCRIPTEN__
     glDisable(GL_CLIP_DISTANCE0);

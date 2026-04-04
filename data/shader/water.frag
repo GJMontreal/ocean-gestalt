@@ -62,6 +62,7 @@ uniform int debugDiffuse;
 uniform int showEnv;
 uniform int showReflection;
 
+
 vec3 visualizeLightContribution(vec3 lightPos, vec3 fragPos) {
     float intensity = 1.0 / distance(lightPos, fragPos);
     intensity = clamp(intensity * 0.2, 0.0, 1.0);
@@ -171,6 +172,7 @@ void main() {
 
     vec3 reflection = fresnel * combinedReflection;
 
+
     // Depth-based colour modulation
     float depth = length(viewPos - fs_in.FragPos);
     float depthFade = smoothstep(depthFadeNear, depthFadeFar, depth);
@@ -185,6 +187,7 @@ void main() {
     // Caustic flicker in troughs
     float causticStrength = smoothstep(causticTroughMin, causticTroughMax, -fs_in.FragPos.y);
 
+
     vec2 flickerUV = fs_in.FragPos.xz * causticScale;
     flickerUV += time * causticSpeed;
     float causticFlicker = fbm(flickerUV);
@@ -196,6 +199,7 @@ void main() {
     causticFlicker = pow(causticFlicker, causticSharpness);
 
     vec3 causticLight = causticColor * causticFlicker * causticStrength * causticIntensity;
+
 
 
     vec3 finalColor =

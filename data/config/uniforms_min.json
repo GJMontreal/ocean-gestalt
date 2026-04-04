@@ -11,6 +11,7 @@
     "model_gltf_pbr.waterlineNoise": 0.8,
     "model_gltf_pbr.wetStrength": 0.5,
     "model_gltf_pbr.wireframeColor": [0.4, 0.5, 0.55],
+
     "mesh_shader.causticIntensity": 1.0,
     "mesh_shader.causticColor": [1.0, 0.9, 0.7],
     "mesh_shader.causticScale": 2.0,
@@ -35,6 +36,7 @@
     "mesh_shader.foamSlopeMin": 0.7089999914169312,
     "mesh_shader.fogDensity": 0.009999999776482582,
     "mesh_shader.gust.direction": [0.9608904123306274, 0.27692896127700806, 0.0],
+
     "mesh_shader.gust.scale": 0.009,
     "mesh_shader.gust.speed": 0.008,
     "mesh_shader.gust.strength": 0.008,
@@ -82,6 +84,7 @@
     "waves[6].wavelength": 55.096126556396484,
     "waves[7].amplitude": 0.09399999678134918,
     "waves[7].direction": [-0.5272182822227478, -0.8497298955917358, 0.0],
+
     "waves[7].phase": 3.5510001182556152,
     "waves[7].steepness": 1.0,
     "waves[7].wavelength": 4.903873443603516,

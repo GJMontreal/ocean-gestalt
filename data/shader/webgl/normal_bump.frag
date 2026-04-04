@@ -24,6 +24,7 @@ uniform float waterlineNoise;
 uniform float wetStrength;
 uniform float waterlineClip;
 uniform vec3 wireframeColor;
+
 uniform int isReflectionPass;
 
 struct WAVE {
@@ -99,6 +100,7 @@ void main() {
     if (waterlineClip > 0.5  && FragPos.y <  surfaceY_clip) discard;
     if (waterlineClip < -0.5 && FragPos.y >= surfaceY_clip) discard;
 
+
     if (isReflectionPass == 1 && FragPos.y < 0.0) discard;
 
     // Base color
@@ -123,6 +125,7 @@ void main() {
     float diff = max(dot(finalNormal, lightDir), 0.0);
 
     float roughness = texture(roughnessMap, TexCoord).g; // glTF: roughness in G channel
+
     float shininess = pow(1.0 - roughness, 2.0);
 
     vec3 ambient = 0.2 * albedo;
@@ -140,6 +143,7 @@ void main() {
     float surfaceY      = waveHeightAt(FragPos.xz);
     float bandCenter    = surfaceY - waterlineBias;
     float belowWater    = smoothstep(surfaceY + 0.2, surfaceY - 0.5, FragPos.y);
+
     float waterlineBand = 1.0 - smoothstep(0.0, waterlineWidth, abs(FragPos.y - bandCenter));
 
     // Break up the solid ring with noise
@@ -151,6 +155,7 @@ void main() {
     vec3 wetTint = vec3(0.05, 0.08, 0.1);
     vec3 color = mix(ambient + diffuse + specular + waterBounce, wetTint, belowWater * wetStrength);
 
+
     // Foam rim at waterline
     color = mix(color, vec3(0.9, 0.95, 1.0), waterlineBand * waterlineStrength);
 
@@ -161,6 +166,7 @@ void main() {
 
     // Gamma correction: linear → sRGB for display
     color = pow(color, vec3(1.0 / 2.2));
+
 
     FragColor = vec4(color, 1.0);
 }
