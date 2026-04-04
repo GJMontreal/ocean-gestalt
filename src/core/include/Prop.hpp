@@ -18,6 +18,11 @@ public:
   void activate() override {}
   void deactivate() override {}
   void setRightingWeight(float w) { rightingWeight = w; }
+  void setSpinParameters(float torqueScale, float damping, float stiffness) {
+    spinTorqueScale = torqueScale;
+    angularDamping  = damping;
+    torsionalStiffness = stiffness;
+  }
 
 private:
   friend MoveableBase<Prop>;
@@ -27,7 +32,16 @@ private:
   std::shared_ptr<Drawable> drawable;
   std::weak_ptr<Configuration> context;
 
-  // 0.0 = rigid upright, 1.0 = fully follows wave surface. Will become a
-  // per-prop JSON config field when scene description is added.
+  // 0.0 = rigid upright, 1.0 = fully follows wave surface.
   float rightingWeight = 0.5f;
+
+  // spin state
+  float angularVelocity = 0.0f;
+  float currentYaw      = 0.0f;
+  float lastTime        = -1.0f;
+
+  // spin config (set from scene.json via setSpinParameters)
+  float spinTorqueScale    = 2.0f;
+  float angularDamping     = 1.5f;
+  float torsionalStiffness = 0.5f;
 };

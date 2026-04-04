@@ -39,7 +39,10 @@
             "scale": 2.0,
             "floating": true,
             "tethered": false,
-            "rightingWeight": 0.5
+            "rightingWeight": 0.5,
+            "spinTorqueScale": 2.0,
+            "angularDamping": 1.5,
+            "torsionalStiffness": 0.5
         },
         {
             "name": "mooring",
@@ -49,8 +52,11 @@
             "rotation": { "x": 0.0, "y": 0.0, "z": 0.0 },
             "scale": 1.0,
             "floating": true,
-            "tethered": false,
-            "rightingWeight": 0.5
+            "tethered": true,
+            "rightingWeight": 0.5,
+            "spinTorqueScale": 2.0,
+            "angularDamping": 1.5,
+            "torsionalStiffness": 0.5
         }
     ]
 }

@@ -114,6 +114,7 @@ void OceanGestalt::buildScene() {
     prop->getMoveable().setIsFloating(cfg.floating);
     prop->getMoveable().setIsTethered(cfg.tethered);
     prop->setRightingWeight(cfg.rightingWeight);
+    prop->setSpinParameters(cfg.spinTorqueScale, cfg.angularDamping, cfg.torsionalStiffness);
     sceneElements.emplace_back(SceneElement{cfg.name, mesh, prop});
   }
 

@@ -202,7 +202,10 @@ void Configuration::loadScene(const string& fileName) {
     if (m.contains("scale"))    cfg.scale    = glm::vec3(m.at("scale").get<float>());
     cfg.floating       = m.value("floating", true);
     cfg.tethered       = m.value("tethered", false);
-    cfg.rightingWeight = m.value("rightingWeight", 0.5f);
+    cfg.rightingWeight     = m.value("rightingWeight",     0.5f);
+    cfg.spinTorqueScale    = m.value("spinTorqueScale",    2.0f);
+    cfg.angularDamping     = m.value("angularDamping",     1.5f);
+    cfg.torsionalStiffness = m.value("torsionalStiffness", 0.5f);
     sceneModels.push_back(cfg);
   }
 }

@@ -5,6 +5,7 @@
 #include "GerstnerWave.hpp"
 #include "Moveable.hpp"
 
+#include <glm/gtc/constants.hpp>
 #include <glm/gtc/quaternion.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/vector_angle.hpp>
@@ -28,10 +29,11 @@ Prop::Prop(std::shared_ptr<Drawable> drawable, glm::vec3 origin, std::shared_ptr
     auto displacement = glm::vec3(0.0f);
     glm::vec3 targetNormal = glm::vec3(0.0f, 1.0f, 0.0f);
 
+    glm::vec3 dx, dz;
     if (getMoveable().getIsFloating()) {
       displacement = evaluateGerstnerWaves(getContext()->getWaves(), positionXZ, time);
-      auto dx = evaluateGerstnerWaves(getContext()->getWaves(), positionXZ + glm::vec2(0.1f, 0.0f), time);
-      auto dz = evaluateGerstnerWaves(getContext()->getWaves(), positionXZ + glm::vec2(0.0f, 0.1f), time);
+      dx = evaluateGerstnerWaves(getContext()->getWaves(), positionXZ + glm::vec2(0.1f, 0.0f), time);
+      dz = evaluateGerstnerWaves(getContext()->getWaves(), positionXZ + glm::vec2(0.0f, 0.1f), time);
 
       // Build full surface tangents (base step + displacement delta) so the
       // normal is always upward-facing and varies smoothly — no sign flips.
@@ -53,8 +55,34 @@ Prop::Prop(std::shared_ptr<Drawable> drawable, glm::vec3 origin, std::shared_ptr
     glm::vec3 prevUp = lastRotation * glm::vec3(0.0f, 1.0f, 0.0f);
     glm::quat rAlign = glm::rotation(prevUp, targetNormal);
     glm::quat rotation = glm::normalize(rAlign * lastRotation);
-    lastRotation = rotation;
+    lastRotation = rotation;  // tilt-only, kept yaw-free for stable normal tracking
 
-    return {displacement, rotation, glm::vec3(1.0f)};
+    // dt — guard against first frame and time wrap
+    float dt = 0.0f;
+    if (lastTime >= 0.0f && time > lastTime && (time - lastTime) < 0.5f)
+      dt = time - lastTime;
+    lastTime = time;
+
+    // curl of XZ displacement reusing already-computed dx/dz samples
+    float curlY = 0.0f;
+    if (getMoveable().getIsFloating()) {
+      curlY = ((dx.z - displacement.z) - (dz.x - displacement.x)) / 0.1f;
+    }
+
+    // angular equation of motion
+    float torque = curlY * spinTorqueScale
+                 - angularDamping * angularVelocity;
+    if (getMoveable().getIsTethered())
+      torque -= torsionalStiffness * currentYaw;
+
+    angularVelocity += torque * dt;
+    currentYaw      += angularVelocity * dt;
+
+    // prevent float precision drift for freely-spinning props
+    if (!getMoveable().getIsTethered())
+      currentYaw = fmod(currentYaw, 2.0f * glm::pi<float>());
+
+    glm::quat yawRot = glm::angleAxis(currentYaw, glm::vec3(0.0f, 1.0f, 0.0f));
+    return {displacement, glm::normalize(rotation * yawRot), glm::vec3(1.0f)};
   };
 }

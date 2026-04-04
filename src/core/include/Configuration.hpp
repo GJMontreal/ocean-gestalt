@@ -34,9 +34,12 @@ struct SceneModelConfig {
   glm::vec3   position      = glm::vec3(0.0f);
   glm::vec3   rotation      = glm::vec3(0.0f); // Euler degrees (X, Y, Z)
   glm::vec3   scale         = glm::vec3(1.0f);
-  bool        floating      = true;
-  bool        tethered      = false;
-  float       rightingWeight = 0.5f;
+  bool        floating           = true;
+  bool        tethered           = false;
+  float       rightingWeight     = 0.5f;
+  float       spinTorqueScale    = 2.0f;
+  float       angularDamping     = 1.5f;
+  float       torsionalStiffness = 0.5f;
 };
 
 class Configuration: public AppContextInterface, public std::enable_shared_from_this<Configuration> {
