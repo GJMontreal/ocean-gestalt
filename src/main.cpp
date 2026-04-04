@@ -56,7 +56,7 @@ extern "C" {
 
   EMSCRIPTEN_KEEPALIVE
   void onPageVisible() {
-    if(app->getIsRunning()){
+    if(app->getIsSimulating()){
       app->muteAudio(false);
     }
   }

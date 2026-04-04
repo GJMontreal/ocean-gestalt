@@ -115,11 +115,11 @@ void OceanGestalt::buildScene() {
     prop->getMoveable().setIsTethered(cfg.tethered);
     prop->setRightingWeight(cfg.rightingWeight);
     prop->setSpinParameters(cfg.spinTorqueScale, cfg.angularDamping, cfg.torsionalStiffness);
-    if (cfg.waterlineBias)     mesh->setUniformOverride("waterlineBias",     *cfg.waterlineBias);
-    if (cfg.waterlineWidth)    mesh->setUniformOverride("waterlineWidth",    *cfg.waterlineWidth);
-    if (cfg.waterlineStrength) mesh->setUniformOverride("waterlineStrength", *cfg.waterlineStrength);
-    if (cfg.waterlineNoise)    mesh->setUniformOverride("waterlineNoise",    *cfg.waterlineNoise);
-    if (cfg.wetStrength)       mesh->setUniformOverride("wetStrength",       *cfg.wetStrength);
+    if (cfg.waterlineBias.has_value())     mesh->setUniformOverride("waterlineBias",     *cfg.waterlineBias);
+    if (cfg.waterlineWidth.has_value())    mesh->setUniformOverride("waterlineWidth",    *cfg.waterlineWidth);
+    if (cfg.waterlineStrength.has_value()) mesh->setUniformOverride("waterlineStrength", *cfg.waterlineStrength);
+    if (cfg.waterlineNoise.has_value())    mesh->setUniformOverride("waterlineNoise",    *cfg.waterlineNoise);
+    if (cfg.wetStrength.has_value())       mesh->setUniformOverride("wetStrength",       *cfg.wetStrength);
     sceneElements.emplace_back(SceneElement{cfg.name, mesh, prop});
   }
 

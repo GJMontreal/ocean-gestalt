@@ -31,7 +31,6 @@ public:
   GltfModel(const std::string& glbPath, glm::vec3 origin, std::shared_ptr<Configuration> context);
   ~GltfModel();
 
-  void setOrigin(glm::vec3 origin) { Drawable::setOrigin(origin); }
   void setMeshShader(std::shared_ptr<ShaderProgram> shader) { meshShader = shader; }
   void setNormalShader(std::shared_ptr<ShaderProgram> shader) { normalShader = shader; }
   void setUniformOverride(const std::string& name, float value) { uniformOverrides[name] = value; }
