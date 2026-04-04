@@ -144,17 +144,28 @@ void GltfModel::load(const std::string& glbPath) {
       return loadTexture(d, w, h, ch);
     };
 
-    GLuint whitePixel  = fallbackTexture(255, 255, 255);
     GLuint normalPixel = fallbackTexture(128, 128, 255);  // flat normal
-    GLuint mrPixel     = fallbackTexture(0, 255, 0);       // full rough, no metal
 
     if (mat.has_pbr_metallic_roughness) {
       const auto& pbr = mat.pbr_metallic_roughness;
-      gm.colorMap  = loadCgltfTexture(&pbr.base_color_texture,    true,  whitePixel,  upload);
-      gm.mrMap     = loadCgltfTexture(&pbr.metallic_roughness_texture, false, mrPixel, upload);
+
+      // Color fallback: use base_color_factor so solid-color materials render correctly
+      const float* c = pbr.base_color_factor;  // [R, G, B, A]
+      GLuint colorFallback = fallbackTexture(
+          static_cast<unsigned char>(c[0] * 255),
+          static_cast<unsigned char>(c[1] * 255),
+          static_cast<unsigned char>(c[2] * 255));
+      gm.colorMap = loadCgltfTexture(&pbr.base_color_texture, true, colorFallback, upload);
+
+      // MR fallback: glTF packs roughness in G, metallic in B
+      GLuint mrFallback = fallbackTexture(
+          0,
+          static_cast<unsigned char>(pbr.roughness_factor  * 255),
+          static_cast<unsigned char>(pbr.metallic_factor   * 255));
+      gm.mrMap = loadCgltfTexture(&pbr.metallic_roughness_texture, false, mrFallback, upload);
     } else {
-      gm.colorMap = whitePixel;
-      gm.mrMap    = mrPixel;
+      gm.colorMap = fallbackTexture(255, 255, 255);
+      gm.mrMap    = fallbackTexture(0, 255, 0);  // full rough, no metal
     }
     gm.normalMap = loadCgltfTexture(&mat.normal_texture, false, normalPixel, upload);
 
