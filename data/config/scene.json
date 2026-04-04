@@ -33,7 +33,7 @@
         {
             "name": "buoy",
             "file": "buoy.glb",
-            "shader": "buoy_mesh",
+            "shader": "model_gltf_pbr",
             "position": { "x": 5.0, "y": 0.0, "z": 5.0 },
             "rotation": { "x": 0.0, "y": 0.0, "z": 0.0 },
             "scale": 1.0,
@@ -44,7 +44,7 @@
         {
             "name": "mooring",
             "file": "mooring.glb",
-            "shader": "mooring_mesh",
+            "shader": "model_gltf_pbr",
             "position": { "x": 0.0, "y": 0.0, "z": 0.0 },
             "rotation": { "x": 0.0, "y": 0.0, "z": 0.0 },
             "scale": 1.0,

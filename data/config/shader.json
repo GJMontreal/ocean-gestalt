@@ -56,20 +56,7 @@
         "fragment": "simple.frag",
         "geometry": "drawable_normal.gs"
     },
-    "buoy_mesh": {
-        "vertex": "normal_bump.vert",
-        "fragment": "normal_bump.frag",
-        "texture": {
-            "normalMap": "metal_normal.png",
-            "bumpMap": "metal_bump.png",
-            "colorMap": "metal_color.png",
-            "roughnessMap": "metal_bump.png"
-        },
-        "cubemap": {
-            "envMap": "skybox"  
-        }
-    },
-    "mooring_mesh": {
+    "model_gltf_pbr": {
         "vertex": "model_gltf_pbr.vert",
         "fragment": "normal_bump.frag",
         "cubemap": {
