@@ -10,11 +10,11 @@
 class Wave;
 
 struct Biquad {
-    float a0;
-    float a1;
-    float a2;
-    float b1;
-    float b2;
+    float a0 = 0.0f;
+    float a1 = 0.0f;
+    float a2 = 0.0f;
+    float b1 = 0.0f;
+    float b2 = 0.0f;
     float z1 = 0;
     float z2 = 0;
 

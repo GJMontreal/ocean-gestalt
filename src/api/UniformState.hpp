@@ -33,7 +33,10 @@ class UniformState : public IUniformStore {
   void renderThreadCallback();
 
   private:
+  void seedFromShaders();
+
   AppContextInterface& context;
+  bool seeded = false;
   std::mutex updateMutex;
   // std::unordered_map<std::string, std::vector<PendingUniformUpdate>> pendingUpdates;
   std::unordered_map<std::string, std::vector<PendingUniformUpdate>> pendingUpdatesFront;

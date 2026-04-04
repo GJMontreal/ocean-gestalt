@@ -18,7 +18,7 @@ class Ocean : public Model {
 
  private:
   float elapsedTime=0;
-  double lastTime;
+  double lastTime = 0.0;
   std::vector<Wave*> waves; //this is moving to the configuration
 
   void setWaveUniforms(const vector<shared_ptr<Wave>>& waves,

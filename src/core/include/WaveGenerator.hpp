@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ApiAdapter.hpp"
+#include "Configuration.hpp"
 #include <glm/glm.hpp>
 
 
@@ -10,6 +11,7 @@ struct Wind{
 };
 class WaveGenerator {
  public:
+  WaveGenerator(std::shared_ptr<Configuration> configuration, std::shared_ptr<ApiAdapter> api);
   WaveGenerator(int numWaves, Wind& wind, std::shared_ptr<ApiAdapter> api) ;
 };
 

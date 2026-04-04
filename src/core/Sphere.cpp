@@ -7,6 +7,8 @@
 #include "glError.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include "Utilities.hpp"
+#include "Wave.hpp"
 
 Sphere::Sphere(glm::vec3 origin, glm::vec4 color, std::shared_ptr<Configuration> context, float radius):
 Drawable(origin, context), color(color) {
@@ -124,6 +126,17 @@ void Sphere::drawMesh(Uniforms& uniforms, Transform transform) {
   shader->setUniform("model",   getModelTransform(transform));
   shader->setUniform("viewPos", this->getContext()->camera->getPosition());
   shader->setUniform("lightPos",this->getContext()->light->getPosition());
+  shader->setUniform("time", uniforms.time);
+  shader->setUniform("isReflectionPass", uniforms.isReflectionPass);
+
+  const auto& waves = this->getContext()->waves;
+  for (int i = 0; i < (int)waves.size(); i++) {
+    shader->setUniform(string_format("waves[%d].amplitude",  i), waves[i]->amplitude);
+    shader->setUniform(string_format("waves[%d].wavelength", i), waves[i]->wavelength);
+    shader->setUniform(string_format("waves[%d].steepness",  i), waves[i]->steepness);
+    shader->setUniform(string_format("waves[%d].phase",      i), waves[i]->phase);
+    shader->setUniform(string_format("waves[%d].direction",  i), glm::vec3(waves[i]->direction, 0.0f));
+  }
 
 #ifdef __EMSCRIPTEN__
     shader->setUniform("projection", uniforms.projection);

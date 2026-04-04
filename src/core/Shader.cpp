@@ -146,7 +146,8 @@ GLint ShaderProgram::uniform(const std::string& name) {
     if (r == GL_INVALID_OPERATION){
       cerr << "[ERROR] GL_INVALID_OPERATION Getting uniform location" << endl;
     } else if( r < 0) {
-      cout << "[Warning] uniform " << name << " doesn't exist in shader " << this->getName() << endl;
+      // TODO: silence these 
+      // cout << "[Warning] uniform " << name << " doesn't exist in shader " << this->getName() << endl;
     }else{
       uniforms[name] = r; // I don't think we should add it if it's not in the program
     }
@@ -349,7 +350,7 @@ GLuint ShaderProgram::loadTexture(const std::string& path, const std::string& un
         throw std::runtime_error("Failed to load texture: " + path);
     }
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     glCheckError(__FILE__, __LINE__);
     glGenerateMipmap(GL_TEXTURE_2D);
     glCheckError(__FILE__, __LINE__);
@@ -377,7 +378,7 @@ GLuint ShaderProgram::loadCubemap(const std::string& path, const std::string& un
         if (data) {
             glTexImage2D(
                 GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-                0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+                0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
             );
 #ifdef DEBUG_GL
 #ifndef __EMSCRIPTEN__

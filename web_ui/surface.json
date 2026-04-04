@@ -2,63 +2,121 @@
     "port": 8080,
     "uniforms": {
         "_meta": {
-            "display": "Shader Uniforms"
+            "display": "Surface"
         },
-         "mesh_shader": {
-             
-        
-        "normalMapping.speed": {
-            "type": "float",
-            "min": 0,
-            "max": 0.5,
+        "mesh_shader": {
             "_meta": {
-                "display": "Normal Map Speed",
-                "control": "slider"
-            }
-        },
-        "normalMapping.scale": {
-            "type": "float",
-            "min": 0.0,
-            "max": 0.5,
-            "_meta": {
-                "display": "Normal Map Scale",
-                "control": "slider"
-            }
-        },
-        "normalMapping.heading": {
-            "type": "float",
-            "min": 0,
-            "max": 360,
-            "_meta": {
-                "display": "Normal Map Heading",
-                "control": "slider"
-            }
-        },
-        "fogDensity": {
-            "type": "float",
-            "min": 0,
-            "max": 0.01,
-            "_meta": {
-                "display": "Fog Density",
-                "control": "slider"
-            }
-        },
+                "display": "Rendering"
+            },
+            "normalMapping.speed": {
+                "type": "float",
+                "min": 0,
+                "max": 0.5,
+                "_meta": {
+                    "display": "Normal Map Speed",
+                    "control": "slider"
+                }
+            },
+            "normalMapping.scale": {
+                "type": "float",
+                "min": 0,
+                "max": 0.5,
+                "_meta": {
+                    "display": "Normal Map Scale",
+                    "control": "slider"
+                }
+            },
+            "normalMapping.heading": {
+                "type": "float",
+                "min": 0,
+                "max": 360,
+                "_meta": {
+                    "display": "Normal Map Heading",
+                    "control": "slider"
+                }
+            },
+            "reflectionDistortion": {
+                "type": "float",
+                "min": 0,
+                "max": 0.15,
+                "_meta": {
+                    "display": "Reflection Distortion",
+                    "control": "slider"
+                }
+            },
+            "fresnelF0": {
+                "type": "float",
+                "min": 0,
+                "max": 0.3,
+                "_meta": {
+                    "display": "Fresnel F0",
+                    "control": "slider"
+                }
+            },
+            "gamma": {
+                "type": "float",
+                "min": 0.1,
+                "max": 2.2,
+                "_meta": {
+                    "display": "Gamma",
+                    "control": "slider"
+                }
+            },
+            "fogDensity": {
+                "type": "float",
+                "min": 0,
+                "max": 0.05,
+                "_meta": {
+                    "display": "Fog Density",
+                    "control": "slider"
+                }
+            },
+            "fogColor": {
+                "type": "vec3",
+                "_meta": {
+                    "display": "Fog Colour",
+                    "control": "color"
+                }
+            },
+            "deepWaterTint": {
+                "type": "vec3",
+                "_meta": {
+                    "display": "Deep Water Tint",
+                    "control": "color"
+                }
+            },
+            "depthFadeNear": {
+                "type": "float",
+                "min": 0,
+                "max": 50,
+                "_meta": {
+                    "display": "Depth Fade Near",
+                    "control": "slider"
+                }
+            },
+            "depthFadeFar": {
+                "type": "float",
+                "min": 10,
+                "max": 200,
+                "_meta": {
+                    "display": "Depth Fade Far",
+                    "control": "slider"
+                }
+            },
             "showEnv": {
-            "type": "bool",
-            "_meta": {
-                "display": "Show Environment",
-                "control": "toggle"
+                "type": "bool",
+                "_meta": {
+                    "display": "Show Environment Map",
+                    "control": "toggle"
+                }
+            },
+            "showMesh": {
+                "type": "bool",
+                "_meta": {
+                    "display": "Show Mesh",
+                    "control": "toggle"
+                }
             }
         }
-        }
-          ,"ambientStrength":{
-            "type": "float",
-            "min": 0,
-            "max": 1,
-            "_meta": {
-                "display": "Ambient Strength",
-                "control": "slider"
-            }
-          }
     }
-  }
+}

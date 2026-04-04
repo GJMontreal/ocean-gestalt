@@ -49,7 +49,8 @@ void Model::drawWireframe(Uniforms& uniforms) {
     auto _guard = ShaderScope(shader);
     shader->setUniform("time", uniforms.time);
     shader->setUniform("model", getTransform());
-      
+    shader->setUniform("showMesh", 1);
+
 #ifdef __EMSCRIPTEN__
     shader->setUniform("projection", uniforms.projection);
     shader->setUniform("view", uniforms.view);
@@ -82,7 +83,20 @@ void Model::drawMesh(Uniforms& uniforms, Transform _) {
 #ifdef DEBUG_GL
     glCheckError(__FILE__, __LINE__);
 #endif
-  
+
+    if (uniforms.reflectionTexture) {
+      glActiveTexture(GL_TEXTURE3);
+      glBindTexture(GL_TEXTURE_2D, uniforms.reflectionTexture);
+      shader->setUniform("reflectionTex", 3);
+      shader->setUniform("reflectionMatrix", uniforms.reflectionMatrix);
+    }
+    if (uniforms.shadowTexture) {
+      glActiveTexture(GL_TEXTURE4);
+      glBindTexture(GL_TEXTURE_2D, uniforms.shadowTexture);
+      shader->setUniform("shadowMap", 4);
+      shader->setUniform("lightSpaceMatrix", uniforms.lightSpaceMatrix);
+    }
+
     if (drawTriangles) {
       mesh.draw();
     }

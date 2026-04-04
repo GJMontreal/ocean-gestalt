@@ -15,6 +15,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_operation.hpp>
 #include "glm/gtc/type_ptr.hpp"
 
@@ -92,6 +93,7 @@ void OceanGestalt::buildScene() {
   auto ocean = std::make_shared<Ocean>(configuration);
   ocean->setIfShouldDrawMesh(true);
   ocean->setIfShouldDrawLines(true);
+  ocean->setIfShouldDrawWireframe(false);
   sceneElements.emplace_back(SceneElement{"waves",ocean,std::nullopt});
   
   auto buoy = std::make_shared<Buoy>(glm::vec3(5.0f,0.f,5.0f), configuration);
@@ -102,9 +104,9 @@ void OceanGestalt::buildScene() {
   buoyDrawable->setNormalShader(drawableNormalShader);
 #endif
   sceneElements.emplace_back(SceneElement{"buoy",buoyDrawable,buoy});
-  
 
-
+  reflectionPass = std::make_unique<ReflectionPass>(configuration->reflectionSize, configuration->reflectionSize);
+  shadowPass = std::make_unique<ShadowPass>(configuration->shadowSize);
 }
 
 void OceanGestalt::runOnce(){
@@ -147,9 +149,78 @@ void OceanGestalt::loop() {
   setUniformBuffers(projection, view);
 #endif
 
+  // --- Shadow pre-pass ---
+  {
+    glm::vec3 lightPos = configuration->light->getPosition();
+    float halfSize = configuration->meshSize * 0.5f;
+    glm::mat4 lightProj = glm::ortho(-halfSize, halfSize, -halfSize, halfSize, 0.1f, 50.0f);
+    glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 lightSpaceMatrix = lightProj * lightView;
+
+#ifndef __EMSCRIPTEN__
+    setUniformBuffers(lightProj, lightView);
+#endif
+    shadowPass->beginCapture();
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(2.0f, 4.0f);
+
+    Uniforms shadowUniforms{.projection = lightProj, .view = lightView, .time = uniformTime};
+    for (auto& element : sceneElements) {
+      if (element.name == "waves" || element.name == "camera") continue;
+      if (element.drawable) {
+        (*element.drawable)->draw(shadowUniforms);
+      }
+    }
+
+    glDisable(GL_POLYGON_OFFSET_FILL);
+    shadowPass->endCapture(getWidth(), getHeight());
+#ifndef __EMSCRIPTEN__
+    setUniformBuffers(projection, view);
+#endif
+
+    uniforms.lightSpaceMatrix = lightSpaceMatrix;
+    uniforms.shadowTexture = shadowPass->getDepthTextureID();
+  }
+
+  // --- Reflection pre-pass ---
+  {
+    glm::mat4 reflectY = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, -1.0f, 1.0f));
+    glm::mat4 reflectedView = view * reflectY;
+    glm::mat4 reflectionMatrix = projection * reflectedView;
+
+#ifndef __EMSCRIPTEN__
+    setUniformBuffers(projection, reflectedView);
+#endif
+    reflectionPass->beginCapture();
+#ifndef __EMSCRIPTEN__
+    glEnable(GL_CLIP_DISTANCE0);
+#endif
+    glFrontFace(GL_CW);
+
+    Uniforms reflUniforms{.projection = projection, .view = reflectedView, .time = uniformTime, .isReflectionPass = 1};
+    for (auto& element : sceneElements) {
+      if (element.name == "waves") continue;
+      if (element.drawable) {
+        (*element.drawable)->draw(reflUniforms);
+      }
+    }
+
+    glFrontFace(GL_CCW);
+#ifndef __EMSCRIPTEN__
+    glDisable(GL_CLIP_DISTANCE0);
+#endif
+    reflectionPass->endCapture(getWidth(), getHeight());
+#ifndef __EMSCRIPTEN__
+    setUniformBuffers(projection, view);
+#endif
+
+    uniforms.reflectionMatrix = reflectionMatrix;
+    uniforms.reflectionTexture = reflectionPass->getTextureID();
+  }
+
   // clear
   glClear(GL_COLOR_BUFFER_BIT);
- 
+
   glClearColor(0.0f, 0.05f, 0.1f,
                1.0f);  // TODO: we should set this in the environment
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -225,8 +296,7 @@ void OceanGestalt::toggleSimulation() {
 }
 
 void OceanGestalt::toggleWireframe() {
-  std::cout << "Toggle wireframe" << std::endl;
-    if (auto drawable = currentElement->drawable) {
+  if (auto drawable = currentElement->drawable) {
     (*drawable)->setIfShouldDrawWireframe(!(*drawable)->getIfShouldDrawWireframe());
   }
 }
@@ -269,7 +339,8 @@ void OceanGestalt::selectNextElement() {
 void OceanGestalt::loadUniforms() {
 #ifndef __EMSCRIPTEN__
     std::thread([this] {
-      configuration->loadUniforms(CONFIGURATION_DIR "uniforms.json");
+      std::cout << "Loading uniforms" << std::endl;
+      configuration->loadUniforms(CONFIGURATION_DIR "uniforms_min.json");
     }).detach();
 #else
     auto* that = this;

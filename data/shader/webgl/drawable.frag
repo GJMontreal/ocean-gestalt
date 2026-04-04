@@ -10,13 +10,15 @@ uniform mat4 view;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
   
-uniform float ambientStrength;
+uniform int isReflectionPass;
 
 // output
 out vec4 FragColor;
 
 void main(void)
-{    
+{
+  if (isReflectionPass == 1 && oFragPos.y < 0.0) discard;
+
 vec3 lightDir = normalize(viewPos - oFragPos);
   vec3 norm = normalize(oNormal);
 

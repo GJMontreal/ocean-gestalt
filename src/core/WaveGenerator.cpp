@@ -2,7 +2,7 @@
 
 #include "random.hpp"
 
-
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/rotate_vector.hpp>
@@ -46,6 +46,7 @@ WaveGenerator::WaveGenerator(int numWaves, Wind& wind, std::shared_ptr<ApiAdapte
     api->setValue(pathPrefix + "amplitude", amplitude);
     api->setValue(pathPrefix + "wavelength", lambda);
     api->setValue(pathPrefix + "phase", phase);
+    
     // TODO: remind me why we're using a vec3 for direction
     api->setValue(pathPrefix + "direction",
                  std::vector<float>{direction.x, direction.y,0.0f});

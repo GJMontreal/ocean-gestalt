@@ -9,6 +9,37 @@ It's a bit of ocean you can fit in your pocket.
 
 =======================
 
+**Controls**
+
+| Input | Action |
+|-------|--------|
+| W / A / S / D | Move forward / left / back / right |
+| Space / Shift | Move up / down |
+| Drag | Look around |
+| T | Toggle camera attachment to water surface |
+| P | Pause/resume simulation |
+| M | Toggle mesh visibility |
+| L | Toggle wireframe |
+| F | Toggle fullscreen (native only) |
+| B | Dump current uniforms to stdout |
+| O | Save current uniforms to `data/config/output.json` |
+| G | Reload uniforms from config file |
+| R | Generate new random wave uniforms |
+| / | Toggle HUD text |
+
+=======================
+
+**Running locally (WebGL build)**
+
+Requires [emsdk](https://emscripten.org/docs/getting_started/downloads.html). Activate it before building:
+```
+source ~/emsdk/emsdk_env.sh
+./web_build.sh
+```
+Then open `http://localhost:8000`. The script builds and serves in one step.
+
+=======================
+
 **Running locally (native build)**
 
 Build:
@@ -43,12 +74,9 @@ https://emscripten.org
 An updated glfw api  
 https://github.com/pongasoft/emscripten-glfw  
 
-
-
 https://learnopengl.com/About  
 
 http://get.webgl.org  
 
 =====================  
 A note for android users; I'm not certain this will work on your device. If there's someone who could give me a hand debugging that I'd really appreciate the help. I've seen it work on some handsets and not others     
-

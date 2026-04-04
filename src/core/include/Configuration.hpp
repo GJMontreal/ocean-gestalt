@@ -47,6 +47,8 @@ class Configuration: public AppContextInterface, public std::enable_shared_from_
 
   int meshSize;
   int meshSubdivisions;
+  int reflectionSize = 512;
+  int shadowSize = 2048;
   
   float medianWavelength;
   float medianAmplitude;

@@ -71,8 +71,8 @@ private:
 
     float fontSize = 16.f;
    
-    float screenWidth;
-    float screenHeight;  
+    float screenWidth = 0.0f;
+    float screenHeight = 0.0f;
 
     bool loadFont(const std::string& fontPath, int fontSize);
     void setupBuffers();
