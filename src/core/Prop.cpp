@@ -75,16 +75,11 @@ Prop::Prop(std::shared_ptr<Drawable> drawable, glm::vec3 origin, std::shared_ptr
 
     // angular equation of motion
     float torque = spinTorque * spinTorqueScale
-                 - angularDamping * angularVelocity;
-    if (getMoveable().getIsTethered())
-      torque -= torsionalStiffness * currentYaw;
+                 - angularDamping * angularVelocity
+                 - torsionalStiffness * currentYaw;
 
     angularVelocity += torque * dt;
     currentYaw      += angularVelocity * dt;
-
-    // prevent float precision drift for freely-spinning props
-    if (!getMoveable().getIsTethered())
-      currentYaw = fmod(currentYaw, 2.0f * glm::pi<float>());
 
     glm::quat yawRot = glm::angleAxis(currentYaw, glm::vec3(0.0f, 1.0f, 0.0f));
     return {displacement, glm::normalize(rotation * yawRot), glm::vec3(1.0f)};
