@@ -16,7 +16,7 @@ std::vector<std::pair<int, Action>> KeyBindings::getKeyBindings() const {
     {GLFW_KEY_K, [](OceanGestalt* obj) { obj->toggleDrawLines(); }},
     {GLFW_KEY_L, [](OceanGestalt* obj) { obj->toggleWireframe(); }},
     {GLFW_KEY_B, [](OceanGestalt* obj) { obj->dumpUniforms(); }},
-    {GLFW_KEY_O, [](OceanGestalt* obj) { obj->configuration->save(CONFIGURATION_DIR "/output.json"); }},
+    {GLFW_KEY_O, [](OceanGestalt* obj) { obj->saveScene(); }},
     {GLFW_KEY_T, [](OceanGestalt* obj) { obj->toggleFloatingCamera();}},
     {GLFW_KEY_SLASH, [](OceanGestalt* obj) { obj->toggleDisplayText();}},
 #ifndef __EMSCRIPTEN__

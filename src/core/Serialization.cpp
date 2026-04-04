@@ -5,10 +5,30 @@
 // Configuration
 void to_json(json& j, const Configuration& configuration) {
   j = {{"camera", *(configuration.camera.get())},
-       {"light", configuration.light->getPosition()}};
+       {"light",  configuration.light->getPosition()}};
+  j["mesh"]       = {{"size", configuration.meshSize},
+                     {"subdivisions", configuration.meshSubdivisions}};
+  j["reflection"] = {{"size", configuration.reflectionSize}};
+  j["shadow"]     = {{"size", configuration.shadowSize}};
 
-  j["mesh"] = {{"size", configuration.meshSize},
-               {"subdivisions", configuration.meshSubdivisions}};
+  json models = json::array();
+  for (const auto& m : configuration.sceneModels) {
+    models.push_back({
+      {"name",               m.name},
+      {"file",               m.file},
+      {"shader",             m.shader},
+      {"position",           m.position},
+      {"rotation",           m.rotation},
+      {"scale",              m.scale.x},
+      {"floating",           m.floating},
+      {"tethered",           m.tethered},
+      {"rightingWeight",     m.rightingWeight},
+      {"spinTorqueScale",    m.spinTorqueScale},
+      {"angularDamping",     m.angularDamping},
+      {"torsionalStiffness", m.torsionalStiffness}
+    });
+  }
+  j["models"] = models;
 }
 
 void to_json(json& j, shared_ptr<Wave> p) {

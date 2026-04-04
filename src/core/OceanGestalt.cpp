@@ -277,8 +277,16 @@ void OceanGestalt::renderText() {
   configuration->textRenderer->drawText(
       fps.getFPSString(), {10.0f,  textYLocation, 0.0f}, textColor, textSize);
   configuration->textRenderer->drawText(currentElement->name,
-                                        {200.0f,  textYLocation, 0.0f},
+                                        {200.0f, textYLocation, 0.0f},
                                         textColor, textSize);
+  if (auto& mov = currentElement->moveable) {
+    auto pos = (*mov)->getMoveable().position;
+    auto posStr = "(" + std::to_string(static_cast<int>(pos.x))
+                + ", " + std::to_string(static_cast<int>(pos.y))
+                + ", " + std::to_string(static_cast<int>(pos.z)) + ")";
+    configuration->textRenderer->drawText(
+        posStr, {500.0f, textYLocation, 0.0f}, textColor, textSize);
+  }
   configuration->textRenderer->render();
 }
 
@@ -339,6 +347,20 @@ void OceanGestalt::toggleDrawLines() {
   if (auto drawable = currentElement->drawable) {
     (*drawable)->setIfShouldDrawLines(!(*drawable)->getIfShouldDrawLines());
   }
+}
+
+void OceanGestalt::saveScene() {
+  for (auto& element : sceneElements) {
+    if (!element.moveable) continue;
+    auto pos = (*element.moveable)->getMoveable().position;
+    for (auto& cfg : configuration->sceneModels) {
+      if (cfg.name == element.name) {
+        cfg.position = pos;
+        break;
+      }
+    }
+  }
+  configuration->save(CONFIGURATION_DIR "scene.json");
 }
 
 // TODO: this should apply to any drawable / moveable

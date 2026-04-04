@@ -108,6 +108,7 @@ class OceanGestalt final : public OceanGestaltInterface,
 
   KeyBindings keyBindings;
 
+  void saveScene();
   void toggleNormalDisplay();
   void toggleWireframe();
   void toggleMesh();
