@@ -1,6 +1,8 @@
 in vec3 FragPos;
 in vec2 TexCoord;
-in mat3 TBN;
+in vec3 vTangent;
+in vec3 vBitangent;
+in vec3 vNormal;
 
 out vec4 FragColor;
 
@@ -109,6 +111,7 @@ void main() {
     // Normal map (Tangent space to World space)
     vec3 sampledNormal = texture(normalMap, TexCoord).rgb;
     sampledNormal = normalize(sampledNormal * 2.0 - 1.0);
+    mat3 TBN = mat3(vTangent, vBitangent, vNormal);
     vec3 normal = normalize(TBN * sampledNormal);
 
     // Bump map (height) — used to perturb the normal further

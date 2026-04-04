@@ -9,7 +9,9 @@ uniform mat4 model;
 
 out vec3 FragPos;
 out vec2 TexCoord;
-out mat3 TBN;
+out vec3 vTangent;
+out vec3 vBitangent;
+out vec3 vNormal;
 
 void main() {
     // Proper TBN from GLTF tangents — no cross-with-up approximation.
@@ -17,9 +19,11 @@ void main() {
     vec3 T = normalize(mat3(model) * aTangent.xyz);
     vec3 B = cross(N, T) * aTangent.w;
 
-    TBN      = mat3(T, B, N);
-    FragPos  = vec3(model * vec4(aPosition, 1.0));
-    TexCoord = aTexCoord;
+    vTangent   = T;
+    vBitangent = B;
+    vNormal    = N;
+    FragPos    = vec3(model * vec4(aPosition, 1.0));
+    TexCoord   = aTexCoord;
 
     gl_Position = projection * view * vec4(FragPos, 1.0);
 }
