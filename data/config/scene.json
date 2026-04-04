@@ -31,12 +31,12 @@
     },
     "models": [
         {
-            "name": "buoy",
-            "file": "buoy.glb",
+            "name": "duck",
+            "file": "duck.glb",
             "shader": "model_gltf_pbr",
             "position": { "x": 5.0, "y": 0.0, "z": 5.0 },
             "rotation": { "x": 0.0, "y": 0.0, "z": 0.0 },
-            "scale": 1.0,
+            "scale": 2.0,
             "floating": true,
             "tethered": false,
             "rightingWeight": 0.5
