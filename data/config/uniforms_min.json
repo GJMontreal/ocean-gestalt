@@ -36,7 +36,7 @@
     "mesh_shader.foamSlopeMin": 0.7089999914169312,
     "mesh_shader.fogDensity": 0.009999999776482582,
     "mesh_shader.gust.direction": [0.9608904123306274, 0.27692896127700806, 0.0],
-
+    "mesh_shader.baseColor": [0.0, 0.03999999910593033, 0.029999999329447746, 1.0],
     "mesh_shader.gust.scale": 0.009,
     "mesh_shader.gust.speed": 0.008,
     "mesh_shader.gust.strength": 0.008,

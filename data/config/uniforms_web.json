@@ -12,7 +12,6 @@
     "model_gltf_pbr.wireframeColor": [0.4, 0.5, 0.55],
     "wireframe_shader.baseColor": [0.15, 0.36, 0.25, 1.0],
     "mesh_shader.baseColor": [0.0, 0.03999999910593033, 0.029999999329447746, 1.0],
-
     "mesh_shader.causticIntensity": 1.0,
     "mesh_shader.causticColor": [1.0, 0.9, 0.7],
     "mesh_shader.causticScale": 2.0,

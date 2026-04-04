@@ -37,14 +37,15 @@
             "rightingWeight": 0.5,
             "rotation": {
                 "x": 0.0,
-                "y": 0.0,
+                "y": 70.0,
                 "z": 0.0
             },
             "scale": 2.0,
             "shader": "model_gltf_pbr",
             "spinTorqueScale": 2.0,
             "tethered": true,
-            "torsionalStiffness": 2.5
+            "torsionalStiffness": 2.5,
+            "waterlineWidth": 0.5
         },
         {
             "angularDamping": 1.5,
