@@ -1,5 +1,5 @@
 {
-    "normal_shader": {
+    "water_normal_shader": {
         "vertex": "gerstner.vert",
         "geometry": "gerstner_normal.gs",
         "fragment": "simple.frag",
@@ -10,7 +10,7 @@
             "a": 1
         }
     },
-    "wireframe_shader": {
+    "water_wireframe_shader": {
         "vertex": "gerstner.vert",
         "fragment": "simple.frag",
         "color": {
@@ -20,7 +20,7 @@
             "a": 1
         }
     },
-    "mesh_shader": {
+    "water_mesh_shader": {
         "vertex": "gerstner.vert",
         "fragment": "water.frag",
         "texture": {
@@ -39,7 +39,7 @@
     },
     "drawable_mesh": {
         "vertex": "drawable.vert",
-        "fragment": "drawable.frag",
+        "fragment": "simple.frag",
         "color": {
             "r": 0,
             "g": 1,

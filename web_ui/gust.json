@@ -4,7 +4,7 @@
         "_meta": {
             "display": "Water Effects"
         },
-        "mesh_shader": {
+        "water_mesh_shader": {
             "_meta": {
                 "display": "Water Surface"
             },

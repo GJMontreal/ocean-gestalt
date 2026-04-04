@@ -19,20 +19,20 @@ TEST_CASE("matchesPattern: wildcard does not match wrong parameter") {
 }
 
 TEST_CASE("matchesPattern: wildcard does not match unrelated keys") {
-    CHECK_FALSE(matchesPattern("waves[*].amplitude", "mesh_shader.causticScale"));
+    CHECK_FALSE(matchesPattern("waves[*].amplitude", "water_mesh_shader.causticScale"));
     CHECK_FALSE(matchesPattern("waves[*].amplitude", "buoy_mesh.ambientStrength"));
 }
 
 TEST_CASE("matchesPattern: wildcard at start") {
     CHECK(matchesPattern("*.amplitude", "waves[0].amplitude"));
-    CHECK(matchesPattern("*.amplitude", "mesh_shader.amplitude"));
+    CHECK(matchesPattern("*.amplitude", "water_mesh_shader.amplitude"));
     CHECK_FALSE(matchesPattern("*.amplitude", "waves[0].wavelength"));
 }
 
 TEST_CASE("matchesPattern: multiple wildcards") {
     CHECK(matchesPattern("waves[*].*", "waves[0].amplitude"));
     CHECK(matchesPattern("waves[*].*", "waves[3].direction"));
-    CHECK_FALSE(matchesPattern("waves[*].*", "mesh_shader.causticScale"));
+    CHECK_FALSE(matchesPattern("waves[*].*", "water_mesh_shader.causticScale"));
 }
 
 TEST_CASE("matchesAnyPattern: returns true if any pattern matches") {
@@ -40,7 +40,7 @@ TEST_CASE("matchesAnyPattern: returns true if any pattern matches") {
     CHECK(matchesAnyPattern(patterns, "waves[0].amplitude"));
     CHECK(matchesAnyPattern(patterns, "waves[4].steepness"));
     CHECK_FALSE(matchesAnyPattern(patterns, "waves[0].wavelength"));
-    CHECK_FALSE(matchesAnyPattern(patterns, "mesh_shader.causticScale"));
+    CHECK_FALSE(matchesAnyPattern(patterns, "water_mesh_shader.causticScale"));
 }
 
 TEST_CASE("matchesAnyPattern: empty pattern list matches nothing") {

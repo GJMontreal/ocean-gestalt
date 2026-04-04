@@ -4,7 +4,7 @@
         "_meta": {
             "display": "Surface"
         },
-        "mesh_shader": {
+        "water_mesh_shader": {
             "_meta": {
                 "display": "Rendering"
             },

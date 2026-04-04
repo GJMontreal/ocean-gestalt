@@ -39,7 +39,7 @@ public:
 // ---- Testable subclass ----
 class TestableUniformPathHandler: public UniformPathHandler{
 public:
-  TestableUniformPathHandler():UniformPathHandler(nullptr,{"mesh_shader"}) {};
+  TestableUniformPathHandler():UniformPathHandler(nullptr,{"water_mesh_shader"}) {};
 
   using UniformPathHandler::UniformPathHandler;
 
@@ -63,9 +63,9 @@ TEST_CASE("parseUniformPath handles heading substitution correctly with shaderna
   using V = std::vector<std::string>;
   auto handler = TestableUniformPathHandler();
 
-  auto parsed = handler.callParseUniformPath(V{"uniforms","mesh_shader", "wave[0]", "heading"});
+  auto parsed = handler.callParseUniformPath(V{"uniforms","water_mesh_shader", "wave[0]", "heading"});
 
-  CHECK(parsed.shaderName == "mesh_shader");
+  CHECK(parsed.shaderName == "water_mesh_shader");
   CHECK(parsed.internalPath == "wave[0].direction");
   CHECK(parsed.externalPath == "wave[0].heading");
   CHECK(parsed.convertHeading == true);
@@ -116,7 +116,7 @@ TEST_CASE("set: routes only to named shader when shader name present") {
 
 TEST_CASE("set: converts heading to direction vec3") {
   auto store = std::make_shared<MockUniformStore>();
-  UniformPathHandler handler(store, {"mesh_shader"});
+  UniformPathHandler handler(store, {"water_mesh_shader"});
 
   handler.set({"uniforms", "wave[0]", "heading"}, ApiValue{0.0f}, false);
 
@@ -130,7 +130,7 @@ TEST_CASE("set: converts heading to direction vec3") {
 
 TEST_CASE("set: syncWaveFunction called for wave-related path") {
   auto store = std::make_shared<MockUniformStore>();
-  UniformPathHandler handler(store, {"mesh_shader"});
+  UniformPathHandler handler(store, {"water_mesh_shader"});
 
   std::string syncedPath;
   ApiValue syncedValue{0.f};
@@ -159,9 +159,9 @@ TEST_CASE("get: retrieves value from store") {
 TEST_CASE("get: converts stored direction vec3 back to heading") {
   auto store = std::make_shared<MockUniformStore>();
   // heading 90 degrees → {0, 1, 0}
-  store->stored["mesh_shader/wave[0].direction"] =
+  store->stored["water_mesh_shader/wave[0].direction"] =
       ApiValue{std::vector<float>{0.f, 1.f, 0.f}};
-  UniformPathHandler handler(store, {"mesh_shader"});
+  UniformPathHandler handler(store, {"water_mesh_shader"});
 
   auto result = handler.get({"uniforms", "wave[0]", "heading"});
 

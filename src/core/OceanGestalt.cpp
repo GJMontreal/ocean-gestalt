@@ -85,11 +85,11 @@ void OceanGestalt::buildScene() {
   auto drawableNormalShader = configuration->getShader("drawable_normal");
 #endif
   lightDrawable->setShader(drawableMeshShader);
-  lightDrawable->setIfShouldDrawMesh(false);
+  lightDrawable->setIfShouldDrawMesh(true);
 #ifndef __EMSCRIPTEN__
   lightDrawable->setNormalShader(drawableNormalShader);
 #endif
-  sceneElements.emplace_back(SceneElement{"light",lightDrawable, this->light});  //TODO: light should have a moveable, not be a moveable
+  sceneElements.emplace_back(SceneElement{"light",lightDrawable, this->light});
 
   auto ocean = std::make_shared<Ocean>(configuration);
   ocean->setIfShouldDrawMesh(true);

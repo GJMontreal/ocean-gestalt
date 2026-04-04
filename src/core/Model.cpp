@@ -45,7 +45,7 @@ void Model::draw(Uniforms& uniforms) {
 
 void Model::drawNormals(Uniforms& uniforms, Transform _) {
   for (Mesh mesh : meshes) {
-    auto shader = configuration->getShader("normal_shader");
+    auto shader = configuration->getShader("water_normal_shader");
     auto _guard = ShaderScope(shader);
     shader->setUniform("time", uniforms.time);
     shader->setUniform("model", getTransform());
@@ -55,7 +55,7 @@ void Model::drawNormals(Uniforms& uniforms, Transform _) {
 
 void Model::drawWireframe(Uniforms& uniforms, Transform /*transform*/) {
   for (Mesh mesh : meshes) {
-    auto shader = configuration->getShader("wireframe_shader");
+    auto shader = configuration->getShader("water_wireframe_shader");
     auto _guard = ShaderScope(shader);
     shader->setUniform("time", uniforms.time);
     shader->setUniform("model", getTransform());
@@ -75,7 +75,7 @@ void Model::drawWireframe(Uniforms& uniforms, Transform /*transform*/) {
 
 void Model::drawMesh(Uniforms& uniforms, Transform _) {
   for (Mesh mesh : meshes) {
-    auto shader = configuration->getShader("mesh_shader");
+    auto shader = configuration->getShader("water_mesh_shader");
     auto _guard = ShaderScope(shader);
 
     shader->setUniform("time", uniforms.time);

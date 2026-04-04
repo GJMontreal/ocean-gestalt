@@ -99,7 +99,7 @@
                 }
             }
         },
-        "wireframe_shader": {
+        "water_wireframe_shader": {
             "_meta": {
                 "display": "Wireframe"
             },
