@@ -124,8 +124,7 @@ void main() {
     float roughness = texture(roughnessMap, fs_in.TexCoord).g; // glTF: roughness in G channel
     float shininess = pow(1.0 - roughness, 2.0);  // High roughness → low shininess
     
-    vec3 envLighting = texture(envMap, finalNormal).rgb;
-    vec3 ambient = 0.2 * albedo * envLighting;
+    vec3 ambient = 0.2 * albedo;
 
     vec3 specularSample = texture(envMap, reflectDir).rgb;
     vec3 specular = specularFactor * shininess * specularSample;

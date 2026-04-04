@@ -351,8 +351,13 @@ void GltfModel::load(const std::string& glbPath) {
               << (mat.name ? mat.name : "(unnamed)") << ":"
               << " color="              << colorLabel()
               << " normal="             << normalLabel()
-              << " metallic-roughness=" << mrLabel()
-              << "\n";
+              << " metallic-roughness=" << mrLabel();
+    if (mat.has_pbr_metallic_roughness) {
+      const auto& pbr = mat.pbr_metallic_roughness;
+      std::cout << " (roughness=" << pbr.roughness_factor
+                << " metallic="  << pbr.metallic_factor << ")";
+    }
+    std::cout << "\n";
   }
   if (primitives.empty())
     std::cout << "GltfModel: warning — no primitives loaded\n";
