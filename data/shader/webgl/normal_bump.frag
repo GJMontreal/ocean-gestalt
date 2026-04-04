@@ -122,7 +122,7 @@ void main() {
 
     float diff = max(dot(finalNormal, lightDir), 0.0);
 
-    float roughness = texture(roughnessMap, TexCoord).r;
+    float roughness = texture(roughnessMap, TexCoord).g; // glTF: roughness in G channel
     float shininess = pow(1.0 - roughness, 2.0);
 
     vec3 envLighting = texture(envMap, finalNormal).rgb;
