@@ -5,6 +5,7 @@
 #include "GerstnerWave.hpp"
 #include "Moveable.hpp"
 
+#include <cmath>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/quaternion.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
@@ -63,14 +64,16 @@ Prop::Prop(std::shared_ptr<Drawable> drawable, glm::vec3 origin, std::shared_ptr
       dt = time - lastTime;
     lastTime = time;
 
-    // curl of XZ displacement reusing already-computed dx/dz samples
-    float curlY = 0.0f;
+    // noise-based spin torque — varies smoothly with position and time
+    float spinTorque = 0.0f;
     if (getMoveable().getIsFloating()) {
-      curlY = ((dx.z - displacement.z) - (dz.x - displacement.x)) / 0.1f;
+      float phase1 = positionXZ.x * 0.07f + time * 0.13f;
+      float phase2 = positionXZ.y * 0.05f + time * 0.09f;
+      spinTorque = std::sin(phase1) * std::cos(phase2);
     }
 
     // angular equation of motion
-    float torque = curlY * spinTorqueScale
+    float torque = spinTorque * spinTorqueScale
                  - angularDamping * angularVelocity;
     if (getMoveable().getIsTethered())
       torque -= torsionalStiffness * currentYaw;

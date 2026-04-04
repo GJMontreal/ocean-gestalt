@@ -11,6 +11,7 @@ add_executable(unit_tests
   test_wave.cpp
   test_restPathHandler.cpp
   test_patternMatch.cpp
+  test_prop_spin.cpp
 )
 
 set_property(TARGET unit_tests PROPERTY CXX_STANDARD 17)
