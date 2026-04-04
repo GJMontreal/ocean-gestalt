@@ -69,7 +69,8 @@ Prop::Prop(std::shared_ptr<Drawable> drawable, glm::vec3 origin, std::shared_ptr
     if (getMoveable().getIsFloating()) {
       float phase1 = positionXZ.x * 0.07f + time * 0.13f;
       float phase2 = positionXZ.y * 0.05f + time * 0.09f;
-      spinTorque = std::sin(phase1) * std::cos(phase2);
+      float waveStrength = glm::length(glm::vec2(displacement.x, displacement.z));
+      spinTorque = std::sin(phase1) * std::cos(phase2) * waveStrength;
     }
 
     // angular equation of motion
