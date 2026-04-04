@@ -63,6 +63,10 @@ void Skybox::draw(Uniforms& uniforms){
 void Skybox::drawMesh(Uniforms& uniforms, Transform transform) {
   auto shader = getContext()->getShader("skybox");
   auto _guard = ShaderScope(shader);
+#ifdef __EMSCRIPTEN__
+  shader->setUniform("projection", uniforms.projection);
+  shader->setUniform("view",       uniforms.view);
+#endif
   glDisable(GL_CULL_FACE);
   glDepthMask(GL_FALSE); 
   // glDepthFunc(GL_LEQUAL);
