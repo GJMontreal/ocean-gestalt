@@ -67,8 +67,8 @@ class Moveable {
     bool getIsFloating() const { return isFloating; };
     void setIsTethered(bool t) { isTethered = t; }
     bool getIsTethered() const { return isTethered; }
-protected:
 
+  private:
     // simulation
     bool isFloating = true;
     bool isTethered = false;

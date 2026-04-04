@@ -15,7 +15,7 @@ Prop::Prop(std::shared_ptr<Drawable> drawable, glm::vec3 origin, std::shared_ptr
     : drawable(drawable), context(context) {
   lastRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
 
-  moveable.onPositionChanged = [&](const glm::vec3& pos) {
+  moveable.onPositionChanged = [this](const glm::vec3& pos) {
     this->drawable->setOrigin(pos);
   };
 
@@ -28,9 +28,11 @@ Prop::Prop(std::shared_ptr<Drawable> drawable, glm::vec3 origin, std::shared_ptr
     auto& position = getDrawable()->getPosition();
     auto positionXZ = glm::vec2(position.x, position.z);
     auto displacement = glm::vec3(0.0f);
-    glm::vec3 targetNormal = glm::vec3(0.0f, 1.0f, 0.0f);
+    auto targetNormal = glm::vec3(0.0f, 1.0f, 0.0f);
 
-    glm::vec3 dx, dz;
+    glm::vec3 dx;
+    glm::vec3 dz;
+    
     if (getMoveable().getIsFloating()) {
       displacement = evaluateGerstnerWaves(getContext()->getWaves(), positionXZ, time);
       dx = evaluateGerstnerWaves(getContext()->getWaves(), positionXZ + glm::vec2(0.1f, 0.0f), time);

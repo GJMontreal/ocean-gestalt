@@ -1,5 +1,4 @@
-
-I wanted to revisit an idea I had some 15 years ago. Nothing new under the sun, but I did enjoy putting this together. I wanted to create something which while hinting at a physical analogue didn't take the approach of trying for verisimilitude.  
+I wanted to revisit an idea I had some 15 years ago. I did enjoy putting this together, hinting at a physical analogue without aiming for verisimilitude.  
 
 You can try out the results at:  
  https://geoffreyjones.ca/ocean-gestalt/

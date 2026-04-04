@@ -20,7 +20,7 @@ class Camera : public MoveableBase<Camera> {
   // updating these directly won't properly recalculate camera vectors
   // camera Attributes
 
-  Camera(vec3 position = vec3(0.0f, 0.0f, 3.0f),
+  explicit Camera(vec3 position = vec3(0.0f, 0.0f, 3.0f),
          vec3 up = vec3(0.0f, 1.0f, 0.0f),
          float yaw = YAW,
          float pitch = PITCH,

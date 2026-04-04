@@ -184,7 +184,7 @@ void GltfModel::load(const std::string& glbPath) {
     if (!node.mesh) continue;
 
     // Bake node world transform into vertex data so that scale/rotation/translation
-    // from the DCC tool (e.g. Fusion 360 mm→m) are applied automatically.
+    // from the DCC tool are applied automatically.
     cgltf_float nm[16];
     cgltf_node_transform_world(&node, nm);
     glm::mat4 nodeTransform(
