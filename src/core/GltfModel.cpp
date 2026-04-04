@@ -408,8 +408,7 @@ void GltfModel::drawMesh(Uniforms& uniforms, Transform transform) {
     glDrawElements(GL_TRIANGLES, prim.indexCount, GL_UNSIGNED_INT, nullptr);
 
     // Pass 2: wireframe below the waterline
-    shader->setUniform("waterlineClip",  -1.0f);
-    shader->setUniform("wireframeColor", glm::vec3(0.4f, 0.5f, 0.55f));
+    shader->setUniform("waterlineClip", -1.0f);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, prim.lineEBO);
     glDrawElements(GL_LINES, prim.lineIndexCount, GL_UNSIGNED_INT, nullptr);
 
@@ -435,15 +434,14 @@ void GltfModel::drawNormals(Uniforms& /*uniforms*/, Transform transform) {
 #endif
 }
 
-void GltfModel::drawWireframe(Uniforms& uniforms) {
-  auto shader = meshShader ? meshShader : configuration->getShader("model_gltf_pbr");
+void GltfModel::drawWireframe(Uniforms& uniforms, Transform transform) {
+  auto shader = configuration->getShader("gltf_wireframe");
   if (!shader) return;
   auto _guard = ShaderScope(shader);
-  shader->setUniform("model",    getModelTransform(Transform{}));
+  shader->setUniform("model",    getModelTransform(transform));
   shader->setUniform("lightPos", configuration->light->getPosition());
   shader->setUniform("viewPos",  configuration->camera->getPosition());
   shader->setUniform("time",     uniforms.time);
-  shader->setUniform("waterlineClip", 0.0f);
 #ifdef __EMSCRIPTEN__
   shader->setUniform("projection", uniforms.projection);
   shader->setUniform("view",       uniforms.view);

@@ -28,7 +28,7 @@ void Model::draw(Uniforms& uniforms) {
   }
   {
     if (getIfShouldDrawWireframe()) {
-      drawWireframe(uniforms);
+      drawWireframe(uniforms, transform);
     }
 
 #ifndef __EMSCRIPTEN__
@@ -53,7 +53,7 @@ void Model::drawNormals(Uniforms& uniforms, Transform _) {
   }
 }
 
-void Model::drawWireframe(Uniforms& uniforms) {
+void Model::drawWireframe(Uniforms& uniforms, Transform /*transform*/) {
   for (Mesh mesh : meshes) {
     auto shader = configuration->getShader("wireframe_shader");
     auto _guard = ShaderScope(shader);

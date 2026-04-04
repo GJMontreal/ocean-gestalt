@@ -35,7 +35,7 @@ class Model : public Drawable{
 
   void drawNormals(Uniforms& uniforms, Transform transform) override;
   void drawMesh(Uniforms& uniforms, Transform transform) override;
-  virtual void drawWireframe(Uniforms& uniforms);
+  virtual void drawWireframe(Uniforms& uniforms, Transform transform);
 
   std::vector<Mesh> meshes;
   bool drawTriangles = true;

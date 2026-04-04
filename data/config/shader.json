@@ -46,7 +46,12 @@
             "b": 1,
             "a": 1
         }
-    },"drawable_normal": {
+    },
+    "gltf_wireframe": {
+        "vertex": "drawable.vert",
+        "fragment": "simple.frag"
+    },
+    "drawable_normal": {
         "vertex": "drawable.vert",
         "fragment": "simple.frag",
         "geometry": "drawable_normal.gs"

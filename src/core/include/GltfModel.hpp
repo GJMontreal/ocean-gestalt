@@ -37,7 +37,7 @@ public:
 protected:
   void drawMesh(Uniforms& uniforms, Transform transform) override;
   void drawNormals(Uniforms& uniforms, Transform transform) override;
-  void drawWireframe(Uniforms& uniforms) override;
+  void drawWireframe(Uniforms& uniforms, Transform transform) override;
 
 private:
   void load(const std::string& glbPath);
