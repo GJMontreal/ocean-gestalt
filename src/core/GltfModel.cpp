@@ -13,6 +13,7 @@
 #include "stb_image.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
+#include <set>
 #include <stdexcept>
 
 // ---------------------------------------------------------------------------
@@ -50,9 +51,10 @@ GltfModel::GltfModel(const std::string& glbPath, glm::vec3 origin,
 
 GltfModel::~GltfModel() {
   for (auto& p : primitives) {
-    if (p.VAO) glDeleteVertexArrays(1, &p.VAO);
-    if (p.VBO) glDeleteBuffers(1, &p.VBO);
-    if (p.EBO) glDeleteBuffers(1, &p.EBO);
+    if (p.VAO)     glDeleteVertexArrays(1, &p.VAO);
+    if (p.VBO)     glDeleteBuffers(1, &p.VBO);
+    if (p.EBO)     glDeleteBuffers(1, &p.EBO);
+    if (p.lineEBO) glDeleteBuffers(1, &p.lineEBO);
   }
   for (auto& m : materials) {
     if (m.colorMap)  glDeleteTextures(1, &m.colorMap);
@@ -268,6 +270,8 @@ void GltfModel::load(const std::string& glbPath) {
       glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GltfVertex),
                    verts.data(), GL_STATIC_DRAW);
 
+      // we need to generate lines as well
+
       glGenBuffers(1, &gp.EBO);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gp.EBO);
       glBufferData(GL_ELEMENT_ARRAY_BUFFER, idxs.size() * sizeof(unsigned int),
@@ -291,6 +295,16 @@ void GltfModel::load(const std::string& glbPath) {
                             (void*)offsetof(GltfVertex, tangent));
 
       glBindVertexArray(0);
+
+      // Line EBO — generated outside VAO context so VAO retains triangle EBO
+      auto lineIdxs = generateWireframe(idxs);
+      gp.lineIndexCount = static_cast<int>(lineIdxs.size());
+      glGenBuffers(1, &gp.lineEBO);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gp.lineEBO);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                   lineIdxs.size() * sizeof(GLuint), lineIdxs.data(), GL_STATIC_DRAW);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
       primitives.push_back(gp);
     }
   }
@@ -319,6 +333,19 @@ void GltfModel::load(const std::string& glbPath) {
   cgltf_free(data);
 }
 
+std::vector<GLuint> GltfModel::generateWireframe(std::vector<GLuint>& triangles) {
+  std::set<std::pair<GLuint, GLuint>> edges;
+  for (size_t i = 0; i + 2 < triangles.size(); i += 3) {
+    GLuint a = triangles[i], b = triangles[i+1], c = triangles[i+2];
+    edges.insert({std::min(a,b), std::max(a,b)});
+    edges.insert({std::min(b,c), std::max(b,c)});
+    edges.insert({std::min(a,c), std::max(a,c)});
+  }
+  std::vector<GLuint> lines;
+  lines.reserve(edges.size() * 2);
+  for (auto& e : edges) { lines.push_back(e.first); lines.push_back(e.second); }
+  return lines;
+}
 // ---------------------------------------------------------------------------
 // Draw
 // ---------------------------------------------------------------------------
@@ -339,7 +366,6 @@ void GltfModel::drawMesh(Uniforms& uniforms, Transform transform) {
   shader->setUniform("lightPos",           configuration->light->getPosition());
   shader->setUniform("time",               uniforms.time);
   shader->setUniform("isReflectionPass",   uniforms.isReflectionPass);
-  shader->setUniform("waterlineY",         getPosition().y + transform.displacement.y);
 
 #ifdef __EMSCRIPTEN__
   shader->setUniform("projection", uniforms.projection);
@@ -378,12 +404,14 @@ void GltfModel::drawMesh(Uniforms& uniforms, Transform transform) {
     // Pass 1: shaded mesh above the waterline
     shader->setUniform("waterlineClip", 1.0f);
     glBindVertexArray(prim.VAO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, prim.EBO);
     glDrawElements(GL_TRIANGLES, prim.indexCount, GL_UNSIGNED_INT, nullptr);
 
     // Pass 2: wireframe below the waterline
     shader->setUniform("waterlineClip",  -1.0f);
     shader->setUniform("wireframeColor", glm::vec3(0.4f, 0.5f, 0.55f));
-    glDrawElements(GL_LINES, prim.indexCount, GL_UNSIGNED_INT, nullptr);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, prim.lineEBO);
+    glDrawElements(GL_LINES, prim.lineIndexCount, GL_UNSIGNED_INT, nullptr);
 
     glBindVertexArray(0);
     shader->setUniform("waterlineClip", 0.0f);
@@ -408,19 +436,22 @@ void GltfModel::drawNormals(Uniforms& /*uniforms*/, Transform transform) {
 }
 
 void GltfModel::drawWireframe(Uniforms& uniforms) {
-  auto shader = configuration->getShader("model_obj_wireframe");
+  auto shader = meshShader ? meshShader : configuration->getShader("model_gltf_pbr");
   if (!shader) return;
   auto _guard = ShaderScope(shader);
   shader->setUniform("model",    getModelTransform(Transform{}));
   shader->setUniform("lightPos", configuration->light->getPosition());
   shader->setUniform("viewPos",  configuration->camera->getPosition());
+  shader->setUniform("time",     uniforms.time);
+  shader->setUniform("waterlineClip", 0.0f);
 #ifdef __EMSCRIPTEN__
   shader->setUniform("projection", uniforms.projection);
   shader->setUniform("view",       uniforms.view);
 #endif
   for (auto& prim : primitives) {
     glBindVertexArray(prim.VAO);
-    glDrawElements(GL_LINES, prim.indexCount, GL_UNSIGNED_INT, nullptr);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, prim.lineEBO);
+    glDrawElements(GL_LINES, prim.lineIndexCount, GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
   }
 }

@@ -25,7 +25,6 @@ uniform float waterlineStrength;
 uniform float waterlineNoise;
 uniform float wetStrength;
 uniform float waterlineClip;
-uniform float waterlineY;
 uniform vec3 wireframeColor;
 
 struct WAVE {
@@ -97,8 +96,9 @@ float fbm(vec2 p) {
 }
 
 void main() {
-    if (waterlineClip > 0.5  && fs_in.FragPos.y <  waterlineY) discard;
-    if (waterlineClip < -0.5 && fs_in.FragPos.y >= waterlineY) discard;
+    float surfaceY_clip = waveHeightAt(fs_in.FragPos.xz) - waterlineBias;
+    if (waterlineClip > 0.5  && fs_in.FragPos.y <  surfaceY_clip) discard;
+    if (waterlineClip < -0.5 && fs_in.FragPos.y >= surfaceY_clip) discard;
 
     // Base color
     vec3 albedo = texture(colorMap, fs_in.TexCoord).rgb;
@@ -133,8 +133,9 @@ void main() {
     vec3 diffuse = 0.6 * diff * albedo;
    
     // Waterline effect
-    float bandCenter    = waterlineY - waterlineBias;
-    float belowWater    = smoothstep(waterlineY + 0.2, waterlineY - 0.5, fs_in.FragPos.y);
+    float surfaceY      = waveHeightAt(fs_in.FragPos.xz);
+    float bandCenter    = surfaceY - waterlineBias;
+    float belowWater    = smoothstep(surfaceY + 0.2, surfaceY - 0.5, fs_in.FragPos.y);
     float waterlineBand = 1.0 - smoothstep(0.0, waterlineWidth, abs(fs_in.FragPos.y - bandCenter));
 
     // Break up the solid ring with noise

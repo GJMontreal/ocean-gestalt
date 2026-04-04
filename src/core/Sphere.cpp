@@ -169,7 +169,6 @@ void Sphere::drawMesh(Uniforms& uniforms, Transform transform) {
   shader->setUniform("lightPos",this->getContext()->light->getPosition());
   shader->setUniform("time", uniforms.time);
   shader->setUniform("isReflectionPass", uniforms.isReflectionPass);
-  shader->setUniform("waterlineY", getPosition().y + transform.displacement.y);
 
   const auto& waves = this->getContext()->waves;
   for (int i = 0; i < (int)waves.size(); i++) {

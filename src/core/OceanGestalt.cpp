@@ -108,7 +108,7 @@ void OceanGestalt::buildScene() {
   auto buoy = std::make_shared<Prop>(buoyMesh, glm::vec3(5.0f,0.f,5.0f), configuration);
   sceneElements.emplace_back(SceneElement{"buoy", buoyMesh, buoy});
 
-  auto mooringMesh = std::make_shared<GltfModel>(MODEL_DIR "mooring.glb", glm::vec3(0,0,0), configuration);
+  auto mooringMesh = std::make_shared<GltfModel>(MODEL_DIR "cube.glb", glm::vec3(0,0,0), configuration);
   mooringMesh->setIfShouldDrawMesh(true);
   mooringMesh->setMeshShader(configuration->getShader("mooring_mesh"));
 #ifndef __EMSCRIPTEN__

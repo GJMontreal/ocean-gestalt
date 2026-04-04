@@ -14,10 +14,8 @@ struct GltfVertex {
 };
 
 struct GltfPrimitive {
-  GLuint VAO = 0;
-  GLuint VBO = 0;
-  GLuint EBO = 0;
-  int indexCount = 0;
+  GLuint VAO = 0, VBO = 0, EBO = 0, lineEBO = 0;
+  int indexCount = 0, lineIndexCount = 0;
   int materialIndex = -1;
 };
 
@@ -47,6 +45,8 @@ private:
   GLuint fallbackTexture(unsigned char r, unsigned char g, unsigned char b);
 
   glm::mat4 getModelTransform(Transform transform);
+
+  std::vector<GLuint> generateWireframe(std::vector<GLuint>& triangles);
 
   std::vector<GltfPrimitive> primitives;
   std::vector<GltfMaterial>  materials;
