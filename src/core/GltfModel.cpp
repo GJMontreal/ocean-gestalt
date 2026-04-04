@@ -326,16 +326,26 @@ void GltfModel::load(const std::string& glbPath) {
             << "  materials: "  << materials.size() << "\n";
   for (cgltf_size mi = 0; mi < data->materials_count; ++mi) {
     const cgltf_material& mat = data->materials[mi];
-    bool hasColor  = mat.has_pbr_metallic_roughness
-                     && mat.pbr_metallic_roughness.base_color_texture.texture;
-    bool hasNormal = mat.normal_texture.texture != nullptr;
-    bool hasMR     = mat.has_pbr_metallic_roughness
-                     && mat.pbr_metallic_roughness.metallic_roughness_texture.texture;
+    auto colorLabel = [&]() -> const char* {
+      if (!mat.has_pbr_metallic_roughness) return "fallback";
+      if (mat.pbr_metallic_roughness.base_color_texture.texture) return "embedded";
+      const float* c = mat.pbr_metallic_roughness.base_color_factor;
+      return (c[0] < 0.99f || c[1] < 0.99f || c[2] < 0.99f) ? "factor" : "fallback";
+    };
+    auto mrLabel = [&]() -> const char* {
+      if (!mat.has_pbr_metallic_roughness) return "fallback";
+      if (mat.pbr_metallic_roughness.metallic_roughness_texture.texture) return "embedded";
+      const auto& pbr = mat.pbr_metallic_roughness;
+      return (pbr.roughness_factor < 0.99f || pbr.metallic_factor > 0.01f) ? "factor" : "fallback";
+    };
+    auto normalLabel = [&]() -> const char* {
+      return mat.normal_texture.texture ? "embedded" : "fallback";
+    };
     std::cout << "  mat[" << mi << "] "
               << (mat.name ? mat.name : "(unnamed)") << ":"
-              << " color="            << (hasColor  ? "embedded" : "fallback")
-              << " normal="           << (hasNormal ? "embedded" : "fallback")
-              << " metallic-roughness=" << (hasMR   ? "embedded" : "fallback")
+              << " color="              << colorLabel()
+              << " normal="             << normalLabel()
+              << " metallic-roughness=" << mrLabel()
               << "\n";
   }
   if (primitives.empty())
