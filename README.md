@@ -101,5 +101,8 @@ https://learnopengl.com/About
 
 http://get.webgl.org  
 
+the rubber duck model is from 
+https://www.patreon.com/cw/ryankingart?vanity=ryankingart
+
 =====================  
 A note for android users; I'm not certain this will work on your device. If there's someone who could give me a hand debugging that I'd really appreciate the help. I've seen it work on some handsets and not others     
