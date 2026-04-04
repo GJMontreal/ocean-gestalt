@@ -94,6 +94,12 @@ if (EMSCRIPTEN)
     configure_file(${file} ${CMAKE_CURRENT_BINARY_DIR}/data/config/${fname} COPYONLY)
   endforeach(file)
 
+  file(GLOB MODEL_FILES "data/models/*.glb")
+  foreach(file ${MODEL_FILES})
+    get_filename_component(fname "${file}" NAME)
+    configure_file(${file} ${CMAKE_CURRENT_BINARY_DIR}/data/models/${fname} COPYONLY)
+  endforeach(file)
+
   foreach(file
     "github-mark-white.png"
     "favicon.ico"
