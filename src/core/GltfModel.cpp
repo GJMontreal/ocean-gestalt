@@ -447,6 +447,11 @@ void GltfModel::drawMesh(Uniforms& uniforms, Transform transform) {
     shader->setUniform("waterlineClip", 0.0f);
   }
 
+  // Per-model uniform overrides applied after each primitive so they
+  // take precedence over global values set by the uniform system.
+  for (const auto& [name, value] : uniformOverrides)
+    shader->setUniform(name, value);
+
 #ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);
 #endif

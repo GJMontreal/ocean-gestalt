@@ -13,7 +13,7 @@ void to_json(json& j, const Configuration& configuration) {
 
   json models = json::array();
   for (const auto& m : configuration.sceneModels) {
-    models.push_back({
+    json entry = {
       {"name",               m.name},
       {"file",               m.file},
       {"shader",             m.shader},
@@ -26,7 +26,13 @@ void to_json(json& j, const Configuration& configuration) {
       {"spinTorqueScale",    m.spinTorqueScale},
       {"angularDamping",     m.angularDamping},
       {"torsionalStiffness", m.torsionalStiffness}
-    });
+    };
+    if (m.waterlineBias)     entry["waterlineBias"]     = *m.waterlineBias;
+    if (m.waterlineWidth)    entry["waterlineWidth"]    = *m.waterlineWidth;
+    if (m.waterlineStrength) entry["waterlineStrength"] = *m.waterlineStrength;
+    if (m.waterlineNoise)    entry["waterlineNoise"]    = *m.waterlineNoise;
+    if (m.wetStrength)       entry["wetStrength"]       = *m.wetStrength;
+    models.push_back(entry);
   }
   j["models"] = models;
 }

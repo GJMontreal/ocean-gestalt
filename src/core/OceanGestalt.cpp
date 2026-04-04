@@ -115,6 +115,11 @@ void OceanGestalt::buildScene() {
     prop->getMoveable().setIsTethered(cfg.tethered);
     prop->setRightingWeight(cfg.rightingWeight);
     prop->setSpinParameters(cfg.spinTorqueScale, cfg.angularDamping, cfg.torsionalStiffness);
+    if (cfg.waterlineBias)     mesh->setUniformOverride("waterlineBias",     *cfg.waterlineBias);
+    if (cfg.waterlineWidth)    mesh->setUniformOverride("waterlineWidth",    *cfg.waterlineWidth);
+    if (cfg.waterlineStrength) mesh->setUniformOverride("waterlineStrength", *cfg.waterlineStrength);
+    if (cfg.waterlineNoise)    mesh->setUniformOverride("waterlineNoise",    *cfg.waterlineNoise);
+    if (cfg.wetStrength)       mesh->setUniformOverride("wetStrength",       *cfg.wetStrength);
     sceneElements.emplace_back(SceneElement{cfg.name, mesh, prop});
   }
 

@@ -8,6 +8,7 @@
 #include <GL/glew.h>
 #include <memory.h>
 #include <nlohmann/json.hpp>
+#include <optional>
 #include <string>
 
 using nlohmann::json;
@@ -40,6 +41,13 @@ struct SceneModelConfig {
   float       spinTorqueScale    = 2.0f;
   float       angularDamping     = 1.5f;
   float       torsionalStiffness = 0.5f;
+
+  // Per-model waterline overrides — absent means use the global shader uniform
+  std::optional<float> waterlineBias;
+  std::optional<float> waterlineWidth;
+  std::optional<float> waterlineStrength;
+  std::optional<float> waterlineNoise;
+  std::optional<float> wetStrength;
 };
 
 class Configuration: public AppContextInterface, public std::enable_shared_from_this<Configuration> {

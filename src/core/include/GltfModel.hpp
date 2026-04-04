@@ -2,6 +2,7 @@
 
 #include "Model.hpp"
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 // Vertex layout for GLTF primitives — separate from the existing Vertex struct
@@ -33,6 +34,7 @@ public:
   void setOrigin(glm::vec3 origin) { Drawable::setOrigin(origin); }
   void setMeshShader(std::shared_ptr<ShaderProgram> shader) { meshShader = shader; }
   void setNormalShader(std::shared_ptr<ShaderProgram> shader) { normalShader = shader; }
+  void setUniformOverride(const std::string& name, float value) { uniformOverrides[name] = value; }
 
 protected:
   void drawMesh(Uniforms& uniforms, Transform transform) override;
@@ -53,4 +55,5 @@ private:
 
   std::shared_ptr<ShaderProgram> meshShader;
   std::shared_ptr<ShaderProgram> normalShader;
+  std::unordered_map<std::string, float> uniformOverrides;
 };

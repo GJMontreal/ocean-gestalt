@@ -206,6 +206,11 @@ void Configuration::loadScene(const string& fileName) {
     cfg.spinTorqueScale    = m.value("spinTorqueScale",    2.0f);
     cfg.angularDamping     = m.value("angularDamping",     1.5f);
     cfg.torsionalStiffness = m.value("torsionalStiffness", 0.5f);
+    if (m.contains("waterlineBias"))     cfg.waterlineBias     = m.at("waterlineBias").get<float>();
+    if (m.contains("waterlineWidth"))    cfg.waterlineWidth    = m.at("waterlineWidth").get<float>();
+    if (m.contains("waterlineStrength")) cfg.waterlineStrength = m.at("waterlineStrength").get<float>();
+    if (m.contains("waterlineNoise"))    cfg.waterlineNoise    = m.at("waterlineNoise").get<float>();
+    if (m.contains("wetStrength"))       cfg.wetStrength       = m.at("wetStrength").get<float>();
     sceneModels.push_back(cfg);
   }
 }
