@@ -14,21 +14,31 @@ Model::Model(std::shared_ptr<Configuration> configuration)
   calculateNormalMatrix(getTransform(), normalMatrix);
 }
 
+Model::Model(std::shared_ptr<Configuration> configuration, std::vector<Mesh> meshes)
+    : meshes(std::move(meshes)), Drawable(glm::vec3(0.0f,0.0f,0.0f),configuration) {
+  this->configuration = configuration;
+  calculateNormalMatrix(getTransform(), normalMatrix);
+}
+
 // specify different shaders for mesh, wireframe, and normals
 void Model::draw(Uniforms& uniforms) {
+  Transform transform;
+  if (preDraw) {
+    transform = preDraw(*this, uniforms.time);
+  }
   {
     if (getIfShouldDrawWireframe()) {
-      drawWireframe(uniforms);
+      drawWireframe(uniforms, transform);
     }
 
 #ifndef __EMSCRIPTEN__
     if (getIfShouldDrawNormals()) {
-      drawNormals(uniforms, Transform());
+      drawNormals(uniforms, transform);
     }
 #endif
 
     if (getIfShouldDrawMesh()) {
-      drawMesh(uniforms, Transform());
+      drawMesh(uniforms, transform);
     }
   }
 }
@@ -43,7 +53,7 @@ void Model::drawNormals(Uniforms& uniforms, Transform _) {
   }
 }
 
-void Model::drawWireframe(Uniforms& uniforms) {
+void Model::drawWireframe(Uniforms& uniforms, Transform /*transform*/) {
   for (Mesh mesh : meshes) {
     auto shader = configuration->getShader("wireframe_shader");
     auto _guard = ShaderScope(shader);

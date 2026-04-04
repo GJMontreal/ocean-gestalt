@@ -1,0 +1,78 @@
+{
+    "camera": {
+        "pitch": -1.830389142036438,
+        "position": {
+            "x": 20.247739791870117,
+            "y": 4.08154296875,
+            "z": -0.9442388415336609
+        },
+        "up": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+        },
+        "yaw": -189.5284881591797,
+        "zoom": 35.100013732910156
+    },
+    "light": {
+        "x": 6.7324934005737305,
+        "y": 12.003326416015625,
+        "z": 3.397582530975342
+    },
+    "mesh": {
+        "size": 60,
+        "subdivisions": 2
+    },
+    "models": [
+        {
+            "angularDamping": 0.05000000074505806,
+            "file": "duck.glb",
+            "floating": true,
+            "name": "duck",
+            "position": {
+                "x": 6.230735778808594,
+                "y": 0.34759521484375,
+                "z": 4.183797359466553
+            },
+            "rightingWeight": 0.5,
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": 2.0,
+            "shader": "model_gltf_pbr",
+            "spinTorqueScale": 2.0,
+            "tethered": true,
+            "torsionalStiffness": 2.5
+        },
+        {
+            "angularDamping": 1.5,
+            "file": "mooring.glb",
+            "floating": true,
+            "name": "mooring",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rightingWeight": 0.5,
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": 1.0,
+            "shader": "model_gltf_pbr",
+            "spinTorqueScale": 2.0,
+            "tethered": true,
+            "torsionalStiffness": 1.5
+        }
+    ],
+    "reflection": {
+        "size": 512
+    },
+    "shadow": {
+        "size": 2048
+    }
+}

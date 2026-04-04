@@ -1,3 +1,5 @@
+precision mediump float;
+
 in vec3 TexDir;
 out vec4 FragColor;
 

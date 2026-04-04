@@ -6,8 +6,10 @@
 
 #include <iostream>
 
-Skybox::Skybox(std::shared_ptr<Configuration> context):Drawable(glm::vec3(0.f,0.f,0.f),context){
+Skybox::Skybox(std::shared_ptr<Configuration> context)
+    : Drawable(glm::vec3(0.f, 0.f, 0.f), context) {
   bindVertices();
+  setIfShouldDrawMesh(true);
 }
 
 void Skybox::bindVertices() {
@@ -57,17 +59,21 @@ void Skybox::draw(Uniforms& uniforms){
   }
 }
 
+
 void Skybox::drawMesh(Uniforms& uniforms, Transform transform) {
   auto shader = getContext()->getShader("skybox");
   auto _guard = ShaderScope(shader);
-
-  glFrontFace(GL_CW);
+#ifdef __EMSCRIPTEN__
+  shader->setUniform("projection", uniforms.projection);
+  shader->setUniform("view",       uniforms.view);
+#endif
+  glDisable(GL_CULL_FACE);
   glDepthMask(GL_FALSE); 
   // glDepthFunc(GL_LEQUAL);
   glBindVertexArray(vao);
   glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
   // glDepthFunc(GL_LESS);
-  glFrontFace(GL_CCW);
+  glEnable(GL_CULL_FACE);
   glDepthMask(GL_TRUE);
 #ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);

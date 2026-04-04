@@ -20,6 +20,7 @@
 #include "Moveable.hpp"
 #include "KeyExecutable.hpp"
 #include "SurfAudio.hpp"
+#include "Skybox.hpp"
 
 #include "FPSCounter.hpp"
 #include "ReflectionPass.hpp"
@@ -69,7 +70,7 @@ class OceanGestalt final : public OceanGestaltInterface,
   void onRender(const std::function<void(float)>& callback) final;
   void pauseSimulation(bool) override;
   void muteAudio(bool);
-  bool getIsRunning() const { return isRunning;};
+  bool getIsSimulating() const { return isRunning; };
   
  protected:
   void loop() override;
@@ -94,6 +95,8 @@ class OceanGestalt final : public OceanGestaltInterface,
   std::vector<SceneElement> sceneElements;
   std::vector<SceneElement>::iterator currentElement;
 
+  std::shared_ptr<Skybox> skybox;
+
   double elapsedTime=0;
   double lastTime = 0.0;
   bool isRunning = true;
@@ -105,13 +108,14 @@ class OceanGestalt final : public OceanGestaltInterface,
 
   KeyBindings keyBindings;
 
+  void saveScene();
   void toggleNormalDisplay();
   void toggleWireframe();
   void toggleMesh();
   void toggleDrawTriangles();
   void toggleDrawLines();
   void dumpUniforms();
-  void toggleFloatingCamera();
+  void toggleFloating();
   void selectNextElement();
   void toggleFullscreen(GLFWwindow*);
   void toggleDisplayText();

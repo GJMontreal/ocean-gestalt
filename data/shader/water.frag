@@ -60,6 +60,8 @@ uniform int debugLightPos;
 uniform int debugFragPos;
 uniform int debugDiffuse;
 uniform int showEnv;
+uniform int showReflection;
+
 
 vec3 visualizeLightContribution(vec3 lightPos, vec3 fragPos) {
     float intensity = 1.0 / distance(lightPos, fragPos);
@@ -170,7 +172,6 @@ void main() {
 
     vec3 reflection = fresnel * combinedReflection;
 
-    vec3 diffuse  = (1.0 - fresnel) * diff * shadow * fs_in.Color;
 
     // Depth-based colour modulation
     float depth = length(viewPos - fs_in.FragPos);
@@ -178,8 +179,14 @@ void main() {
     vec3 deepColor = fs_in.Color * deepWaterTint;
     vec3 shiftedColor = mix(fs_in.Color, deepColor, depthFade);
 
+   // Gamma correction
+    shiftedColor = pow(shiftedColor, vec3(gamma));
+    
+    vec3 diffuse  = (1.0 - fresnel) * diff * shadow * shiftedColor;
+
     // Caustic flicker in troughs
     float causticStrength = smoothstep(causticTroughMin, causticTroughMax, -fs_in.FragPos.y);
+
 
     vec2 flickerUV = fs_in.FragPos.xz * causticScale;
     flickerUV += time * causticSpeed;
@@ -193,8 +200,7 @@ void main() {
 
     vec3 causticLight = causticColor * causticFlicker * causticStrength * causticIntensity;
 
-    // Gamma correction
-    shiftedColor = pow(shiftedColor, vec3(gamma));
+
 
     vec3 finalColor =
     reflection  +
@@ -220,6 +226,6 @@ void main() {
     vec3 fragViz = normalize(fs_in.FragPos);
     finalColor = mix(finalColor, fragViz, float(debugFragPos));
     finalColor = mix(finalColor, reflection, float(showEnv));
-
+    finalColor = mix(finalColor, planarRefl, float(showReflection));
     FragColor = vec4(finalColor, 1.0);
 }

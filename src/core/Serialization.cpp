@@ -5,10 +5,36 @@
 // Configuration
 void to_json(json& j, const Configuration& configuration) {
   j = {{"camera", *(configuration.camera.get())},
-       {"light", configuration.light->getPosition()}};
+       {"light",  configuration.light->getPosition()}};
+  j["mesh"]       = {{"size", configuration.meshSize},
+                     {"subdivisions", configuration.meshSubdivisions}};
+  j["reflection"] = {{"size", configuration.reflectionSize}};
+  j["shadow"]     = {{"size", configuration.shadowSize}};
 
-  j["mesh"] = {{"size", configuration.meshSize},
-               {"subdivisions", configuration.meshSubdivisions}};
+  json models = json::array();
+  for (const auto& m : configuration.sceneModels) {
+    json entry = {
+      {"name",               m.name},
+      {"file",               m.file},
+      {"shader",             m.shader},
+      {"position",           m.position},
+      {"rotation",           m.rotation},
+      {"scale",              m.scale.x},
+      {"floating",           m.floating},
+      {"tethered",           m.tethered},
+      {"rightingWeight",     m.rightingWeight},
+      {"spinTorqueScale",    m.spinTorqueScale},
+      {"angularDamping",     m.angularDamping},
+      {"torsionalStiffness", m.torsionalStiffness}
+    };
+    if (m.waterlineBias)     entry["waterlineBias"]     = *m.waterlineBias;
+    if (m.waterlineWidth)    entry["waterlineWidth"]    = *m.waterlineWidth;
+    if (m.waterlineStrength) entry["waterlineStrength"] = *m.waterlineStrength;
+    if (m.waterlineNoise)    entry["waterlineNoise"]    = *m.waterlineNoise;
+    if (m.wetStrength)       entry["wetStrength"]       = *m.wetStrength;
+    models.push_back(entry);
+  }
+  j["models"] = models;
 }
 
 void to_json(json& j, shared_ptr<Wave> p) {

@@ -34,7 +34,7 @@ void loop_iteration() {
   registered_loop();
 }
 
-Application* currentApplication = NULL;
+Application* currentApplication = nullptr;
 
 Application& Application::getInstance() {
   if (currentApplication)

@@ -10,11 +10,29 @@
 #include "Utilities.hpp"
 #include "Wave.hpp"
 
+#include <set>
+#include <utility>
+
 Sphere::Sphere(glm::vec3 origin, glm::vec4 color, std::shared_ptr<Configuration> context, float radius):
 Drawable(origin, context), color(color) {
   generateSphereMesh(vertices, indices, 1.0);
+  generateEdgeIndices();
   this->setScale(glm::vec3(radius));
   bindVertices();
+}
+
+void Sphere::generateEdgeIndices() {
+  std::set<std::pair<unsigned int, unsigned int>> edgeSet;
+  for (size_t i = 0; i + 2 < indices.size(); i += 3) {
+    unsigned int i0 = indices[i], i1 = indices[i+1], i2 = indices[i+2];
+    edgeSet.insert({std::min(i0,i1), std::max(i0,i1)});
+    edgeSet.insert({std::min(i1,i2), std::max(i1,i2)});
+    edgeSet.insert({std::min(i0,i2), std::max(i0,i2)});
+  }
+  for (auto& e : edgeSet) {
+    edgeIndices.push_back(e.first);
+    edgeIndices.push_back(e.second);
+  }
 }
 
 //Chat GPT generated!
@@ -98,6 +116,29 @@ glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                       (void*)offsetof(Vertex, tangent));
 
 glBindVertexArray(0);
+
+// Edge VAO — same VBO, separate EBO for GL_LINES wireframe pass
+glGenVertexArrays(1, &edgeVAO);
+glBindVertexArray(edgeVAO);
+
+glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+glGenBuffers(1, &edgeEBO);
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, edgeEBO);
+glBufferData(GL_ELEMENT_ARRAY_BUFFER, edgeIndices.size() * sizeof(unsigned int),
+             edgeIndices.data(), GL_STATIC_DRAW);
+
+glEnableVertexAttribArray(0);
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                      (void*)offsetof(Vertex, position));
+glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                      (void*)offsetof(Vertex, texCoord));
+glEnableVertexAttribArray(1);
+glEnableVertexAttribArray(2);
+glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                      (void*)offsetof(Vertex, tangent));
+
+glBindVertexArray(0);
 glCheckError(__FILE__, __LINE__);
 }
 
@@ -143,12 +184,29 @@ void Sphere::drawMesh(Uniforms& uniforms, Transform transform) {
     shader->setUniform("view", uniforms.view);
 #endif
 
-  glBindVertexArray(VAO);
-  glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-  glBindVertexArray(0);
+  if (waterlineWireframe) {
+    // Pass 1: solid fill, discard fragments below the waterline
+    shader->setUniform("waterlineClip", 1.0f);
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+
+    // Pass 2: wireframe edges, discard fragments above the waterline
+    shader->setUniform("waterlineClip", -1.0f);
+    glBindVertexArray(edgeVAO);
+    glDrawElements(GL_LINES, edgeIndices.size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+
+    shader->setUniform("waterlineClip", 0.0f);
+  } else {
+    shader->setUniform("waterlineClip", 0.0f);
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+  }
 #ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);
-#endif  
+#endif
 }
 
 void Sphere::drawNormals(Uniforms& uniforms, Transform transform) {

@@ -9,10 +9,12 @@
 class Mesh {
  public:
   Mesh(int size, int subdivisions, glm::vec4 aColor = glm::vec4({.01f, .15f, .210f, 0.0f})); // this colour should come from the configuration
+  Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
   ~Mesh() = default;
 
   // So that we can specify different shaders for each
-  void draw()const;  
+  void draw()const;
+  void drawAsLines()const;
   void drawWireframe()const;
   void drawNormals()const;
 
@@ -27,8 +29,10 @@ class Mesh {
   std::vector<GLuint> getTriangularIndices()const;
 
  private:
-  int size;  // x and y are symmetrical
-  int subdivisions; 
+  int size = 0;
+  int subdivisions = 0;
+  int indexCount = 0;
+  int wireframeIndexCount = 0;
   glm::vec4 color;
 
   // Our vertices are shared between the triangular mesh and line strips

@@ -10,7 +10,9 @@ uniform float hullDisplacementAmt;
 
 out vec3 FragPos;
 out vec2 TexCoord;
-out mat3 TBN;
+out vec3 vTangent;
+out vec3 vBitangent;
+out vec3 vNormal;
 
 // 3D value noise for hull displacement
 float hash3(vec3 p) {
@@ -58,7 +60,9 @@ void main() {
     vec3 T = normalize(mat3(model) * normalize(aTangent));
     vec3 B = cross(N, T);
 
-    TBN     = mat3(T, B, N);
+    vTangent   = T;
+    vBitangent = B;
+    vNormal    = N;
     FragPos = vec3(model * vec4(displacedPos, 1.0));
     TexCoord = aTexCoord;
 

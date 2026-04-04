@@ -46,20 +46,19 @@
             "b": 1,
             "a": 1
         }
-    },"drawable_normal": {
+    },
+    "gltf_wireframe": {
+        "vertex": "drawable.vert",
+        "fragment": "simple.frag"
+    },
+    "drawable_normal": {
         "vertex": "drawable.vert",
         "fragment": "simple.frag",
         "geometry": "drawable_normal.gs"
     },
-    "buoy_mesh": {
-        "vertex": "normal_bump.vert",
+    "model_gltf_pbr": {
+        "vertex": "model_gltf_pbr.vert",
         "fragment": "normal_bump.frag",
-        "texture": {
-            "normalMap": "metal_normal.png",
-            "bumpMap": "metal_bump.png",
-            "colorMap": "metal_color.png",
-            "roughnessMap": "metal_bump.png"
-        },
         "cubemap": {
             "envMap": "skybox"
         }
@@ -67,5 +66,12 @@
     "text": {
         "vertex": "text.vert",
         "fragment": "text.frag"
+    },
+    "skybox": {
+      "vertex":"skybox.vert",
+      "fragment":"skybox.frag",
+    "cubemap": {
+            "envMap": "skybox"
     }
+  }
 }

@@ -8,6 +8,7 @@
 #include "Utilities.hpp"
 #include "TextRenderer.hpp"
 #include "UniformAnimator.hpp"
+#include "PatternMatch.hpp"
 #include <memory>
 #include <fstream>
 #include <iostream>
@@ -39,6 +40,7 @@ Configuration::Configuration(const string& environment,
   loadCamera(environment);
   loadLight(environment);
   loadMesh(environment);
+  loadScene(environment);
   loadShaders(shader);
   loadAPISettings(api);
 
@@ -186,6 +188,33 @@ void Configuration::loadMesh(const string& fileName) {
   }
 }
 
+void Configuration::loadScene(const string& fileName) {
+  json data;
+  loadJSON(fileName, data);
+  if (!data.contains("models")) return;
+  for (auto& m : data.at("models")) {
+    SceneModelConfig cfg;
+    cfg.name   = m.at("name");
+    cfg.file   = m.at("file");
+    cfg.shader = m.value("shader", std::string{});
+    if (m.contains("position")) cfg.position = m.at("position").get<glm::vec3>();
+    if (m.contains("rotation")) cfg.rotation = m.at("rotation").get<glm::vec3>();
+    if (m.contains("scale"))    cfg.scale    = glm::vec3(m.at("scale").get<float>());
+    cfg.floating       = m.value("floating", true);
+    cfg.tethered       = m.value("tethered", false);
+    cfg.rightingWeight     = m.value("rightingWeight",     0.5f);
+    cfg.spinTorqueScale    = m.value("spinTorqueScale",    2.0f);
+    cfg.angularDamping     = m.value("angularDamping",     1.5f);
+    cfg.torsionalStiffness = m.value("torsionalStiffness", 0.5f);
+    if (m.contains("waterlineBias"))     cfg.waterlineBias     = m.at("waterlineBias").get<float>();
+    if (m.contains("waterlineWidth"))    cfg.waterlineWidth    = m.at("waterlineWidth").get<float>();
+    if (m.contains("waterlineStrength")) cfg.waterlineStrength = m.at("waterlineStrength").get<float>();
+    if (m.contains("waterlineNoise"))    cfg.waterlineNoise    = m.at("waterlineNoise").get<float>();
+    if (m.contains("wetStrength"))       cfg.wetStrength       = m.at("wetStrength").get<float>();
+    sceneModels.push_back(cfg);
+  }
+}
+
 void Configuration::loadGenerator(const string& fileName) {
   json data;
   loadJSON(fileName, data);
@@ -223,25 +252,56 @@ void Configuration::loadUniforms(const string& fileName) {
     json j;
     loadJSON(fileName, j);
     auto anim = animator.lock();
+
+    std::optional<float> globalDuration;
+    if (j.contains("duration") && j["duration"].is_number()) {
+      globalDuration = j["duration"].get<float>();
+    }
+
+    std::vector<std::string> animatePatterns;
+    if (j.contains("animate") && j["animate"].is_array()) {
+      animatePatterns = j["animate"].get<std::vector<std::string>>();
+    }
+
     for (auto it = j.begin(); it != j.end(); ++it) {
+      if (it.key() == "duration" || it.key() == "animate") continue;
+
       const std::string key = "uniforms." + it.key();
       const json& value = it.value();
 
-      if (anim && value.is_object() && value.contains("value") && value.contains("duration")) {
-        ApiValue target = value["value"].get<ApiValue>();
-        float duration  = value["duration"].get<float>();
-        ApiValue from   = 0.0f;
-        if (auto current = locked->getValue(key)) {
-          from = *current;
+      std::optional<float> duration;
+      ApiValue target;
+
+      if (value.is_object() && value.contains("value") && value.contains("duration")) {
+        target   = value["value"].get<ApiValue>();
+        duration = value["duration"].get<float>();
+      } else {
+        target = value.get<ApiValue>();
+        if (!animatePatterns.empty() && matchesAnyPattern(animatePatterns, it.key())) {
+          duration = globalDuration;
         }
+      }
+
+      bool isAnimatable = std::holds_alternative<float>(target) ||
+                          std::holds_alternative<std::vector<float>>(target);
+
+      if (anim && duration && isAnimatable) {
+        // Default from-value must match the type of target so lerpValue doesn't throw.
+        ApiValue zero = std::visit([](auto&& v) -> ApiValue {
+          using T = std::decay_t<decltype(v)>;
+          if constexpr (std::is_same_v<T, std::vector<float>>)
+            return std::vector<float>(v.size(), 0.0f);
+          else
+            return T{};
+        }, target);
+        ApiValue from = locked->getValue(key).value_or(zero);
         std::shared_ptr<ApiAdapter> apiPtr = locked;
-        anim->animateTo(from, target, duration,
+        anim->animateTo(from, target, *duration,
                         [apiPtr, key](const ApiValue& v) {
                           apiPtr->setValue(key, v, false);
                         }, key);
       } else {
-        ApiValue apiVal = value.get<ApiValue>();
-        locked->setValue(key, apiVal);
+        locked->setValue(key, target);
       }
     }
   }

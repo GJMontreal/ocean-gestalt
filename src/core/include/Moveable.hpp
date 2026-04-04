@@ -45,6 +45,7 @@ public:
     const Moveable& getMoveable() const override { return static_cast<const Derived&>(*this).moveable; }
     void activate() override { static_cast<Derived&>(*this).activate();};  //implement your own if you'd like 
     void deactivate() override { static_cast<Derived&>(*this).deactivate();};  //implement your own if you'd like
+
 };
 
 class Moveable {
@@ -61,4 +62,14 @@ class Moveable {
     std::function<void(glm::vec3 position)> onPositionChanged;  
     
     std::function<MoveDirection&()> getMoveDirection;
+
+    void setIsFloating(bool floating) { isFloating = floating; };
+    bool getIsFloating() const { return isFloating; };
+    void setIsTethered(bool t) { isTethered = t; }
+    bool getIsTethered() const { return isTethered; }
+
+  private:
+    // simulation
+    bool isFloating = true;
+    bool isTethered = false;
 };

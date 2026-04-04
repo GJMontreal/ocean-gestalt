@@ -66,7 +66,7 @@ void UniformAnimator::tick(float time) {
 }
 
 float UniformAnimator::easeInOut(float t) {
-    return t * t * (3.f - 2.f * t);  // smoothstep
+    return t;
 }
 
 ApiValue UniformAnimator::lerpValue(const ApiValue& a, const ApiValue& b, float t) {

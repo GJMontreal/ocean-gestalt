@@ -1,6 +1,8 @@
 in vec3 FragPos;
 in vec2 TexCoord;
-in mat3 TBN;
+in vec3 vTangent;
+in vec3 vBitangent;
+in vec3 vNormal;
 
 out vec4 FragColor;
 
@@ -22,6 +24,9 @@ uniform float waterlineWidth;
 uniform float waterlineStrength;
 uniform float waterlineNoise;
 uniform float wetStrength;
+uniform float waterlineClip;
+uniform vec3 wireframeColor;
+
 uniform int isReflectionPass;
 
 struct WAVE {
@@ -93,6 +98,11 @@ float fbm(vec2 p) {
 }
 
 void main() {
+    float surfaceY_clip = waveHeightAt(FragPos.xz) - waterlineBias;
+    if (waterlineClip > 0.5  && FragPos.y <  surfaceY_clip) discard;
+    if (waterlineClip < -0.5 && FragPos.y >= surfaceY_clip) discard;
+
+
     if (isReflectionPass == 1 && FragPos.y < 0.0) discard;
 
     // Base color
@@ -101,6 +111,7 @@ void main() {
     // Normal map (Tangent space to World space)
     vec3 sampledNormal = texture(normalMap, TexCoord).rgb;
     sampledNormal = normalize(sampledNormal * 2.0 - 1.0);
+    mat3 TBN = mat3(vTangent, vBitangent, vNormal);
     vec3 normal = normalize(TBN * sampledNormal);
 
     // Bump map (height) — used to perturb the normal further
@@ -116,21 +127,26 @@ void main() {
 
     float diff = max(dot(finalNormal, lightDir), 0.0);
 
-    float roughness = texture(roughnessMap, TexCoord).r;
+    float roughness = texture(roughnessMap, TexCoord).g; // glTF: roughness in G channel
+
     float shininess = pow(1.0 - roughness, 2.0);
 
-    vec3 envLighting = texture(envMap, finalNormal).rgb;
-    vec3 ambient = 0.2 * albedo * envLighting;
+    vec3 ambient = 0.2 * albedo;
 
     vec3 specularSample = texture(envMap, reflectDir).rgb;
     vec3 specular = specularFactor * shininess * specularSample;
 
     vec3 diffuse = 0.6 * diff * albedo;
 
+    // Water bounce — sunlight reflected off the water surface illuminates downward-facing surfaces
+    float waterFacing = max(dot(finalNormal, vec3(0.0, -1.0, 0.0)), 0.0);
+    vec3 waterBounce = 0.25 * albedo * texture(envMap, vec3(0.0, -1.0, 0.0)).rgb * waterFacing;
+
     // Waterline effect
-    float surfaceY = waveHeightAt(FragPos.xz);
-    float bandCenter = surfaceY - waterlineBias;
-    float belowWater = smoothstep(surfaceY + 0.2, surfaceY - 0.5, FragPos.y);
+    float surfaceY      = waveHeightAt(FragPos.xz);
+    float bandCenter    = surfaceY - waterlineBias;
+    float belowWater    = smoothstep(surfaceY + 0.2, surfaceY - 0.5, FragPos.y);
+
     float waterlineBand = 1.0 - smoothstep(0.0, waterlineWidth, abs(FragPos.y - bandCenter));
 
     // Break up the solid ring with noise
@@ -140,10 +156,20 @@ void main() {
 
     // Wet hull darkening below waterline
     vec3 wetTint = vec3(0.05, 0.08, 0.1);
-    vec3 color = mix(ambient + diffuse + specular, wetTint, belowWater * wetStrength);
+    vec3 color = mix(ambient + diffuse + specular + waterBounce, wetTint, belowWater * wetStrength);
+
 
     // Foam rim at waterline
     color = mix(color, vec3(0.9, 0.95, 1.0), waterlineBand * waterlineStrength);
+
+    if (waterlineClip < -0.5) {
+        FragColor = vec4(wireframeColor, 1.0);
+        return;
+    }
+
+    // Gamma correction: linear → sRGB for display
+    color = pow(color, vec3(1.0 / 2.2));
+
 
     FragColor = vec4(color, 1.0);
 }

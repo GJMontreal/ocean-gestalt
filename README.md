@@ -1,5 +1,4 @@
-
-I wanted to revisit an idea I had some 15 years ago. Nothing new under the sun, but I did enjoy putting this together. I wanted to create something which while hinting at a physical analogue didn't take the approach of trying for verisimilitude.  
+I wanted to revisit an idea I had some 15 years ago. I did enjoy putting this together, hinting at a physical analogue without aiming for verisimilitude.  
 
 You can try out the results at:  
  https://geoffreyjones.ca/ocean-gestalt/
@@ -36,7 +35,31 @@ Requires [emsdk](https://emscripten.org/docs/getting_started/downloads.html). Ac
 source ~/emsdk/emsdk_env.sh
 ./web_build.sh
 ```
-Then open `http://localhost:8000`. The script builds and serves in one step.
+The script builds, deploys artifacts to the Hugo module, stages the changed files, and prints a suggested commit message. The module path defaults to `../web/ocean-gestalt-module` relative to this repo; override it with the `OCEAN_MODULE_DIR` environment variable if your layout differs. It then serves on `http://localhost:8000` for quick standalone testing.
+
+To test through Hugo (needed for template rendering):
+```
+cd ../web/geoffreyjones.ca
+hugo server
+```
+
+**Deploying a build**
+
+After `web_build.sh` completes:
+```
+cd ../web/ocean-gestalt-module
+git commit -m "Update WASM artifacts YYYY-MM-DD"
+git push
+```
+Then update the Hugo project to the new commit:
+```
+cd ../web/geoffreyjones.ca
+hugo mod get github.com/GJMontreal/ocean-gestalt-module@<commit>
+hugo mod tidy
+```
+
+The Hugo project uses a local `replace` directive in `go.mod` pointing at `../ocean-gestalt-module` for development. Remove or update this before publishing the Hugo site against a real tag/commit.
+
 
 =======================
 
@@ -77,6 +100,9 @@ https://github.com/pongasoft/emscripten-glfw
 https://learnopengl.com/About  
 
 http://get.webgl.org  
+
+the rubber duck model is from 
+https://www.patreon.com/cw/ryankingart?vanity=ryankingart
 
 =====================  
 A note for android users; I'm not certain this will work on your device. If there's someone who could give me a hand debugging that I'd really appreciate the help. I've seen it work on some handsets and not others     

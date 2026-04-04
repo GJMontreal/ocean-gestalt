@@ -5,7 +5,8 @@
 #include "Uniforms.hpp"
 #include "asset.hpp"
 #include "glError.hpp"
-#include "Buoy.hpp"
+#include "GltfModel.hpp"
+#include "Prop.hpp"
 #include "Skybox.hpp"
 #include "TextRenderer.hpp"
 #include "GerstnerWave.hpp"
@@ -37,7 +38,7 @@ constexpr double TEXT_VISIBLE_TIME = 200;
 // our application should keep a reference to the OceanApi
 OceanGestalt::OceanGestalt() : Application() {
   configuration = std::make_shared<Configuration>(
-      CONFIGURATION_DIR "environment.json", CONFIGURATION_DIR "shader.json",
+      CONFIGURATION_DIR "scene.json", CONFIGURATION_DIR "shader.json",
       CONFIGURATION_DIR "generator.json", CONFIGURATION_DIR "api.json");
   buildScene();
  
@@ -71,7 +72,7 @@ void OceanGestalt::buildScene() {
   this->camera = configuration->camera;
   this->camera->setConfiguration(configuration);
   this->camera->getMoveable().movementSpeed = 10.f;
-  this->camera->setIsFloating(true);
+  this->camera->getMoveable().setIsFloating(true);
 
   sceneElements.emplace_back(SceneElement{"camera",std::nullopt,this->camera});
   
@@ -96,14 +97,34 @@ void OceanGestalt::buildScene() {
   ocean->setIfShouldDrawWireframe(false);
   sceneElements.emplace_back(SceneElement{"waves",ocean,std::nullopt});
   
-  auto buoy = std::make_shared<Buoy>(glm::vec3(5.0f,0.f,5.0f), configuration);
-  auto buoyDrawable = buoy->getDrawable();
-  buoyDrawable->setShader(configuration->getShader("buoy_mesh"));
-  buoyDrawable->setIfShouldDrawMesh(true);
+  for (auto& cfg : configuration->sceneModels) {
+    auto mesh = std::make_shared<GltfModel>(
+        std::string(MODEL_DIR) + cfg.file, cfg.position, configuration);
+    mesh->setIfShouldDrawMesh(true);
+    mesh->setScale(cfg.scale);
+    mesh->setRotation(cfg.rotation);
+    if (!cfg.shader.empty()) {
+      if (auto shader = configuration->getShader(cfg.shader))
+        mesh->setMeshShader(shader);
+    }
 #ifndef __EMSCRIPTEN__
-  buoyDrawable->setNormalShader(drawableNormalShader);
+    mesh->setNormalShader(configuration->getShader("drawable_normal"));
 #endif
-  sceneElements.emplace_back(SceneElement{"buoy",buoyDrawable,buoy});
+    auto prop = std::make_shared<Prop>(mesh, cfg.position, configuration);
+    prop->getMoveable().setIsFloating(cfg.floating);
+    prop->getMoveable().setIsTethered(cfg.tethered);
+    prop->setRightingWeight(cfg.rightingWeight);
+    prop->setSpinParameters(cfg.spinTorqueScale, cfg.angularDamping, cfg.torsionalStiffness);
+    if (cfg.waterlineBias.has_value())     mesh->setUniformOverride("waterlineBias",     *cfg.waterlineBias);
+    if (cfg.waterlineWidth.has_value())    mesh->setUniformOverride("waterlineWidth",    *cfg.waterlineWidth);
+    if (cfg.waterlineStrength.has_value()) mesh->setUniformOverride("waterlineStrength", *cfg.waterlineStrength);
+    if (cfg.waterlineNoise.has_value())    mesh->setUniformOverride("waterlineNoise",    *cfg.waterlineNoise);
+    if (cfg.wetStrength.has_value())       mesh->setUniformOverride("wetStrength",       *cfg.wetStrength);
+    sceneElements.emplace_back(SceneElement{cfg.name, mesh, prop});
+  }
+
+  skybox = std::make_shared<Skybox>(configuration);
+
 
   reflectionPass = std::make_unique<ReflectionPass>(configuration->reflectionSize, configuration->reflectionSize);
   shadowPass = std::make_unique<ShadowPass>(configuration->shadowSize);
@@ -197,13 +218,21 @@ void OceanGestalt::loop() {
 #endif
     glFrontFace(GL_CW);
 
-    Uniforms reflUniforms{.projection = projection, .view = reflectedView, .time = uniformTime, .isReflectionPass = 1};
+    Uniforms reflUniforms{.projection = projection,
+                          .view = reflectedView,
+                          .time = uniformTime,
+                          .isReflectionPass = 1};
+    
+    skybox->draw(reflUniforms);
+
+
     for (auto& element : sceneElements) {
       if (element.name == "waves") continue;
       if (element.drawable) {
         (*element.drawable)->draw(reflUniforms);
       }
     }
+  
 
     glFrontFace(GL_CCW);
 #ifndef __EMSCRIPTEN__
@@ -256,8 +285,16 @@ void OceanGestalt::renderText() {
   configuration->textRenderer->drawText(
       fps.getFPSString(), {10.0f,  textYLocation, 0.0f}, textColor, textSize);
   configuration->textRenderer->drawText(currentElement->name,
-                                        {200.0f,  textYLocation, 0.0f},
+                                        {200.0f, textYLocation, 0.0f},
                                         textColor, textSize);
+  if (auto& mov = currentElement->moveable) {
+    auto pos = (*mov)->getMoveable().position;
+    auto posStr = "(" + std::to_string(static_cast<int>(pos.x))
+                + ", " + std::to_string(static_cast<int>(pos.y))
+                + ", " + std::to_string(static_cast<int>(pos.z)) + ")";
+    configuration->textRenderer->drawText(
+        posStr, {500.0f, textYLocation, 0.0f}, textColor, textSize);
+  }
   configuration->textRenderer->render();
 }
 
@@ -320,8 +357,25 @@ void OceanGestalt::toggleDrawLines() {
   }
 }
 
-void OceanGestalt::toggleFloatingCamera() {
-  camera->setIsFloating(!camera->getIsFloating());
+void OceanGestalt::saveScene() {
+  for (auto& element : sceneElements) {
+    if (!element.moveable) continue;
+    auto pos = (*element.moveable)->getMoveable().position;
+    for (auto& cfg : configuration->sceneModels) {
+      if (cfg.name == element.name) {
+        cfg.position = pos;
+        break;
+      }
+    }
+  }
+  configuration->save(CONFIGURATION_DIR "scene.json");
+}
+
+
+void OceanGestalt::toggleFloating() {
+  if( auto moveable = currentElement->moveable){
+    (*moveable)->getMoveable().setIsFloating(!(*moveable)->getMoveable().getIsFloating());
+  }
 }
 
 void OceanGestalt::toggleDisplayText() {
@@ -353,12 +407,8 @@ void OceanGestalt::loadUniforms() {
 }
 
 void OceanGestalt::generateUniforms() {
-#ifndef __EMSCRIPTEN__
-   auto api = this->configuration->getApi();
-    glm::vec2 dir{ randf(-1.0f,1.0f),randf(-1.0f,1.0f)};
-    Wind wind{dir,randf(0.1f,100.f)};
-    WaveGenerator(configuration->waves.size(), wind, api);
-#endif
+  auto api = this->configuration->getApi();
+  WaveGenerator(configuration, api);
 }
 
 void OceanGestalt::dumpUniforms() {
