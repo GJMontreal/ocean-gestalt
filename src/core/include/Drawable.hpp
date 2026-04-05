@@ -18,9 +18,9 @@ struct DrawableVertex {
 };
 
 struct Transform {
-  glm::vec3 displacement;
-  glm::quat rotation;
-  glm::vec3 scale;
+  glm::vec3 displacement = glm::vec3(0.0);
+  glm::quat rotation = glm::vec3(0.0);
+  glm::vec3 scale = glm::vec3(1.0);
 };
 
 class Drawable: public MoveableBase<Drawable>  {
