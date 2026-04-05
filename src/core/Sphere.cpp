@@ -144,6 +144,7 @@ glCheckError(__FILE__, __LINE__);
 
 void Sphere::draw(Uniforms& uniforms) {
   Transform transform;
+  
   if(preDraw){
     transform = preDraw(*this, uniforms.time);
   }
@@ -170,40 +171,15 @@ void Sphere::drawMesh(Uniforms& uniforms, Transform transform) {
   shader->setUniform("time", uniforms.time);
   shader->setUniform("isReflectionPass", uniforms.isReflectionPass);
 
-  const auto& waves = this->getContext()->waves;
-  for (int i = 0; i < (int)waves.size(); i++) {
-    shader->setUniform(string_format("waves[%d].amplitude",  i), waves[i]->amplitude);
-    shader->setUniform(string_format("waves[%d].wavelength", i), waves[i]->wavelength);
-    shader->setUniform(string_format("waves[%d].steepness",  i), waves[i]->steepness);
-    shader->setUniform(string_format("waves[%d].phase",      i), waves[i]->phase);
-    shader->setUniform(string_format("waves[%d].direction",  i), glm::vec3(waves[i]->direction, 0.0f));
-  }
-
 #ifdef __EMSCRIPTEN__
     shader->setUniform("projection", uniforms.projection);
     shader->setUniform("view", uniforms.view);
 #endif
 
-  if (waterlineWireframe) {
-    // Pass 1: solid fill, discard fragments below the waterline
-    shader->setUniform("waterlineClip", 1.0f);
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+  glBindVertexArray(VAO);
+  glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+  glBindVertexArray(0);
 
-    // Pass 2: wireframe edges, discard fragments above the waterline
-    shader->setUniform("waterlineClip", -1.0f);
-    glBindVertexArray(edgeVAO);
-    glDrawElements(GL_LINES, edgeIndices.size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
-
-    shader->setUniform("waterlineClip", 0.0f);
-  } else {
-    shader->setUniform("waterlineClip", 0.0f);
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
-  }
 #ifdef DEBUG_GL
   glCheckError(__FILE__, __LINE__);
 #endif

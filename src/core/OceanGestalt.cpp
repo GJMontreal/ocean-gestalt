@@ -77,7 +77,7 @@ void OceanGestalt::buildScene() {
   sceneElements.emplace_back(SceneElement{"camera",std::nullopt,this->camera});
   
   this->light = std::make_shared<Light>(configuration->lightPosition, configuration);
-  configuration->light = light;
+  configuration->light = this->light;
   auto lightDrawable = this->light->getDrawable();
 
   auto drawableMeshShader = configuration->getShader("drawable_mesh");
