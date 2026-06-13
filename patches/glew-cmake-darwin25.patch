@@ -1,0 +1,11 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -117,6 +117,8 @@ endif()
+
+ # OS Specific dependencies
+ if(APPLE AND CMAKE_SYSTEM_VERSION VERSION_LESS "25.0.0")
+ 	find_library(AGL_LIBRARY AGL REQUIRED)
+ 	list(APPEND LIBRARIES ${AGL_LIBRARY})
++elseif(APPLE)
++	# Darwin >= 25 (macOS 16+): AGL removed; OpenGL framework is sufficient
+ elseif(NOT WIN32)
