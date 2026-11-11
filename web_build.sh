@@ -11,27 +11,31 @@ rm -rf "$BUILD_DIR"
 emcmake cmake -B "$BUILD_DIR" -G Ninja -DCMAKE_BUILD_TYPE=MinSizeRel "$SCRIPT_DIR"
 cmake --build "$BUILD_DIR"
 
-# Deploy artifacts to Hugo module
-echo "Deploying to $MODULE_STATIC..."
-cp "$BUILD_DIR/ocean-gestalt.js" \
-   "$BUILD_DIR/ocean-gestalt.wasm" \
-   "$BUILD_DIR/ocean-gestalt.data" \
-   "$BUILD_DIR/keypress.js" \
-   "$BUILD_DIR/manifest.json" \
-   "$BUILD_DIR/favicon.ico" \
-   "$BUILD_DIR/apple-touch-icon.png" \
-   "$BUILD_DIR/github-mark-white.png" \
-   "$BUILD_DIR/thumbnail.jpg" \
-   "$MODULE_STATIC/"
-cp "$SCRIPT_DIR/data/config/uniforms_web.json" "$MODULE_STATIC/"
+if [ -d "$MODULE_DIR" ]; then
+  # Deploy artifacts to Hugo module
+  echo "Deploying to $MODULE_STATIC..."
+  cp "$BUILD_DIR/ocean-gestalt.js" \
+     "$BUILD_DIR/ocean-gestalt.wasm" \
+     "$BUILD_DIR/ocean-gestalt.data" \
+     "$BUILD_DIR/keypress.js" \
+     "$BUILD_DIR/manifest.json" \
+     "$BUILD_DIR/favicon.ico" \
+     "$BUILD_DIR/apple-touch-icon.png" \
+     "$BUILD_DIR/github-mark-white.png" \
+     "$BUILD_DIR/thumbnail.jpg" \
+     "$MODULE_STATIC/"
+  cp "$SCRIPT_DIR/data/config/uniforms_web.json" "$MODULE_STATIC/"
 
-git -C "$MODULE_DIR" add static/ocean-gestalt/
+  git -C "$MODULE_DIR" add static/ocean-gestalt/
 
-echo ""
-echo "Staged changes in ocean-gestalt-module. Suggested commit message:"
-echo ""
-echo "  Update WASM artifacts $(date +%Y-%m-%d)"
-echo ""
+  echo ""
+  echo "Staged changes in ocean-gestalt-module. Suggested commit message:"
+  echo ""
+  echo "  Update WASM artifacts $(date +%Y-%m-%d)"
+  echo ""
+else
+  echo "Skipping deploy: $MODULE_DIR not found (set OCEAN_MODULE_DIR to enable)"
+fi
 
 # Serve locally for quick testing (hugo server is needed for template testing)
 cd "$BUILD_DIR"

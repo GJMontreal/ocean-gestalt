@@ -2,6 +2,7 @@
 
 #include "IUniformStore.hpp"
 #include <cmath>
+#include <functional>
 
 class buoy;
 

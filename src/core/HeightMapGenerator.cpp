@@ -1,6 +1,7 @@
 // #define STB_IMAGE_WRITE_IMPLEMENTATION
 
 #include "HeightMapGenerator.hpp"
+#include <algorithm>
 #include <glm/glm.hpp>
 #include "stb_image_write.h"
 

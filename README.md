@@ -30,12 +30,12 @@ It's a bit of ocean you can fit in your pocket.
 
 **Running locally (WebGL build)**
 
-Requires [emsdk](https://emscripten.org/docs/getting_started/downloads.html). Activate it before building:
+Requires [emsdk](https://emscripten.org/docs/getting_started/downloads.html) and a `python` on the PATH for the local server. The repo pins the version in `.python-version`, so with pyenv run `pyenv install` once from the repo root. Activate emsdk before building:
 ```
-source ~/emsdk/emsdk_env.sh
+source <path-to-emsdk>/emsdk_env.sh
 ./web_build.sh
 ```
-The script builds, deploys artifacts to the Hugo module, stages the changed files, and prints a suggested commit message. The module path defaults to `../web/ocean-gestalt-module` relative to this repo; override it with the `OCEAN_MODULE_DIR` environment variable if your layout differs. It then serves on `http://localhost:8000` for quick standalone testing.
+The script builds, deploys artifacts to the Hugo module, stages the changed files, and prints a suggested commit message. The module path defaults to `<path-to-repos>/web/ocean-gestalt-module`, a sibling of this repo; override it with `OCEAN_MODULE_DIR`. If the directory does not exist, the deploy step is skipped. It then serves on `http://localhost:8000` for quick standalone testing.
 
 To test through Hugo (needed for template rendering):
 ```
@@ -64,6 +64,11 @@ The Hugo project uses a local `replace` directive in `go.mod` pointing at `../oc
 =======================
 
 **Running locally (native build)**
+
+```
+git clone <repo>
+git submodule update --init --recursive
+```
 
 Build:
 ```

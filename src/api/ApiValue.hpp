@@ -1,7 +1,10 @@
 #pragma once
 
-#include <variant>
 #include <map>
+#include <string>
+#include <unordered_map>
+#include <variant>
+#include <vector>
 
 using ApiValue = std::
     variant<bool, int, float, std::vector<float>>;

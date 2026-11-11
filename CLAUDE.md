@@ -13,7 +13,7 @@ cmake --build build
 
 ### WebGL / Emscripten
 ```bash
-source ~/emsdk/emsdk_env.sh
+source <path-to-emsdk>/emsdk_env.sh
 ./web_build.sh   # cleans build_emscripten/, builds, and serves on localhost:8000
 ```
 The web build uses `-DCMAKE_BUILD_TYPE=MinSizeRel`. Output lands in `build_emscripten/`.

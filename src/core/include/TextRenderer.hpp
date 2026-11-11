@@ -7,6 +7,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 class ShaderProgram;
 struct TextVertex{

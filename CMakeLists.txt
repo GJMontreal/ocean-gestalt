@@ -8,11 +8,8 @@ enable_testing()
 
 add_subdirectory(src/core)
 
-# We need to come up with a better way to specify this path
 if (EMSCRIPTEN)
-  target_include_directories(app-core BEFORE PRIVATE
-  "/Users/gjones/emsdk/upstream/emscripten/cache/ports/contrib.glfw3/include"
-  )
+  target_compile_options(app-core PRIVATE "--use-port=contrib.glfw3")
 endif()
 
 add_subdirectory(src/api)
