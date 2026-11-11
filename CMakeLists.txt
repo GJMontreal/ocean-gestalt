@@ -1,7 +1,7 @@
 # Projects Settings
 cmake_minimum_required (VERSION 3.5...4.0)
 cmake_policy(VERSION 4.0)
-project (ocean-gestalt)
+project (ocean-gestalt VERSION 0.1.0)
 
 enable_testing()
 # cspell: disable
